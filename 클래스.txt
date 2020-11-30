@@ -1,0 +1,22 @@
+필요한것 생각해보기
+
+
+(Wrapper) 		
+class	GeneralObj : Actor
+{
+	Func :
+	Interaction(ButtonInput) 	// 유저랑, 에임 갖다대고 버튼 누르는 형식으로
+	Hovering() 		// 에임 갖다대면 나오는 UI 출력
+	...
+}
+
+class	ItemBase : GeneralObj 	// 아이템 베이스
+{
+	Func:
+	Drop(~)
+	Loot(~)
+	Interaction(ButtonInput) 
+	Hovering() 		// 아이템 관련된 기본형태들을 구현
+	...
+}
+
