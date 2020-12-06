@@ -1,5 +1,6 @@
 필요한것 생각해보기
 
+이름들은 전부 가칭
 
 (Wrapper) 		
 class	GeneralObj : Actor
@@ -50,24 +51,45 @@ class	EquipModBase : ItemBase		// 장비 모드 ( 장착물 ) 베이스
 	ModData				// 인벤토리쪽이나 그런곳에서 쓸 원본 데이터 ( 복사 X )
 }
 
+아이템은 ItemBase 나 하위 클래스 BP 따는것으로 하나씩 구현?
 
+---------------------------------------------------------------
 
+class	MissionTarget : GeneralObj 		// 비동적 타겟
+{
+	Func:
+	Interaction(ButtonInput) override	// 미션 목표에 대한 상호작용 ( 여러 메인, 서브 미션 들의 베이스 )
+	Hovering() override		// 
+}
 
+---------------------------------------------------------------
 
+class	CharacterBase : Character
+{
+	Func:
+	생사관련
+	HP관련
+	Data:
+	HP
+	MP
+}
 
-
-
-
-
-
-class	PlayerCharacter : Character
+class	PlayerCharacter : CharacterBase 
 {
 	Func:
 	Data:
 }
 	
 class	EnemyCharacter
+{
+}
 
-clas
+핑 시스템 -> 어디에? PlayerController?
 
-아이템은 ItemBase 나 하위 클래스 BP 따는것으로 하나씩 구현?
+class	MPlayerController : PlayerController
+{
+	Func:
+	Ping(Obj,Button) -> 여기에 하는게 맞는가 ? // 리플렉션 사용?
+	
+	...
+}
