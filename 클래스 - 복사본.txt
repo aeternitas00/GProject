@@ -1,0 +1,95 @@
+필요한것 생각해보기
+
+이름들은 전부 가칭
+
+(Wrapper) 		
+class	GeneralObj : Actor
+{
+	Func :
+	Interaction(ButtonInput) 		// 유저랑, 에임 갖다대고 버튼 누르는 형식으로 , 인터페이스화??
+	Hovering() 			// 에임 갖다대면 나오는 UI 출력
+	...
+}
+
+class	ItemBase : GeneralObj 		// 아이템 베이스 ( 땅바닥에 있는 것들, 인벤토리랑 별개로 )
+{
+	Func:
+	Drop(~)
+	Loot(~)
+	Interaction(ButtonInput) 
+	Hovering() 			// 아이템 관련된 기본형태들을 구현
+	...
+
+	Data:
+	bIsStackable
+	int CurrentStack
+	int MaxStack			// 여기에 두는것이 맞나?
+	enum InventoryType		// 인벤토리 들어갈 때의 타입
+	enum Rarity			// 희귀도 or 등급
+
+}
+
+class	AmmoBase : ItemBase		// 탄약 계열 베이스
+{
+	Func:
+	Interaction(ButtonInput) override	// 모두 줍기, 개수 정해 줍기
+	Hovering() override		// 탄약 아이템에 에임 갖다대면 나올 UI 지정 >> 현재 가진거 중에 호환되는 장비 표시 등등
+}
+
+class	EquipmentBase : ItemBase		// 장비 계열 베이스
+{
+	Func:
+	Interaction(ButtonInput) override	,
+	Hovering() override		// 장비 아이템에 에임 갖다대면 나올 UI 지정 >> 능력치, 등급 등등
+	Data:
+	EquipData			// 인벤토리쪽이나 그런곳에서 쓸 원본 데이터 ( 복사 X )
+}
+
+class	EquipModBase : ItemBase		// 장비 모드 ( 장착물 ) 베이스
+{
+	Data:
+	ModData				// 인벤토리쪽이나 그런곳에서 쓸 원본 데이터 ( 복사 X )
+}
+
+아이템은 ItemBase 나 하위 클래스 BP 따는것으로 하나씩 구현?
+
+---------------------------------------------------------------
+
+class	MissionTarget : GeneralObj 		// 비동적 타겟
+{
+	Func:
+	Interaction(ButtonInput) override	// 미션 목표에 대한 상호작용 ( 여러 메인, 서브 미션 들의 베이스 )
+	Hovering() override		// 
+}
+
+---------------------------------------------------------------
+
+class	CharacterBase : Character
+{
+	Func:
+	생사관련
+	HP관련
+	Data:
+	HP
+	MP
+}
+
+class	PlayerCharacter : CharacterBase 
+{
+	Func:
+	Data:
+}
+	
+class	EnemyCharacter
+{
+}
+
+핑 시스템 -> 어디에? PlayerController?
+
+class	MPlayerController : PlayerController
+{
+	Func:
+	Ping(Obj,Button) -> 여기에 하는게 맞는가 ? // 리플렉션 사용?
+	
+	...
+}
