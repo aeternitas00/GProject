@@ -36,6 +36,9 @@ public:
 	void OnLeftShiftPressed();
 	void OnLeftShiftReleased();
 
+	void OnRClickPressed();
+	void OnRClickReleased();
+
 	void OnMoveForward(const float Value);
 	void OnMoveRight(const float Value);
 
@@ -53,5 +56,11 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	bool bUsingOptic;
+
+	FVector StaticCameraDistance;
+	FVector CameraDest;
 };
 
