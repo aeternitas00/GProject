@@ -34,6 +34,10 @@ AGProjectCharacter::AGProjectCharacter()
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
+
+	StaticCameraDistance = FVector::XAxisVector * -800.0f;
+	StaticCameraDistance = StaticCameraDistance.RotateAngleAxis(60, FVector::YAxisVector);
+
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
 	// Create a camera...
@@ -86,6 +90,28 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
+
+		// Camera Movement
+
+		if (bUsingOptic)
+		{
+			CameraDest = CursorToWorld->GetComponentLocation() - TopDownCameraComponent->GetComponentLocation() + StaticCameraDistance;
+			CameraDest.Z = 0;
+
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TopDownCameraComponent->GetRelativeLocation().ToString());
+
+			CameraDest = CameraDest.RotateAngleAxis(-60, FVector::YAxisVector);
+
+			// 이곳에 거리제한 추가
+
+			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+		}
+
+		FVector CameraDist = CameraDest - TopDownCameraComponent->GetRelativeLocation();
+		TopDownCameraComponent->AddRelativeLocation(CameraDist / 10);
+
 	}
 }
 
@@ -96,8 +122,8 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &AGProjectCharacter::OnSpacePressed);
 	PlayerInputComponent->BindAction("Space", IE_Released, this, &AGProjectCharacter::OnSpaceReleased);
 
-	//PlayerInputComponent->BindAction("LClick", IE_Pressed, this, &AGProjectCharacter::OnLeftClickPressed);
-	//PlayerInputComponent->BindAction("LClick", IE_Released, this, &AGProjectCharacter::OnLeftClickReleased);
+	PlayerInputComponent->BindAction("RClick", IE_Pressed, this, &AGProjectCharacter::OnRClickPressed);
+	PlayerInputComponent->BindAction("RClick", IE_Released, this, &AGProjectCharacter::OnRClickReleased);
 
 	PlayerInputComponent->BindAction("LShift", IE_Pressed, this, &AGProjectCharacter::OnLeftShiftPressed);
 	PlayerInputComponent->BindAction("LShift", IE_Released, this, &AGProjectCharacter::OnLeftShiftReleased);
@@ -136,6 +162,28 @@ void AGProjectCharacter::OnLeftShiftReleased()
 
 	GetWorldTimerManager().ClearTimer(LShiftTimer);
 	Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed /= 3.0f;
+}
+
+void AGProjectCharacter::OnRClickPressed()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("RClick"));
+	bUsingOptic=true;
+
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, StaticCameraDistance.ToString());
+
+	//StaticCameraDistance = TopDownCameraComponent->GetComponentLocation()-GetActorLocation();
+
+	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, StaticCameraDistance.ToString());
+
+}
+
+void AGProjectCharacter::OnRClickReleased()
+{	
+	bUsingOptic=false;
+	CameraDest=FVector::ZeroVector;
+	//TopDownCameraComponent->SetRelativeLocation(FVector::ZeroVector);
 }
 
 
