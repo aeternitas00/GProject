@@ -62,5 +62,6 @@ private:
 
 	FVector StaticCameraDistance;
 	FVector CameraDest;
+	FVector AimedPosition;
 };
 

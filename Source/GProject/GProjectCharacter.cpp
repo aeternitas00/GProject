@@ -35,7 +35,7 @@ AGProjectCharacter::AGProjectCharacter()
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 
-	StaticCameraDistance = FVector::XAxisVector * -800.0f;
+	StaticCameraDistance = FVector::XAxisVector * CameraBoom->TargetArmLength * -1.0f;
 	StaticCameraDistance = StaticCameraDistance.RotateAngleAxis(60, FVector::YAxisVector);
 
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
@@ -74,17 +74,23 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 				FHitResult HitResult;
 				FCollisionQueryParams Params(NAME_None, FCollisionQueryParams::GetUnknownStatId());
 				FVector StartLocation = TopDownCameraComponent->GetComponentLocation();
-				FVector EndLocation = TopDownCameraComponent->GetComponentRotation().Vector() * 2000.0f;
+				FVector TraceVector = TopDownCameraComponent->GetComponentRotation().Vector();
+				FVector EndLocation = TraceVector * 2000.0f;
+				
 				Params.AddIgnoredActor(this);
-				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
+				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_GameTraceChannel1, Params);
+
 				FQuat SurfaceRotation = HitResult.ImpactNormal.ToOrientationRotator().Quaternion();
 				CursorToWorld->SetWorldLocationAndRotation(HitResult.Location, SurfaceRotation);
+				AimedPosition = CursorToWorld->GetComponentLocation();
+				//if(AimedPosition.Z!= +)
 			}
 		}
 		else if (APlayerController* PC = Cast<APlayerController>(GetController()))
 		{
 			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			//PC->GetHitResultUnderCursor(ECC_Visible, true, TraceHitResult);
+			PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, TraceHitResult);
 			FVector CursorFV = TraceHitResult.ImpactNormal;
 			FRotator CursorR = CursorFV.Rotation();
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
@@ -94,19 +100,27 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 		// Camera Movement
 
 		if (bUsingOptic)
-		{
-			CameraDest = CursorToWorld->GetComponentLocation() - TopDownCameraComponent->GetComponentLocation() + StaticCameraDistance;
-			CameraDest.Z = 0;
+		{			
+			//CameraDest = CursorToWorld->GetComponentLocation() - TopDownCameraComponent->GetComponentLocation() + StaticCameraDistance;
+			//CameraDest.Z = 0;
 
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+			//if (CameraDest.SizeSquared() >= 300.0f)
+			//	CameraDest = CameraDest.GetSafeNormal() * 300.0f;
 
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TopDownCameraComponent->GetRelativeLocation().ToString());
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TopDownCameraComponent->GetRelativeLocation().ToString());
 
-			CameraDest = CameraDest.RotateAngleAxis(-60, FVector::YAxisVector);
+			//CameraDest = CameraDest.RotateAngleAxis(-60, FVector::YAxisVector);
 
 			// 이곳에 거리제한 추가
 
-			GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
+
+			CameraDest = FVector::ZeroVector;
+
+
+
+
 		}
 
 		FVector CameraDist = CameraDest - TopDownCameraComponent->GetRelativeLocation();
