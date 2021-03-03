@@ -106,7 +106,6 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 		FVector2D Res;
 		GEngine->GameViewport->GetViewportSize(Res);
 
-		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, Res.ToString());////
 			
 		CameraBoom->AddRelativeLocation((CameraDest - CameraBoom->GetRelativeLocation()) / CameraSmoothness);
 	}
