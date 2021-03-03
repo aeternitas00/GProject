@@ -19,10 +19,11 @@ void AGProjectPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	// keep updating the destination every tick while desired
-	if (bMoveToMouseCursor)
+	/*if (bMoveToMouseCursor)
 	{
 		MoveToMouseCursor();
-	}
+	}*/
+	
 }
 
 void AGProjectPlayerController::SetupInputComponent()
@@ -38,6 +39,7 @@ void AGProjectPlayerController::SetupInputComponent()
 	InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AGProjectPlayerController::MoveToTouchLocation);
 
 	InputComponent->BindAction("ResetVR", IE_Pressed, this, &AGProjectPlayerController::OnResetVR);
+
 }
 
 void AGProjectPlayerController::OnResetVR()

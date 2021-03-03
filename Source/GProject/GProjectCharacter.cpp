@@ -40,6 +40,7 @@ AGProjectCharacter::AGProjectCharacter()
 
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
+
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
@@ -56,6 +57,12 @@ AGProjectCharacter::AGProjectCharacter()
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
+	// config?
+	CameraSmoothness = 25.0f;
+	CameraSpeed = 10.0f; //viewport aspect ratio?
+	bUsingOptic = false;
+	bHasCameraDestUpdated = false;
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -67,65 +74,41 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 
 	if (CursorToWorld != nullptr)
 	{
-		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		{
-			if (UWorld* World = GetWorld())
-			{
-				FHitResult HitResult;
-				FCollisionQueryParams Params(NAME_None, FCollisionQueryParams::GetUnknownStatId());
-				FVector StartLocation = TopDownCameraComponent->GetComponentLocation();
-				FVector TraceVector = TopDownCameraComponent->GetComponentRotation().Vector();
-				FVector EndLocation = TraceVector * 2000.0f;
-				
-				Params.AddIgnoredActor(this);
-				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_GameTraceChannel1, Params);
-
-				FQuat SurfaceRotation = HitResult.ImpactNormal.ToOrientationRotator().Quaternion();
-				CursorToWorld->SetWorldLocationAndRotation(HitResult.Location, SurfaceRotation);
-				AimedPosition = CursorToWorld->GetComponentLocation();
-				//if(AimedPosition.Z!= +)
-			}
-		}
-		else if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
 		{
 			FHitResult TraceHitResult;
-			//PC->GetHitResultUnderCursor(ECC_Visible, true, TraceHitResult);
-			PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
+
+			PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, TraceHitResult); //def trace channel name?
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
+
+			// Camera Movement
+			if (bUsingOptic)
+			{
+					// Get resolution and get ratio of current pos
+
+					//CameraDest.X *= DEFMAXOFVIEW * 16 ( 16:9 );
+					//CameraDest.Y *= DEFMAXOFVIEW * 9 ( 16:9 );
+
+			
+					CameraDest = CursorToWorld->GetRelativeLocation();
+					CameraDest.Z = 0;
+
+					AimedPosition = CameraDest;
+
+				
+			}
+			else
+			{
+				
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, CursorToWorld->GetRelativeLocation().ToString());////
+			}
 		}
+		FVector2D Res;
+		GEngine->GameViewport->GetViewportSize(Res);
 
-		// Camera Movement
-
-		if (bUsingOptic)
-		{			
-			//CameraDest = CursorToWorld->GetComponentLocation() - TopDownCameraComponent->GetComponentLocation() + StaticCameraDistance;
-			//CameraDest.Z = 0;
-
-			//if (CameraDest.SizeSquared() >= 300.0f)
-			//	CameraDest = CameraDest.GetSafeNormal() * 300.0f;
-
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, TopDownCameraComponent->GetRelativeLocation().ToString());
-
-			//CameraDest = CameraDest.RotateAngleAxis(-60, FVector::YAxisVector);
-
-			// 이곳에 거리제한 추가
-
-			//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, CameraDest.ToString());
-
-			CameraDest = FVector::ZeroVector;
-
-
-
-
-		}
-
-		FVector CameraDist = CameraDest - TopDownCameraComponent->GetRelativeLocation();
-		TopDownCameraComponent->AddRelativeLocation(CameraDist / 10);
-
+		GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, Res.ToString());////
+			
+		CameraBoom->AddRelativeLocation((CameraDest - CameraBoom->GetRelativeLocation()) / CameraSmoothness);
 	}
 }
 
@@ -145,11 +128,20 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGProjectCharacter::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGProjectCharacter::OnMoveRight);
 
+	PlayerInputComponent->BindAxis("MouseX", this, &AGProjectCharacter::OnMouseX);
+	PlayerInputComponent->BindAxis("MouseY", this, &AGProjectCharacter::OnMouseY);
+
 }
 
 void AGProjectCharacter::CharacterDodge()
 {
 	GEngine->AddOnScreenDebugMessage(-1,2.0f,FColor::Red,TEXT("Dodge"));
+}
+
+void AGProjectCharacter::OnSightChanged()
+{
+
+	
 }
 
 void AGProjectCharacter::OnSpacePressed()
@@ -180,16 +172,7 @@ void AGProjectCharacter::OnLeftShiftReleased()
 
 void AGProjectCharacter::OnRClickPressed()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("RClick"));
 	bUsingOptic=true;
-
-
-
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, StaticCameraDistance.ToString());
-
-	//StaticCameraDistance = TopDownCameraComponent->GetComponentLocation()-GetActorLocation();
-
-	//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, StaticCameraDistance.ToString());
 
 }
 
@@ -211,4 +194,22 @@ void AGProjectCharacter::OnMoveRight(const float Value)
 {
 	if (Value != 0)
 		AddMovementInput(FVector::RightVector, Value);
+}
+
+void AGProjectCharacter::OnMouseX(const float Axis)
+{
+	/*if (bHasCameraDestUpdated)
+	{
+		CameraDest.Y += Axis * CameraSpeed;
+		bHasCameraDestUpdated = false;
+	}*/
+}
+
+void AGProjectCharacter::OnMouseY(const float Axis)
+{
+	/*if (bHasCameraDestUpdated)
+	{
+		CameraDest.X += Axis * CameraSpeed;
+		bHasCameraDestUpdated = false;
+	}*/
 }
