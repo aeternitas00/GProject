@@ -34,12 +34,7 @@ AGProjectCharacter::AGProjectCharacter()
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-
-	StaticCameraDistance = FVector::XAxisVector * CameraBoom->TargetArmLength * -1.0f;
-	StaticCameraDistance = StaticCameraDistance.RotateAngleAxis(60, FVector::YAxisVector);
-
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -59,7 +54,7 @@ AGProjectCharacter::AGProjectCharacter()
 
 	// config?
 	CameraSmoothness = 25.0f;
-	CameraSpeed = 10.0f; //viewport aspect ratio?
+
 	bUsingOptic = false;
 	bHasCameraDestUpdated = false;
 
@@ -78,36 +73,48 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 		{
 			FHitResult TraceHitResult;
 
-			PC->GetHitResultUnderCursor(ECC_GameTraceChannel1, true, TraceHitResult); //def trace channel name?
+			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult); //def trace channel name?
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
 
 			// Camera Movement
 			if (bUsingOptic)
 			{
-					// Get resolution and get ratio of current pos
+				const static float DEFMAXOFVIEW_X = 533.3f;
+				const static float DEFMAXOFVIEW_Y = 300.0f;
 
-					//CameraDest.X *= DEFMAXOFVIEW * 16 ( 16:9 );
-					//CameraDest.Y *= DEFMAXOFVIEW * 9 ( 16:9 );
+				FVector2D Res;
+				FVector2D MousePos;
 
+				GEngine->GameViewport->GetViewportSize(Res);
+
+				// Get resolution and get ratio of current pos
 			
-					CameraDest = CursorToWorld->GetRelativeLocation();
-					CameraDest.Z = 0;
 
-					AimedPosition = CameraDest;
+				PC->GetMousePosition(MousePos.X, MousePos.Y);
 
-				
+				MousePos.X = 2 * (MousePos.X - Res.X/2) / Res.X;
+				MousePos.Y = 2 * (MousePos.Y - Res.Y/2) / Res.Y;
+	
+				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, MousePos.ToString());
+
+				//CameraDest = CursorToWorld->GetRelativeLocation();
+				CameraDest.Y = MousePos.X * DEFMAXOFVIEW_X;
+				CameraDest.X = -MousePos.Y * DEFMAXOFVIEW_Y;
+				CameraDest.Z = 0;
+
+				//AimedPosition = CameraDest;
+
+				CameraDest = CameraDest.RotateAngleAxis(-60,FVector::YAxisVector);
 			}
 			else
 			{
-				
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, CursorToWorld->GetRelativeLocation().ToString());////
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, CursorToWorld->GetRelativeLocation().ToString());////
 			}
 		}
-		FVector2D Res;
-		GEngine->GameViewport->GetViewportSize(Res);
 
+		FVector CameraDist = (CameraDest - TopDownCameraComponent->GetRelativeLocation()) / CameraSmoothness;
 			
-		CameraBoom->AddRelativeLocation((CameraDest - CameraBoom->GetRelativeLocation()) / CameraSmoothness);
+		TopDownCameraComponent->AddRelativeLocation(CameraDist);
 	}
 }
 
@@ -127,8 +134,8 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGProjectCharacter::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGProjectCharacter::OnMoveRight);
 
-	PlayerInputComponent->BindAxis("MouseX", this, &AGProjectCharacter::OnMouseX);
-	PlayerInputComponent->BindAxis("MouseY", this, &AGProjectCharacter::OnMouseY);
+	//PlayerInputComponent->BindAxis("MouseX", this, &AGProjectCharacter::OnMouseX);
+	//PlayerInputComponent->BindAxis("MouseY", this, &AGProjectCharacter::OnMouseY);
 
 }
 
@@ -195,20 +202,20 @@ void AGProjectCharacter::OnMoveRight(const float Value)
 		AddMovementInput(FVector::RightVector, Value);
 }
 
-void AGProjectCharacter::OnMouseX(const float Axis)
-{
-	/*if (bHasCameraDestUpdated)
-	{
-		CameraDest.Y += Axis * CameraSpeed;
-		bHasCameraDestUpdated = false;
-	}*/
-}
-
-void AGProjectCharacter::OnMouseY(const float Axis)
-{
-	/*if (bHasCameraDestUpdated)
-	{
-		CameraDest.X += Axis * CameraSpeed;
-		bHasCameraDestUpdated = false;
-	}*/
-}
+//void AGProjectCharacter::OnMouseX(const float Axis)
+//{
+//	/*if (bHasCameraDestUpdated)
+//	{
+//		CameraDest.Y += Axis * CameraSpeed;
+//		bHasCameraDestUpdated = false;
+//	}*/
+//}
+//
+//void AGProjectCharacter::OnMouseY(const float Axis)
+//{
+//	/*if (bHasCameraDestUpdated)
+//	{
+//		CameraDest.X += Axis * CameraSpeed;
+//		bHasCameraDestUpdated = false;
+//	}*/
+//}

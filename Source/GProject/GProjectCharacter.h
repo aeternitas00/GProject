@@ -44,8 +44,8 @@ public:
 	void OnMoveForward(const float Value);
 	void OnMoveRight(const float Value);
 
-	void OnMouseX(const float Axis);
-	void OnMouseY(const float Axis);
+	//void OnMouseX(const float Axis);
+	//void OnMouseY(const float Axis);
 	
 
 	//bool bPressedSpace;
@@ -68,10 +68,8 @@ private:
 
 	bool bHasCameraDestUpdated;
 
-	FVector StaticCameraDistance;
 	FVector CameraDest;
-	float CameraSpeed;
 	float CameraSmoothness;
-	FVector AimedPosition;
+	//FVector AimedPosition;
 };
 
