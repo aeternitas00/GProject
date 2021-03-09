@@ -25,3 +25,16 @@ void AGPItem::Tick(float DeltaTime)
 
 }
 
+void AGPItem::Use()
+{
+	
+}
+
+void AGPItem::Drop()
+{
+
+}
+void AGPItem::Loot()
+{
+
+}

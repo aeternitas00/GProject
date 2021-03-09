@@ -44,33 +44,35 @@ void AGProjectPlayerController::SetupInputComponent()
 
 void AGProjectPlayerController::OnResetVR()
 {
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
+	//Unuse HMD 
+	//UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
 void AGProjectPlayerController::MoveToMouseCursor()
 {
-	if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	{
-		if (AGProjectCharacter* MyPawn = Cast<AGProjectCharacter>(GetPawn()))
-		{
-			if (MyPawn->GetCursorToWorld())
-			{
-				UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-			}
-		}
-	}
-	else
-	{
-		// Trace to see what is under the mouse cursor
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	//Unuse HMD
+	//if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
+	//{
+	//	if (AGProjectCharacter* MyPawn = Cast<AGProjectCharacter>(GetPawn()))
+	//	{
+	//		if (MyPawn->GetCursorToWorld())
+	//		{
+	//			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	// Trace to see what is under the mouse cursor
+	//	FHitResult Hit;
+	//	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 
-		if (Hit.bBlockingHit)
-		{
-			// We hit something, move there
-			SetNewMoveDestination(Hit.ImpactPoint);
-		}
-	}
+	//	if (Hit.bBlockingHit)
+	//	{
+	//		// We hit something, move there
+	//		SetNewMoveDestination(Hit.ImpactPoint);
+	//	}
+	//}
 }
 
 void AGProjectPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)

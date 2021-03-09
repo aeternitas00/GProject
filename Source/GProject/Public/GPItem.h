@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "GPItem.generated.h"
 #include "Items/GPItemData.h"
+#include "GPItem.generated.h"
+
 
 UCLASS()
 class GPROJECT_API AGPItem : public AActor
@@ -30,9 +31,8 @@ public:
 	virtual void Drop(); //인벤토리에서 다시 땅으로. 
 	
 protected:
-	UGPItemData Data;
+	UPROPERTY()
+	UGPItemData* Data;
 
 	int Price;
-
-
 };
