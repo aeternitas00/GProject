@@ -8,7 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
+#include "ActionComponent.h"
+#include "GPInteractionComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
 
@@ -16,6 +17,9 @@ AGProjectCharacter::AGProjectCharacter()
 {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	ActionComponent = CreateDefaultSubobject<UActionComponent>("ActionComp");
+	InteractionComponent = CreateDefaultSubobject<UGPInteractionComponent>("InteractionComp");
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -88,7 +92,6 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 				GEngine->GameViewport->GetViewportSize(Res);
 
 				// Get resolution and get ratio of current pos
-			
 
 				PC->GetMousePosition(MousePos.X, MousePos.Y);
 
@@ -97,7 +100,6 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 	
 				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, MousePos.ToString());
 
-				//CameraDest = CursorToWorld->GetRelativeLocation();
 				CameraDest.Y = MousePos.X * DEFMAXOFVIEW_X;
 				CameraDest.X = -MousePos.Y * DEFMAXOFVIEW_Y;
 				CameraDest.Z = 0;
@@ -122,6 +124,7 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &AGProjectCharacter::OnSpacePressed);
 	PlayerInputComponent->BindAction("Space", IE_Released, this, &AGProjectCharacter::OnSpaceReleased);
 
@@ -130,6 +133,12 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	PlayerInputComponent->BindAction("LShift", IE_Pressed, this, &AGProjectCharacter::OnLeftShiftPressed);
 	PlayerInputComponent->BindAction("LShift", IE_Released, this, &AGProjectCharacter::OnLeftShiftReleased);
+
+	FInputActionBinding ActionBindQuickMelee("QuickMelee", IE_Pressed);
+	ActionBindQuickMelee.ActionDelegate.GetDelegateForManualSet().BindLambda([this](){ActionComponent->StartActionByName(this, "QuickMelee"); });
+
+	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AGProjectCharacter::OnInteractionPressed);
+	PlayerInputComponent->BindAction("Interaction", IE_Released, this, &AGProjectCharacter::OnInteractionReleased);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGProjectCharacter::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGProjectCharacter::OnMoveRight);
@@ -161,32 +170,45 @@ void AGProjectCharacter::OnSpaceReleased()
 	StopJumping();
 }
 
+void AGProjectCharacter::OnInteractionPressed()
+{
+	//if (InteractionComp)
+	//{
+	//	InteractionComp->PrimaryInteract();
+	//}
+}
+
+void AGProjectCharacter::OnInteractionReleased()
+{
+}
+
+
 void AGProjectCharacter::OnLeftShiftPressed()
 {
-	GetWorldTimerManager().SetTimer(LShiftTimer, 0.15f, false);
-	Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed *= 3.0f;
+	FTimerDelegate DodgeDelegate;
+	DodgeDelegate.BindLambda([this](){ ActionComponent->StartActionByName(this, "Sprint"); });
+	GetWorldTimerManager().SetTimer(LShiftTimer, DodgeDelegate, 0.15f, false);
 }
 
 void AGProjectCharacter::OnLeftShiftReleased()
 {
 	if (GetWorldTimerManager().IsTimerActive(LShiftTimer))
-		CharacterDodge();
+		ActionComponent->StartActionByName(this, "Dodge");
 
 	GetWorldTimerManager().ClearTimer(LShiftTimer);
-	Cast<UCharacterMovementComponent>(GetMovementComponent())->MaxWalkSpeed /= 3.0f;
+
+	ActionComponent->StopActionByName(this, "Sprint");
 }
 
 void AGProjectCharacter::OnRClickPressed()
 {
 	bUsingOptic=true;
-
 }
 
 void AGProjectCharacter::OnRClickReleased()
 {	
 	bUsingOptic=false;
 	CameraDest=FVector::ZeroVector;
-	//TopDownCameraComponent->SetRelativeLocation(FVector::ZeroVector);
 }
 
 

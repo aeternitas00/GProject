@@ -9,6 +9,6 @@ public class GProject : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", /*"HeadMountedDisplay",*/ 
-			"NavigationSystem", "AIModule", "GameplayTags"/*, "GameplayTasks", "OnlineSubsystem", "UMG"*/ });
+			"NavigationSystem", "AIModule", "GameplayTags", "GameplayTasks", "GameplayAbilities" /*,"OnlineSubsystem", "UMG"*/ });
     }
 }

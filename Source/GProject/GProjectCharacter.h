@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "GPCharacterBase.h"
 #include "GProjectCharacter.generated.h"
 
+class UActionComponent;
+class UGPInteractionComponent;
+
 UCLASS(Blueprintable)
-class AGProjectCharacter : public ACharacter
+class AGProjectCharacter : public AGPCharacterBase
 {
 	GENERATED_BODY()
 
@@ -33,6 +36,9 @@ public:
 
 	void OnSpacePressed();
 	void OnSpaceReleased();
+	
+	void OnInteractionPressed();
+	void OnInteractionReleased();	
 
 	FTimerHandle LShiftTimer;
 	void OnLeftShiftPressed();
@@ -70,6 +76,12 @@ private:
 
 	FVector CameraDest;
 	float CameraSmoothness;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UActionComponent* ActionComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UGPInteractionComponent* InteractionComponent;
 	//FVector AimedPosition;
 };
 

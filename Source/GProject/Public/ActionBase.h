@@ -27,7 +27,7 @@ public:
 
 /// 액션 : 캐릭터가 취할 수 있는 모든 행동들
 /// ex) 달리기, 장비의 사용, 상호 작용 등등
-UCLASS()
+UCLASS(Blueprintable)
 class GPROJECT_API UActionBase : public UObject
 {
 	GENERATED_BODY()
