@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "GProject.h"
 #include "UObject/NoExportTypes.h"
 #include "ActionComponent.h"
 #include "GameplayTagContainer.h"

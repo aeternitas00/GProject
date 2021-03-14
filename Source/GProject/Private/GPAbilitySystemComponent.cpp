@@ -27,7 +27,7 @@ void UGPAbilitySystemComponent::GetActiveAbilitiesWithTags(const FGameplayTagCon
 
 int32 UGPAbilitySystemComponent::GetDefaultAbilityLevel() const
 {
-	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(OwnerActor);
+	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(GetOwnerActor());
 
 	if (OwningCharacter)
 	{

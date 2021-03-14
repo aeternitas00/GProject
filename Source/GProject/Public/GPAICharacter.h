@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "GProject.h"
 #include "GPCharacterBase.h"
 #include "GameFramework/Character.h"
 #include "GPAICharacter.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class GPROJECT_API AGPAICharacter : public AGPCharacterBase
 {
 	GENERATED_BODY()

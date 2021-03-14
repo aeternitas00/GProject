@@ -4,7 +4,7 @@
 #include "ActionComponent.h"
 #include "ActionBase.h"
 #include "Net/UnrealNetwork.h"
-#include "..\GProject.h"
+#include "GProject.h"
 #include "Engine/ActorChannel.h"
 
 DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_StartActionByName, STATGROUP_GPGAME);

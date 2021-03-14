@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "..\GProject.h"
+#include "GProject.h"
 #include "Abilities/GameplayAbilityTypes.h"
 #include "GPAbilityTypes.h"
 #include "GPTargetType.generated.h"

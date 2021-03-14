@@ -3,38 +3,23 @@
 
 #include "GPItem.h"
 
-// Sets default values
-AGPItem::AGPItem()
+bool UGPItem::IsConsumable() const
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	if (MaxCount <= 0)
+	{
+		return true;
+	}
+	return false;
 }
 
-// Called when the game starts or when spawned
-void AGPItem::BeginPlay()
+FString UGPItem::GetIdentifierString() const
 {
-	Super::BeginPlay();
-	
+	return GetPrimaryAssetId().ToString();
 }
 
-// Called every frame
-void AGPItem::Tick(float DeltaTime)
+FPrimaryAssetId UGPItem::GetPrimaryAssetId() const
 {
-	Super::Tick(DeltaTime);
-
-}
-
-void AGPItem::Use()
-{
-	
-}
-
-void AGPItem::Drop()
-{
-
-}
-void AGPItem::Loot()
-{
-
+	// This is a DataAsset and not a blueprint so we can just use the raw FName
+	// For blueprints you need to handle stripping the _C suffix
+	return FPrimaryAssetId(ItemType, GetFName());
 }

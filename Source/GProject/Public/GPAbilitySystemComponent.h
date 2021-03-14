@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "GProject.h"
 #include "AbilitySystemComponent.h"
 #include "GPAbilityTypes.h"
 #include "GPAbilitySystemComponent.generated.h"

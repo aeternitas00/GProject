@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "GProject.h"
 #include "Components/ActorComponent.h"
 #include "GPInteractionComponent.generated.h"
 
