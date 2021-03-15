@@ -3,11 +3,12 @@
 #pragma once
 
 #include "GProject.h"
-#include "GPTypes.h" // TODO : REMOVE THIS
+#include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "GameFramework/Character.h"
-//#include "UObject/ScriptInterface.h"
+#include "UObject/ScriptInterface.h"
+#include "GPInventoryInterface.h"
 #include "AbilitySystemInterface.h"
-#include "GPAbilitySystemComponent.h"
+#include "Component/GPAbilitySystemComponent.h"
 #include "GPAttributeSet.h"
 #include "GPCharacterBase.generated.h"
 
@@ -39,6 +40,9 @@ protected:
 	/** Fills in with ability specs, based on defaults and inventory */
 	void FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs);
 
+	/** Called when slotted items change, bound to delegate on interface */
+	void OnItemSlotChanged(FGPItemSlot ItemSlot, UGPItem* Item);
+	void RefreshSlottedGameplayAbilities();
 
 public:	
 	/** Returns current health, will be 0 if dead */
@@ -114,8 +118,12 @@ protected:
 	UGPAttributeSet* AttributeSet;
 
 	/** Cached pointer to the inventory source for this character, can be null */
-	//UPROPERTY()
-	//TScriptInterface<IGPInventoryInterface> InventorySource;
+	UPROPERTY()
+	TScriptInterface<IGPInventoryInterface> InventorySource;
+
+	/** Delegate handles */
+	FDelegateHandle InventoryUpdateHandle;
+	FDelegateHandle InventoryLoadedHandle;
 
 	// Friended to allow access to handle functions above
 	friend UGPAttributeSet;

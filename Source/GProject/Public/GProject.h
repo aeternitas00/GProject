@@ -5,7 +5,7 @@
 #include "EngineMinimal.h"
 #include "Engine/Engine.h"
 #include "Net/UnrealNetwork.h"
-#include "GPTypes.h"
+#include "Types/GPTypes.h"
 
 GPROJECT_API DECLARE_LOG_CATEGORY_EXTERN(LogGProject, Log, All);
 

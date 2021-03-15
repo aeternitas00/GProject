@@ -9,7 +9,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ActionComponent.h"
-#include "GPInteractionComponent.h"
+#include "Component/GPInteractionComponent.h"
 #include "Materials/Material.h"
 #include "Engine/World.h"
 

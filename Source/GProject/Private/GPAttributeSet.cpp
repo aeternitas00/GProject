@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GPAttributeSet.h"
-#include "GPAbilitySystemComponent.h"
+#include "Component/GPAbilitySystemComponent.h"
 #include "GPCharacterBase.h"
 #include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"

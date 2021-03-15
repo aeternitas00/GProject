@@ -3,7 +3,7 @@
 #pragma once
 
 #include "GProject.h"
-#include "GPTypes.h" // TODO : REMOVE THIS
+#include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
 #include "GPGameInstanceBase.generated.h"
 

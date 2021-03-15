@@ -2,9 +2,9 @@
 
 
 #include "GPCharacterBase.h"
-#include "GPItem.h"
+#include "Item/GPItem.h"
 #include "AbilitySystemGlobals.h"
-#include "GPGameplayAbility.h"
+#include "Ability/GPGameplayAbility.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -23,14 +23,14 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	//// Try setting the inventory source, this will fail for AI
-	//InventorySource = NewController;
+	// Try setting the inventory source, this will fail for AI
+	InventorySource = NewController;
 
-	//if (InventorySource)
-	//{
-	//	InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &ARPGCharacterBase::OnItemSlotChanged);
-	//	InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &ARPGCharacterBase::RefreshSlottedGameplayAbilities);
-	//}
+	if (InventorySource)
+	{
+		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
+		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
+	}
 
 	// Initialize our abilities
 	if (AbilitySystemComponent)
@@ -138,30 +138,45 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 	}
 
 	// Now potentially override with inventory
-	//if (InventorySource)
-	//{
-	//	const TMap<FGPItemSlot, UGPItem*>& SlottedItemMap = InventorySource->GetSlottedItemMap();
+	if (InventorySource)
+	{
+		const TMap<FGPItemSlot, UGPItem*>& SlottedItemMap = InventorySource->GetSlottedItemMap();
 
-	//	for (const TPair<FGPItemSlot, UGPItem*>& ItemPair : SlottedItemMap)
-	//	{
-	//		UGPItem* SlottedItem = ItemPair.Value;
+		for (const TPair<FGPItemSlot, UGPItem*>& ItemPair : SlottedItemMap)
+		{
+			UGPItem* SlottedItem = ItemPair.Value;
 
-	//		// Use the character level as default
-	//		int32 AbilityLevel = 1;//GetCharacterLevel();
+			// Use the character level as default
+			int32 AbilityLevel = 1;//GetCharacterLevel();
 
-	//		if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
-	//		{
-	//			// Override the ability level to use the data from the slotted item
-	//			AbilityLevel = SlottedItem->AbilityLevel;
-	//		}
+			if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
+			{
+				// Override the ability level to use the data from the slotted item
+				AbilityLevel = SlottedItem->AbilityLevel;
+			}
 
-	//		if (SlottedItem && SlottedItem->GrantedAbility)
-	//		{
-	//			// This will override anything from default
-	//			SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
-	//		}
-	//	}
-	//}
+			if (SlottedItem && SlottedItem->GrantedAbility)
+			{
+				// This will override anything from default
+				SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
+			}
+		}
+	}
+}
+
+void AGPCharacterBase::OnItemSlotChanged(FGPItemSlot ItemSlot, UGPItem* Item)
+{
+	RefreshSlottedGameplayAbilities();
+}
+
+void AGPCharacterBase::RefreshSlottedGameplayAbilities()
+{
+	if (bAbilitiesInitialized)
+	{
+		// Refresh any invalid abilities and adds new ones
+		RemoveSlottedGameplayAbilities(false);
+		AddSlottedGameplayAbilities();
+	}
 }
 
 void AGPCharacterBase::AddSlottedGameplayAbilities()
@@ -183,40 +198,40 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 
 void AGPCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 {
-	//TMap<FGPItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
+	TMap<FGPItemSlot, FGameplayAbilitySpec> SlottedAbilitySpecs;
 
-	//if (!bRemoveAll)
-	//{
-	//	// Fill in map so we can compare
-	//	FillSlottedAbilitySpecs(SlottedAbilitySpecs);
-	//}
+	if (!bRemoveAll)
+	{
+		// Fill in map so we can compare
+		FillSlottedAbilitySpecs(SlottedAbilitySpecs);
+	}
 
-	//for (TPair<FGPItemSlot, FGameplayAbilitySpecHandle>& ExistingPair : SlottedAbilities)
-	//{
-	//	FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(ExistingPair.Value);
-	//	bool bShouldRemove = bRemoveAll || !FoundSpec;
+	for (TPair<FGPItemSlot, FGameplayAbilitySpecHandle>& ExistingPair : SlottedAbilities)
+	{
+		FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(ExistingPair.Value);
+		bool bShouldRemove = bRemoveAll || !FoundSpec;
 
-	//	if (!bShouldRemove)
-	//	{
-	//		// Need to check desired ability specs, if we got here FoundSpec is valid
-	//		FGameplayAbilitySpec* DesiredSpec = SlottedAbilitySpecs.Find(ExistingPair.Key);
+		if (!bShouldRemove)
+		{
+			// Need to check desired ability specs, if we got here FoundSpec is valid
+			FGameplayAbilitySpec* DesiredSpec = SlottedAbilitySpecs.Find(ExistingPair.Key);
 
-	//		if (!DesiredSpec || DesiredSpec->Ability != FoundSpec->Ability || DesiredSpec->SourceObject != FoundSpec->SourceObject)
-	//		{
-	//			bShouldRemove = true;
-	//		}
-	//	}
+			if (!DesiredSpec || DesiredSpec->Ability != FoundSpec->Ability || DesiredSpec->SourceObject != FoundSpec->SourceObject)
+			{
+				bShouldRemove = true;
+			}
+		}
 
-	//	if (bShouldRemove)
-	//	{
-	//		if (FoundSpec)
-	//		{
-	//			// Need to remove registered ability
-	//			AbilitySystemComponent->ClearAbility(ExistingPair.Value);
-	//		}
+		if (bShouldRemove)
+		{
+			if (FoundSpec)
+			{
+				// Need to remove registered ability
+				AbilitySystemComponent->ClearAbility(ExistingPair.Value);
+			}
 
-	//		// Make sure handle is cleared even if ability wasn't found
-	//		ExistingPair.Value = FGameplayAbilitySpecHandle();
-	//	}
-	//}
+			// Make sure handle is cleared even if ability wasn't found
+			ExistingPair.Value = FGameplayAbilitySpecHandle();
+		}
+	}
 }
