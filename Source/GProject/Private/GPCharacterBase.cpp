@@ -25,9 +25,11 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 
 	// Try setting the inventory source, this will fail for AI
 	InventorySource = NewController;
+	GP_LOG(Warning, TEXT("PossessedBy Called"));
 
 	if (InventorySource)
 	{
+		GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
 		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
 		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
 	}
@@ -38,6 +40,32 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
 		AddSlottedGameplayAbilities();
 		//AddStartupGameplayAbilities();
+	}
+}
+
+void AGPCharacterBase::UnPossessed()
+{
+	// Unmap from inventory source
+	if (InventorySource && InventoryUpdateHandle.IsValid())
+	{
+		InventorySource->GetSlottedItemChangedDelegate().Remove(InventoryUpdateHandle);
+		InventoryUpdateHandle.Reset();
+
+		InventorySource->GetInventoryLoadedDelegate().Remove(InventoryLoadedHandle);
+		InventoryLoadedHandle.Reset();
+	}
+
+	InventorySource = nullptr;
+}
+
+void AGPCharacterBase::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	// Our controller changed, must update ActorInfo on AbilitySystemComponent
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->RefreshAbilityActorInfo();
 	}
 }
 
@@ -126,6 +154,37 @@ void AGPCharacterBase::GetActiveAbilitiesWithTags(FGameplayTagContainer AbilityT
 	}
 }
 
+bool AGPCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration)
+{
+	if (AbilitySystemComponent && CooldownTags.Num() > 0)
+	{
+		TimeRemaining = 0.f;
+		CooldownDuration = 0.f;
+
+		FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
+		TArray< TPair<float, float> > DurationAndTimeRemaining = AbilitySystemComponent->GetActiveEffectsTimeRemainingAndDuration(Query);
+		if (DurationAndTimeRemaining.Num() > 0)
+		{
+			int32 BestIdx = 0;
+			float LongestTime = DurationAndTimeRemaining[0].Key;
+			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
+			{
+				if (DurationAndTimeRemaining[Idx].Key > LongestTime)
+				{
+					LongestTime = DurationAndTimeRemaining[Idx].Key;
+					BestIdx = Idx;
+				}
+			}
+
+			TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
+			CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
+
+			return true;
+		}
+	}
+	return false;
+}
+
 void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs)
 {
 	// First add default ones
@@ -147,19 +206,34 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 			UGPItem* SlottedItem = ItemPair.Value;
 
 			// Use the character level as default
+			
 			int32 AbilityLevel = 1;//GetCharacterLevel();
 
-			if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
+			if (SlottedItem)
 			{
 				// Override the ability level to use the data from the slotted item
 				AbilityLevel = SlottedItem->AbilityLevel;
-			}
 
-			if (SlottedItem && SlottedItem->GrantedAbility)
-			{
-				// This will override anything from default
-				SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
+				if (SlottedItem->GrantedAbility)
+				{
+					// This will override anything from default
+					SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
+				}
 			}
+			
+			//int32 AbilityLevel = 1;//GetCharacterLevel();
+
+			//if (SlottedItem && SlottedItem->ItemType.GetName() == FName(TEXT("Weapon")))
+			//{
+			//	// Override the ability level to use the data from the slotted item
+			//	AbilityLevel = SlottedItem->AbilityLevel;
+			//}
+
+			//if (SlottedItem && SlottedItem->GrantedAbility)
+			//{
+			//	// This will override anything from default
+			//	SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
+			//}
 		}
 	}
 }
@@ -235,3 +309,68 @@ void AGPCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 		}
 	}
 }
+
+void AGPCharacterBase::AddStartupGameplayAbilities()
+{
+	check(AbilitySystemComponent);
+
+	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
+	{
+		// Grant abilities, but only on the server	
+		for (TPair<TSubclassOf<UGPGameplayAbility>, int32>& StartupAbility : GameplayAbilities)
+		{
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility.Key, StartupAbility.Value, INDEX_NONE, this));
+		}
+
+		// Now apply passives
+		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
+		{
+			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+			EffectContext.AddSourceObject(this);
+
+			FGameplayEffectSpecHandle NewHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, EffectContext.GetAbilityLevel(), EffectContext);
+			if (NewHandle.IsValid())
+			{
+				FActiveGameplayEffectHandle ActiveGEHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), AbilitySystemComponent);
+			}
+		}
+
+		AddSlottedGameplayAbilities();
+
+		bAbilitiesInitialized = true;
+	}
+}
+
+void AGPCharacterBase::HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, AGPCharacterBase* InstigatorPawn, AActor* DamageCauser)
+{
+	OnDamaged(DamageAmount, HitInfo, DamageTags, InstigatorPawn, DamageCauser);
+}
+
+void AGPCharacterBase::HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	// We only call the BP callback if this is not the initial ability setup
+	if (bAbilitiesInitialized)
+	{
+		OnHealthChanged(DeltaValue, EventTags);
+	}
+}
+
+void AGPCharacterBase::HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		OnManaChanged(DeltaValue, EventTags);
+	}
+}
+
+void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	// Update the character movement's walk speed
+	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
+
+	if (bAbilitiesInitialized)
+	{
+		OnMoveSpeedChanged(DeltaValue, EventTags);
+	}
+}
+

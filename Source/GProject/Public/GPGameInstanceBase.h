@@ -84,7 +84,7 @@ public:
 	//UFUNCTION(BlueprintCallable, Category = Save)
 	//void ResetSaveGame();
 
-protected:
+//protected:
 	/** The current save game object */
 	//UPROPERTY()
 	//UGPSaveGame* CurrentSaveGame;

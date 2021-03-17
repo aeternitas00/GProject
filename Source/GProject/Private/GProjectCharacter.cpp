@@ -98,13 +98,15 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 				MousePos.X = 2 * (MousePos.X - Res.X/2) / Res.X;
 				MousePos.Y = 2 * (MousePos.Y - Res.Y/2) / Res.Y;
 	
-				GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, MousePos.ToString());
+				//GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Blue, MousePos.ToString());
 
 				CameraDest.Y = MousePos.X * DEFMAXOFVIEW_X;
 				CameraDest.X = -MousePos.Y * DEFMAXOFVIEW_Y;
 				CameraDest.Z = 0;
 
-				//AimedPosition = CameraDest;
+				FRotator CharacterRotator = CameraDest.Rotation();
+
+				SetActorRotation(CharacterRotator);
 
 				CameraDest = CameraDest.RotateAngleAxis(-60,FVector::YAxisVector);
 			}
@@ -137,8 +139,8 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	FInputActionBinding ActionBindQuickMelee("QuickMelee", IE_Pressed);
 	ActionBindQuickMelee.ActionDelegate.GetDelegateForManualSet().BindLambda([this](){ActionComponent->StartActionByName(this, "QuickMelee"); });
 
-	PlayerInputComponent->BindAction("Interaction", IE_Pressed, this, &AGProjectCharacter::OnInteractionPressed);
-	PlayerInputComponent->BindAction("Interaction", IE_Released, this, &AGProjectCharacter::OnInteractionReleased);
+	PlayerInputComponent->BindAction("MainInteraction", IE_Pressed, this, &AGProjectCharacter::OnInteractionPressed);
+	PlayerInputComponent->BindAction("MainInteraction", IE_Released, this, &AGProjectCharacter::OnInteractionReleased);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGProjectCharacter::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGProjectCharacter::OnMoveRight);
@@ -172,10 +174,10 @@ void AGProjectCharacter::OnSpaceReleased()
 
 void AGProjectCharacter::OnInteractionPressed()
 {
-	//if (InteractionComp)
-	//{
-	//	InteractionComp->PrimaryInteract();
-	//}
+	if (InteractionComponent)
+	{
+		InteractionComponent->PrimaryInteract();
+	}
 }
 
 void AGProjectCharacter::OnInteractionReleased()

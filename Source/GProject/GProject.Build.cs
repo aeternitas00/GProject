@@ -6,7 +6,7 @@ public class GProject : ModuleRules
 {
 	public GProject(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		//PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PrivatePCHHeaderFile = "Public/GProject.h";
 
