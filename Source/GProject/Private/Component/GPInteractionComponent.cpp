@@ -28,13 +28,10 @@ void UGPInteractionComponent::FindBestInteractable()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(CollisionChannel);
 
-	//AActor* MyOwner = GetOwner();
 	APawn* MyPawn = Cast<APawn>(GetOwner());
 
 	FVector EyeLocation;
 	FRotator EyeRotation;
-
-	//MyOwner->APawn::GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	EyeLocation = MyPawn->GetActorLocation();
 	EyeRotation = MyPawn->GetActorRotation();
@@ -58,9 +55,7 @@ void UGPInteractionComponent::FindBestInteractable()
 	for (FHitResult& Hit : Hits)
 	{
 		//if (bDebugDraw)
-		//{
 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 32, LineColor, false, 0.0f);
-		//}
 
 		AActor* HitActor = Hit.GetActor();
 
@@ -86,9 +81,7 @@ void UGPInteractionComponent::FindBestInteractable()
 	}
 
 	//if (bDebugDraw)
-	//{
 	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 0.0f);
-	//}
 }
 
 // Called when the game starts
@@ -102,7 +95,6 @@ void UGPInteractionComponent::BeginPlay()
 void UGPInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 
 	APawn* MyPawn = Cast<APawn>(GetOwner());
 	if (MyPawn->IsLocallyControlled())

@@ -3,6 +3,7 @@
 
 #include "GPCharacterBase.h"
 #include "Item/GPItem.h"
+#include "UObject/Class.h"
 #include "AbilitySystemGlobals.h"
 #include "Ability/GPGameplayAbility.h"
 

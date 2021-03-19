@@ -5,7 +5,7 @@
 #include "GProject.h"
 #include "Engine/DataAsset.h"
 #include "Styling/SlateBrush.h"
-//#include "Engine/AssetManager.h"
+#include "GPAssetManager.h"
 #include "GPItem.generated.h"
 
 class UGPGameplayAbility;

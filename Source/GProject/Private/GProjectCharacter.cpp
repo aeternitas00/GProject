@@ -125,7 +125,6 @@ void AGProjectCharacter::Tick(float DeltaSeconds)
 void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 	
 	PlayerInputComponent->BindAction("Space", IE_Pressed, this, &AGProjectCharacter::OnSpacePressed);
 	PlayerInputComponent->BindAction("Space", IE_Released, this, &AGProjectCharacter::OnSpaceReleased);
@@ -144,10 +143,6 @@ void AGProjectCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGProjectCharacter::OnMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGProjectCharacter::OnMoveRight);
-
-	//PlayerInputComponent->BindAxis("MouseX", this, &AGProjectCharacter::OnMouseX);
-	//PlayerInputComponent->BindAxis("MouseY", this, &AGProjectCharacter::OnMouseY);
-
 }
 
 void AGProjectCharacter::CharacterDodge()
@@ -226,20 +221,3 @@ void AGProjectCharacter::OnMoveRight(const float Value)
 		AddMovementInput(FVector::RightVector, Value);
 }
 
-//void AGProjectCharacter::OnMouseX(const float Axis)
-//{
-//	/*if (bHasCameraDestUpdated)
-//	{
-//		CameraDest.Y += Axis * CameraSpeed;
-//		bHasCameraDestUpdated = false;
-//	}*/
-//}
-//
-//void AGProjectCharacter::OnMouseY(const float Axis)
-//{
-//	/*if (bHasCameraDestUpdated)
-//	{
-//		CameraDest.X += Axis * CameraSpeed;
-//		bHasCameraDestUpdated = false;
-//	}*/
-//}

@@ -22,102 +22,20 @@ void AGProjectPlayerController::SetupInputComponent()
 {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
-
-	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &AGProjectPlayerController::OnSetDestinationPressed);
-	//InputComponent->BindAction("SetDestination", IE_Released, this, &AGProjectPlayerController::OnSetDestinationReleased);
-
-	// support touch devices 
-	//InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AGProjectPlayerController::MoveToTouchLocation);
-	//InputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AGProjectPlayerController::MoveToTouchLocation);
-
-	//InputComponent->BindAction("ResetVR", IE_Pressed, this, &AGProjectPlayerController::OnResetVR);
 }
-
-//void AGProjectPlayerController::OnResetVR()
-//{
-	//Unuse HMD 
-	//UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-//}
-
-//void AGProjectPlayerController::MoveToMouseCursor()
-//{
-	//Unuse HMD
-	//if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-	//{
-	//	if (AGProjectCharacter* MyPawn = Cast<AGProjectCharacter>(GetPawn()))
-	//	{
-	//		if (MyPawn->GetCursorToWorld())
-	//		{
-	//			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, MyPawn->GetCursorToWorld()->GetComponentLocation());
-	//		}
-	//	}
-	//}
-	//else
-	//{
-	//	// Trace to see what is under the mouse cursor
-	//	FHitResult Hit;
-	//	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-	//	if (Hit.bBlockingHit)
-	//	{
-	//		// We hit something, move there
-	//		SetNewMoveDestination(Hit.ImpactPoint);
-	//	}
-	//}
-//}
-
-//void AGProjectPlayerController::MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location)
-//{
-//	FVector2D ScreenSpaceLocation(Location);
-//
-//	// Trace to see what is under the touch location
-//	FHitResult HitResult;
-//	GetHitResultAtScreenPosition(ScreenSpaceLocation, CurrentClickTraceChannel, true, HitResult);
-//	if (HitResult.bBlockingHit)
-//	{
-//		// We hit something, move there
-//		SetNewMoveDestination(HitResult.ImpactPoint);
-//	}
-//}
-
-//void AGProjectPlayerController::SetNewMoveDestination(const FVector DestLocation)
-//{
-//	APawn* const MyPawn = GetPawn();
-//	if (MyPawn)
-//	{
-//		float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
-//
-//		// We need to issue move command only if far enough in order for walk animation to play correctly
-//		if ((Distance > 120.0f))
-//		{
-//			UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, DestLocation);
-//		}
-//	}
-//}
-
-//void AGProjectPlayerController::OnSetDestinationPressed()
-//{
-//	// set flag to keep updating destination until released
-//	bMoveToMouseCursor = true;
-//}
-//
-//void AGProjectPlayerController::OnSetDestinationReleased()
-//{
-//	// clear flag to indicate we should stop updating the destination
-//	bMoveToMouseCursor = false;
-//}
 
 bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCount, int32 ItemLevel, bool bAutoSlot)
 {
 	bool bChanged = false;
 	if (!NewItem)
 	{
-		//UE_LOG(GProject, Warning, TEXT("AddInventoryItem: Failed trying to add null item!"));
+		GP_LOG(Warning, TEXT("AddInventoryItem: Failed trying to add null item!"));
 		return false;
 	}
 
 	if (ItemCount <= 0 || ItemLevel <= 0)
 	{
-		//UE_LOG(GProject, Warning, TEXT("AddInventoryItem: Failed trying to add item %s with negative count or level!"), *NewItem->GetName());
+		GP_LOG(Warning, TEXT("AddInventoryItem: Failed trying to add item %s with negative count or level!"), *NewItem->GetName());
 		return false;
 	}
 

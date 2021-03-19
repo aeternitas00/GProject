@@ -48,15 +48,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Trace")
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 
-	//UPROPERTY(EditDefaultsOnly, Category = "UI")
-	//TSubclassOf<USWorldUserWidget> DefaultWidgetClass;
-
-	//UPROPERTY()
-	//USWorldUserWidget* DefaultWidgetInstance;
-
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };
