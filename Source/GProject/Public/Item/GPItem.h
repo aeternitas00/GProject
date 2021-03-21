@@ -48,6 +48,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxCount;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
+	int32 MaxStack;
+
+	/** Weapon actor to spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	TSubclassOf<AActor> SpawningActor;
+
 	/** Returns if the item is consumable (MaxCount <= 0)*/
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Max)
 	bool IsConsumable() const;

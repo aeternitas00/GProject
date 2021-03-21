@@ -51,7 +51,7 @@ bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCou
 	{
 		// If data changed, need to update storage and call callback
 		InventoryData.Add(NewItem, NewData);
-		NotifyInventoryItemChanged(true, NewItem);
+		NotifyInventoryItemChanged(NewItem, NewData);
 		bChanged = true;
 	}
 
@@ -119,7 +119,7 @@ bool AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 
 	}
 
 	// If we got this far, there is a change so notify and save
-	NotifyInventoryItemChanged(false, RemovedItem);
+	NotifyInventoryItemChanged(RemovedItem, NewData);
 
 	//SaveInventory();
 	return true;
@@ -264,14 +264,14 @@ bool AGProjectPlayerController::FillEmptySlotWithItem(UGPItem* NewItem)
 	return false;
 }
 
-void AGProjectPlayerController::NotifyInventoryItemChanged(bool bAdded, UGPItem* Item)
+void AGProjectPlayerController::NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData)
 {
 	// Notify native before blueprint
-	OnInventoryItemChangedNative.Broadcast(bAdded, Item);
-	OnInventoryItemChanged.Broadcast(bAdded, Item);
+	OnInventoryItemChangedNative.Broadcast(Item, ItemData);
+	OnInventoryItemChanged.Broadcast(Item, ItemData);
 
 	// Call BP update event
-	InventoryItemChanged(bAdded, Item);
+	InventoryItemChanged(Item, ItemData);
 }
 
 void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item)

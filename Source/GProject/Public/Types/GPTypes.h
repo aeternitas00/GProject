@@ -126,8 +126,8 @@ struct GPROJECT_API FGPItemData
 };
 
 /** Delegate called when an inventory item changes */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, bool, bAdded, UGPItem*, Item);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, bool, UGPItem*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, UGPItem*, FGPItemData);
 
 /** Delegate called when the contents of an inventory slot change */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnSlottedItemChanged, FGPItemSlot, ItemSlot, UGPItem*, Item);

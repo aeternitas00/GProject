@@ -37,7 +37,7 @@ public:
 
 	/** Called after the inventory was changed and we notified all delegates */
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
-	void InventoryItemChanged(bool bAdded, UGPItem* Item);
+	void InventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 
 	/** Called after an item was equipped and we notified all delegates */
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
@@ -119,29 +119,13 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Resets HMD orientation in VR. */
-	//void OnResetVR();
-
-	/** Navigate player to the current mouse cursor location. */
-	//void MoveToMouseCursor();
-
-	/** Navigate player to the current touch location. */
-	//void MoveToTouchLocation(const ETouchIndex::Type FingerIndex, const FVector Location);
-	
-	/** Navigate player to the given world location. */
-	//void SetNewMoveDestination(const FVector DestLocation);
-
-	/** Input handlers for SetDestination action. */
-	//void OnSetDestinationPressed();
-	//void OnSetDestinationReleased();
-
-	//=========================================================================/
+	//=========================================================================//
 
 	/** Auto slots a specific item, returns true if anything changed */
 	bool FillEmptySlotWithItem(UGPItem* NewItem);
 
 	/** Calls the inventory update callbacks */
-	void NotifyInventoryItemChanged(bool bAdded, UGPItem* Item);
+	void NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
 };
 
