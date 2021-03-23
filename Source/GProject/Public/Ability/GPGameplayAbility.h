@@ -8,6 +8,7 @@
 #include "Types/GPAbilityTypes.h"
 #include "GPGameplayAbility.generated.h"
 
+struct FSlateBrush;
 /**
  * 
  */
@@ -20,9 +21,15 @@ public:
 	// Constructor and overrides
 	UGPGameplayAbility();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Icon)
+	FSlateBrush SkillIcon;
+
 	/** Map of gameplay tags to gameplay effect containers */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = GameplayEffects)
 	TMap<FGameplayTag, FGPGameplayEffectContainer> EffectContainerMap;
+
+	UFUNCTION(BlueprintCallable, Category = Ability)
+	bool GetTargetsFromEffectContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, TArray<FHitResult>& outHitResults, TArray<AActor*>& outTargetActors);
 
 	/** Make gameplay effect container spec to be applied later, using the passed in container */
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))

@@ -50,12 +50,6 @@ public:
 	void OnMoveForward(const float Value);
 	void OnMoveRight(const float Value);
 
-	//void OnMouseX(const float Axis);
-	//void OnMouseY(const float Axis);
-	
-
-	//bool bPressedSpace;
-
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

@@ -29,7 +29,7 @@ public:
 
 	/** Called to determine targets to apply gameplay effects to */
 	UFUNCTION(BlueprintNativeEvent)
-		void GetTargets(AGPCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const;
+	void GetTargets(AGPCharacterBase* TargetingCharacter, AActor* TargetingActor, FGameplayEventData EventData, TArray<FHitResult>& OutHitResults, TArray<AActor*>& OutActors) const;
 };
 
 /** Trivial target type that uses the owner */

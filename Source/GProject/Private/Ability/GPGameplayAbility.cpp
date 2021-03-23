@@ -3,14 +3,13 @@
 #include "Ability/GPGameplayAbility.h"
 #include "Component/GPAbilitySystemComponent.h"
 #include "Types/GPTargetType.h"
+#include "Styling/SlateBrush.h"
 #include "GPCharacterBase.h"
 
-UGPGameplayAbility::UGPGameplayAbility() {}
+UGPGameplayAbility::UGPGameplayAbility():SkillIcon() { }
 
-FGPGameplayEffectContainerSpec UGPGameplayAbility::MakeEffectContainerSpecFromContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
+bool UGPGameplayAbility::GetTargetsFromEffectContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, TArray<FHitResult>& outHitResults, TArray<AActor*>& outTargetActors)
 {
-	// First figure out our actor info
-	FGPGameplayEffectContainerSpec ReturnSpec;
 	AActor* OwningActor = GetOwningActorFromActorInfo();
 	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(OwningActor);
 	UGPAbilitySystemComponent* OwningASC = UGPAbilitySystemComponent::GetAbilitySystemComponentFromActor(OwningActor);
@@ -20,11 +19,30 @@ FGPGameplayEffectContainerSpec UGPGameplayAbility::MakeEffectContainerSpecFromCo
 		// If we have a target type, run the targeting logic. This is optional, targets can be added later
 		if (Container.TargetType.Get())
 		{
-			TArray<FHitResult> HitResults;
-			TArray<AActor*> TargetActors;
 			const UGPTargetType* TargetTypeCDO = Container.TargetType.GetDefaultObject();
 			AActor* AvatarActor = GetAvatarActorFromActorInfo();
-			TargetTypeCDO->GetTargets(OwningCharacter, AvatarActor, EventData, HitResults, TargetActors);
+			TargetTypeCDO->GetTargets(OwningCharacter, AvatarActor, EventData, outHitResults, outTargetActors);
+			
+			return true;
+		}
+	}
+	return false;
+}
+
+FGPGameplayEffectContainerSpec UGPGameplayAbility::MakeEffectContainerSpecFromContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
+{
+	// First figure out our actor info
+	FGPGameplayEffectContainerSpec ReturnSpec;
+	UGPAbilitySystemComponent* OwningASC = 
+		UGPAbilitySystemComponent::GetAbilitySystemComponentFromActor(GetOwningActorFromActorInfo());
+
+	if (OwningASC)
+	{
+		// If we have a target type, run the targeting logic. This is optional, targets can be added later
+		TArray<FHitResult> HitResults;
+		TArray<AActor*> TargetActors;
+		if (GetTargetsFromEffectContainer(Container, EventData, HitResults, TargetActors))
+		{
 			ReturnSpec.AddTargets(HitResults, TargetActors);
 		}
 
