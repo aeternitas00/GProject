@@ -80,4 +80,6 @@ void UGPDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 	{
 		OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().DamageProperty, EGameplayModOp::Additive, DamageDone));
 	}
+
+	GP_LOG(Warning,TEXT("DamageExecute %f"), DamageDone);
 }

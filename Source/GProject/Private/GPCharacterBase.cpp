@@ -39,8 +39,8 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-		AddSlottedGameplayAbilities();
-		//AddStartupGameplayAbilities();
+		//AddSlottedGameplayAbilities();
+		AddStartupGameplayAbilities();
 	}
 }
 
@@ -202,6 +202,8 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 	{
 		const TMap<FGPItemSlot, UGPItem*>& SlottedItemMap = InventorySource->GetSlottedItemMap();
 
+		GP_LOG(Warning,TEXT("Slotted Item Maps num is %d"), SlottedItemMap.Num());
+
 		for (const TPair<FGPItemSlot, UGPItem*>& ItemPair : SlottedItemMap)
 		{
 			UGPItem* SlottedItem = ItemPair.Value;
@@ -219,6 +221,9 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 				{
 					// This will override anything from default
 					SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
+
+
+					GP_LOG(Warning, TEXT("Slotted Items name is %s"), *SlottedItem->ItemName.ToString());
 				}
 			}
 			

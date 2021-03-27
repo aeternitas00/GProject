@@ -61,7 +61,7 @@ protected:
 	*/
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnDamaged(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, AGPCharacterBase* InstigatorCharacter, AActor* DamageCauser);
-	// Called from RPGAttributeSet, these call BP events above
+	// Called from GPAttributeSet, these call BP events above
 	virtual void HandleDamage(float DamageAmount, const FHitResult& HitInfo, const struct FGameplayTagContainer& DamageTags, AGPCharacterBase* InstigatorCharacter, AActor* DamageCauser);
 
 	/**

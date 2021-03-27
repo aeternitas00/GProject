@@ -17,11 +17,11 @@ public:
 	AGProjectPlayerController();
 
 	/** Map of all items owned by this player, from definition to data */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<UGPItem*, FGPItemData> InventoryData;
 
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on GPGameInstanceBase */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FGPItemSlot, UGPItem*> SlottedItems;
 
 	/** Delegate called when an inventory item has been added or removed */
