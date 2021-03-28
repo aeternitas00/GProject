@@ -81,7 +81,7 @@ void UGPInteractionComponent::FindBestInteractable()
 	}
 
 	//if (bDebugDraw)
-	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 0.0f);
+	//DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 0.0f);
 }
 
 // Called when the game starts
