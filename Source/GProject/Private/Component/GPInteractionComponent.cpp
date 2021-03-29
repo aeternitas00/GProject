@@ -55,7 +55,7 @@ void UGPInteractionComponent::FindBestInteractable()
 	for (FHitResult& Hit : Hits)
 	{
 		//if (bDebugDraw)
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 32, LineColor, false, 0.0f);
+		//DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 32, LineColor, false, 0.0f);
 
 		AActor* HitActor = Hit.GetActor();
 
