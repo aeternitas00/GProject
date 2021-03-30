@@ -20,6 +20,8 @@ public:
 
 	//PROPERTIES
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UProjectileMovementComponent* ProjMovementComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -36,6 +38,7 @@ protected:
 
 	TArray<AActor*> HitActors;
 
+	FScriptDelegate OverlapDel;
 	// FUNC
 protected:
 	// Called when the game starts or when spawned

@@ -13,17 +13,20 @@ AGPProjectileBase::AGPProjectileBase()
 
 	ProjMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 
+	ProjMovementComp->InitialSpeed=1000.0f;
+	ProjMovementComp->MaxSpeed= 1000.0f;
+
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 
 	RootComponent = SphereCollision;
 	SphereCollision->InitSphereRadius(40.0f);
-	SphereCollision->SetCollisionProfileName(TEXT("Pawn"));
+	SphereCollision->SetCollisionProfileName(TEXT("WorldDynamic"));
+	SphereCollision->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+	SphereCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
 
 	ArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 
 	ArrowComp->SetupAttachment(RootComponent);
-
-	FScriptDelegate OverlapDel;
 
 	OverlapDel.BindUFunction(this,FName("ProjectileOverlapped"));
 
@@ -40,19 +43,24 @@ void AGPProjectileBase::BeginPlay()
 
 void AGPProjectileBase::ProjectileOverlapped(AActor* OverlappedActor, AActor* OtherActor)
 {
-	if (!HitActors.Contains(OtherActor)) return;
+	//GP_LOG(Warning, TEXT("Exec ProjectileOverlapped"));
+
+	//GP_LOG(Warning, TEXT("Name is %s"),*OtherActor->GetFName().ToString());
+
+	if (HitActors.Contains(OtherActor)){ GP_LOG(Warning, TEXT("Double check")); return;}
 
 	HitActors.Add(OtherActor);
 
-	if (OtherActor == GetInstigator()) return;
+	if (OtherActor == GetInstigator()) { GP_LOG(Warning, TEXT("Instigator")); return;}
 
 	TArray<AActor*> TempActor;
 	TArray<FHitResult> EmptyResult;
 
+	TempActor.Add(OtherActor);
+
 	UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(
 	UGPBPFuncLibrary::AddTargetsToEffectContainerSpec(EffectContainerSpec,EmptyResult,TempActor));
-	// TODO : DO SOME EFFECT WITH EffectContainerSpec
-
+	//GP_LOG(Warning, TEXT("Success"));
 }
 
 // Called every frame
