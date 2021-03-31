@@ -49,7 +49,7 @@ FGPGameplayEffectContainerSpec UGPGameplayAbility::MakeEffectContainerSpecFromCo
 		// If we don't have an override level, use the default on the ability itself
 		if (OverrideGameplayLevel == INDEX_NONE)
 		{
-			OverrideGameplayLevel = OverrideGameplayLevel = this->GetAbilityLevel(); //OwningASC->GetDefaultAbilityLevel();
+			OverrideGameplayLevel = this->GetAbilityLevel(); //OwningASC->GetDefaultAbilityLevel();
 		}
 
 		// Build GameplayEffectSpecs for each applied effect
