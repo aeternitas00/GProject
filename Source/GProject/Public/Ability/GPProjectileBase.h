@@ -38,14 +38,13 @@ protected:
 
 	TArray<AActor*> HitActors;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	FScriptDelegate ProjectileHitDelegate;
+	//FScriptDelegate ProjectileHitDelegate;
 	// FUNC
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ProjectileHit(AActor* OverlappedActor, AActor* OtherActor);
 
 public:	

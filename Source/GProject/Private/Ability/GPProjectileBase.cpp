@@ -28,7 +28,7 @@ AGPProjectileBase::AGPProjectileBase()
 
 	ArrowComp->SetupAttachment(RootComponent);
 
-	ProjectileHitDelegate.BindUFunction(this,FName("ProjectileHit"));
+	//ProjectileHitDelegate.BindUFunction(this,FName("ProjectileHit"));
 
 	//OnActorBeginOverlap.Add(OverlapDel);
 	//AActor* OverlappedActor, AActor* OtherActor
