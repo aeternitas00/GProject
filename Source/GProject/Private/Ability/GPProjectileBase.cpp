@@ -28,9 +28,9 @@ AGPProjectileBase::AGPProjectileBase()
 
 	ArrowComp->SetupAttachment(RootComponent);
 
-	OverlapDel.BindUFunction(this,FName("ProjectileOverlapped"));
+	ProjectileHitDelegate.BindUFunction(this,FName("ProjectileHit"));
 
-	OnActorBeginOverlap.Add(OverlapDel);
+	//OnActorBeginOverlap.Add(OverlapDel);
 	//AActor* OverlappedActor, AActor* OtherActor
 }
 
@@ -41,17 +41,18 @@ void AGPProjectileBase::BeginPlay()
 	
 }
 
-void AGPProjectileBase::ProjectileOverlapped(AActor* OverlappedActor, AActor* OtherActor)
+void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//GP_LOG(Warning, TEXT("Exec ProjectileOverlapped"));
 
 	//GP_LOG(Warning, TEXT("Name is %s"),*OtherActor->GetFName().ToString());
 
-	if (HitActors.Contains(OtherActor)){ GP_LOG(Warning, TEXT("Double check")); return;}
+	if (HitActors.Contains(OtherActor)) return;
 
 	HitActors.Add(OtherActor);
 
-	if (OtherActor == GetInstigator()) { GP_LOG(Warning, TEXT("Instigator")); return;}
+	if (OtherActor == GetInstigator()) return;
+
 
 	TArray<AActor*> TempActor;
 	TArray<FHitResult> EmptyResult;

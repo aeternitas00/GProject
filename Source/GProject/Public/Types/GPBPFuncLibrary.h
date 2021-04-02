@@ -39,6 +39,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "HitResults,TargetActors"))
 	static FGPGameplayEffectContainerSpec AddTargetsToEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec, const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
 
+	/** Adds targets to a copy of the passed in effect container spec and returns it */
+	//UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "HitResults,TargetActors"))
+	//static FGPGameplayEffectContainerSpec AddUniqueTargetsToEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec, const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
+
 	/** Applies container spec that was made from an ability */
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	static TArray<FActiveGameplayEffectHandle> ApplyExternalEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec);

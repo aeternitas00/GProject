@@ -36,6 +36,13 @@ FGPGameplayEffectContainerSpec UGPBPFuncLibrary::AddTargetsToEffectContainerSpec
 	return NewSpec;
 }
 
+//FGPGameplayEffectContainerSpec UGPBPFuncLibrary::AddUniqueTargetsToEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec, const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors)
+//{
+//	FGPGameplayEffectContainerSpec NewSpec = ContainerSpec;
+//	NewSpec.AddTargets(HitResults, TargetActors);
+//	return NewSpec;
+//}
+
 TArray<FActiveGameplayEffectHandle> UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec)
 {
 	TArray<FActiveGameplayEffectHandle> AllEffects;

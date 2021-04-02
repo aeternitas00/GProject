@@ -57,4 +57,6 @@ public:
 
 	/** Adds new targets to target data */
 	void AddTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
+
+	//void AddUniqueTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors);
 };

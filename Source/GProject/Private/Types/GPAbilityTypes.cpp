@@ -30,3 +30,19 @@ void FGPGameplayEffectContainerSpec::AddTargets(const TArray<FHitResult>& HitRes
 		TargetData.Add(NewData);
 	}
 }
+
+//void FGPGameplayEffectContainerSpec::AddUniqueTargets(const TArray<FHitResult>& HitResults, const TArray<AActor*>& TargetActors)
+//{
+//	for (const FHitResult& HitResult : HitResults)
+//	{
+//		FGameplayAbilityTargetData_SingleTargetHit* NewData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+//		TargetData.Add(NewData);
+//	}
+//
+//	if (TargetActors.Num() > 0)
+//	{
+//		FGameplayAbilityTargetData_ActorArray* NewData = new FGameplayAbilityTargetData_ActorArray();
+//		NewData->TargetActorArray.Append(TargetActors);
+//		TargetData.Add(NewData);
+//	}
+//}

@@ -172,6 +172,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FGPItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
+	AActor* CurrentWeaponActor;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
+	FGPItemSlot CurrentWeaponSlot;
+
 	/** If true we have initialized our abilities */
 	UPROPERTY()
 	int32 bAbilitiesInitialized;

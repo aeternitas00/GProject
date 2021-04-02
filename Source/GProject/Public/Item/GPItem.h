@@ -51,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)
 	int32 MaxStack;
 
-	/** Weapon actor to spawn */
+	/** Pickup actor to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	TSubclassOf<AActor> SpawningActor;
 
