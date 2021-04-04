@@ -70,22 +70,24 @@ bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCou
 	return false;
 }
 
-bool AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount)
+int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount)
 {
 	if (!RemovedItem)
 	{
 		//UE_LOG(GProject, Warning, TEXT("RemoveInventoryItem: Failed trying to remove null item!"));
-		return false;
+		return -1;
 	}
 
 	// Find current item data, which may be empty
 	FGPItemData NewData;
 	GetInventoryItemData(RemovedItem, NewData);
 
+	float BeforeRemoveNum = NewData.ItemCount;
+
 	if (!NewData.IsValid())
 	{
 		// Wasn't found
-		return false;
+		return -1;
 	}
 
 	// If RemoveCount <= 0, delete all
@@ -105,6 +107,7 @@ bool AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 
 	}
 	else
 	{
+		NewData.ItemCount = 0;
 		// Remove item entirely, make sure it is unslotted
 		InventoryData.Remove(RemovedItem);
 
@@ -118,11 +121,13 @@ bool AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 
 		}
 	}
 
+	float AfterRemoveNum = NewData.ItemCount;
+
 	// If we got this far, there is a change so notify and save
 	NotifyInventoryItemChanged(RemovedItem, NewData);
 
 	//SaveInventory();
-	return true;
+	return BeforeRemoveNum - AfterRemoveNum;
 }
 
 void AGProjectPlayerController::GetInventoryItems(TArray<UGPItem*>& Items, FPrimaryAssetType ItemType)
@@ -230,6 +235,15 @@ void AGProjectPlayerController::FillEmptySlots()
 	{
 		//SaveInventory();
 	}
+}
+
+bool AGProjectPlayerController::IsThereEmptySlotWithType(FPrimaryAssetType inType)
+{
+	for (TPair<FGPItemSlot, UGPItem*>& Pair : SlottedItems)
+	{
+		if (Pair.Key.ItemType == inType && Pair.Value == nullptr)	return true;
+	}
+	return false;
 }
 
 bool AGProjectPlayerController::FillEmptySlotWithItem(UGPItem* NewItem)

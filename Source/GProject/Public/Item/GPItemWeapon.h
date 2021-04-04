@@ -23,4 +23,7 @@ public:
 	/** Weapon actor to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<AActor> WeaponActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
+	int32 MagSize;
 };

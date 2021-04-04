@@ -52,7 +52,7 @@ public:
 
 	/** Remove an inventory item, will also remove from slots. A remove count of <= 0 means to remove all copies */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount = 1);
+	int32 RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount = 1);
 
 	/** Returns all inventory items of a given type. If none is passed as type it will return all */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -81,6 +81,9 @@ public:
 	/** Fills in any empty slots with items in inventory */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	void FillEmptySlots();
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool IsThereEmptySlotWithType(FPrimaryAssetType inType);
 
 	/** Delegate called when the inventory has been loaded/reloaded */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)

@@ -37,8 +37,6 @@ protected:
 	FGPGameplayEffectContainerSpec EffectContainerSpec;
 
 	TArray<AActor*> HitActors;
-
-	//FScriptDelegate ProjectileHitDelegate;
 	// FUNC
 protected:
 	// Called when the game starts or when spawned

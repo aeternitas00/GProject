@@ -107,7 +107,7 @@ void UGPInteractionComponent::ServerInteract_Implementation(AActor* InFocus)
 {
 	if (InFocus == nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact.");
+		//GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Red, "No Focus Actor to interact.");
 		return;
 	}
 
