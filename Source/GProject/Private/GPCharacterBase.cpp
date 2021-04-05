@@ -272,6 +272,8 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 		if (!SpecHandle.IsValid())
 		{
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
+			FString AbStr(SpecPair.Value.Ability->GetName());
+			GP_LOG(Warning,TEXT("%s Add %s"), *GetName(), *AbStr);
 		}
 	}
 }

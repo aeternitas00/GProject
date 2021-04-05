@@ -28,17 +28,14 @@ AGPProjectileBase::AGPProjectileBase()
 
 	ArrowComp->SetupAttachment(RootComponent);
 
-	//ProjectileHitDelegate.BindUFunction(this,FName("ProjectileHit"));
-
-	//OnActorBeginOverlap.Add(OverlapDel);
-	//AActor* OverlappedActor, AActor* OtherActor
 }
 
 // Called when the game starts or when spawned
 void AGPProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SphereCollision->IgnoreActorWhenMoving(GetInstigator(), true);
 }
 
 void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActor)
@@ -52,7 +49,6 @@ void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActo
 	HitActors.Add(OtherActor);
 
 	if (OtherActor == GetInstigator()) return;
-
 
 	TArray<AActor*> TempActor;
 	TArray<FHitResult> EmptyResult;
