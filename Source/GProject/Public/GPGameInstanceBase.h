@@ -5,7 +5,15 @@
 #include "GProject.h"
 #include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
+
+//#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#include <WinSock2.h>
+#pragma comment(lib,"ws2_32")
+
+#include <sstream>
+
 #include "GPGameInstanceBase.generated.h"
+
 
 /**
  * Base class for GameInstance, should be blueprinted
@@ -20,6 +28,7 @@ class GPROJECT_API UGPGameInstanceBase : public UGameInstance
 public:
 	// Constructor
 	UGPGameInstanceBase();
+	~UGPGameInstanceBase();
 
 	/** List of inventory items to add to new players */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
@@ -103,5 +112,16 @@ public:
 
 	/** Called when the async save happens */
 	//virtual void HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess);
+
+
+	/////////////////////// Socket ////////////////////////////
+
+protected:
+	SOCKET Socket;
+
+public:
+
+	UFUNCTION(BlueprintCallable, Category = Socket)
+	bool InitClientSocket();
 
 };

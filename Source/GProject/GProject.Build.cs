@@ -23,6 +23,8 @@ public class GProject : ModuleRules
 			"SlateCore"
 			/*,"OnlineSubsystem",
 			 * "UMG"*/ 
+			//"Sockets"
+			//"Networking"
 		});
     }
 }
