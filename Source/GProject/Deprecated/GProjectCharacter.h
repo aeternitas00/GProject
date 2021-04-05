@@ -9,13 +9,13 @@
 class UActionComponent;
 class UGPInteractionComponent;
 
-UCLASS(Blueprintable)
-class AGProjectCharacter : public AGPCharacterBase
+UCLASS(Blueprintable,Deprecated)
+class ADEPRECATED_GProjectCharacter : public AGPCharacterBase
 {
 	GENERATED_BODY()
 
 public:
-	AGProjectCharacter();
+	ADEPRECATED_GProjectCharacter();
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -28,27 +28,6 @@ public:
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION()
-	void CharacterDodge();
-
-	void OnSightChanged();
-
-	void OnSpacePressed();
-	void OnSpaceReleased();
-	
-	void OnInteractionPressed();
-	void OnInteractionReleased();	
-
-	FTimerHandle LShiftTimer;
-	void OnLeftShiftPressed();
-	void OnLeftShiftReleased();
-
-	void OnRClickPressed();
-	void OnRClickReleased();
-
-	void OnMoveForward(const float Value);
-	void OnMoveRight(const float Value);
 
 private:
 	/** Top down camera */
@@ -63,13 +42,13 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	bool bUsingOptic;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	//bool bUsingOptic;
 
-	bool bHasCameraDestUpdated;
+	//bool bHasCameraDestUpdated;
 
-	FVector CameraDest;
-	float CameraSmoothness;
+	//FVector CameraDest;
+	//float CameraSmoothness;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UActionComponent* ActionComponent;

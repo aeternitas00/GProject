@@ -20,6 +20,7 @@ public:
 	// Sets default values for this component's properties
 	UGPInteractionComponent();
 
+	UFUNCTION(BlueprintCallable)
 	void PrimaryInteract();
 
 protected:

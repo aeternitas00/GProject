@@ -3,7 +3,6 @@
 #include "GProjectPlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
-#include "GProjectCharacter.h"
 #include "Item/GPItem.h"
 //#include "Engine/World.h"
 
