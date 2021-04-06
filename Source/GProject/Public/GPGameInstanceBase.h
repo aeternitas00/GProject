@@ -6,14 +6,14 @@
 #include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
 
-//#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <WinSock2.h>
-#pragma comment(lib,"ws2_32")
-
 #include <sstream>
 
 #include "GPGameInstanceBase.generated.h"
 
+#pragma comment(lib,"ws2_32")
+
+//#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 /**
  * Base class for GameInstance, should be blueprinted
@@ -116,12 +116,14 @@ public:
 
 	/////////////////////// Socket ////////////////////////////
 
-protected:
-	SOCKET Socket;
 
-public:
-
-	UFUNCTION(BlueprintCallable, Category = Socket)
-	bool InitClientSocket();
+//protected:
+//	SOCKET Socket;
+//
+//public:
+//
+//	UFUNCTION(BlueprintCallable, Category = Socket)
+//	bool InitClientSocket();
 
 };
+
