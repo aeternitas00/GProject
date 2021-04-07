@@ -5,15 +5,8 @@
 #include "GProject.h"
 #include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
-
-//#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#include <WinSock2.h>
-#pragma comment(lib,"ws2_32")
-
-#include <sstream>
-
+#include "GPClient.h"
 #include "GPGameInstanceBase.generated.h"
-
 
 /**
  * Base class for GameInstance, should be blueprinted
@@ -112,16 +105,13 @@ public:
 
 	/** Called when the async save happens */
 	//virtual void HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess);
-
-
-	/////////////////////// Socket ////////////////////////////
+public:
+	virtual void Init();
+	virtual void Shutdown();
+protected:
+	virtual void OnStart();
 
 protected:
-	SOCKET Socket;
-
-public:
-
-	UFUNCTION(BlueprintCallable, Category = Socket)
-	bool InitClientSocket();
-
+	FGPClient* GPClient;
 };
+

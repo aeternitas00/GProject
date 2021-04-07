@@ -73,3 +73,8 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# GPServer solution debug files and test client
+GPServer/ClientConsoleApp1/*
+GPServer/Debug/*
+GPServer/GPServer/Debug/*

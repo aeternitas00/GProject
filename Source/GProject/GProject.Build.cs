@@ -20,10 +20,10 @@ public class GProject : ModuleRules
 			"GameplayTags", 
 			"GameplayTasks", 
 			"GameplayAbilities",
-			"SlateCore"
+			"SlateCore",
 			/*,"OnlineSubsystem",
 			 * "UMG"*/ 
-			//"Sockets"
+			//"Sockets",
 			//"Networking"
 		});
     }
