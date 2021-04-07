@@ -1,5 +1,5 @@
 #include "GPClient.h"
-#include "../GPServer/common/GPPacket.h"//
+#include "../GPServer/common/GPPacket.h"
 
 //Thread Worker Starts as NULL, prior to being instanced
 FGPClient* FGPClient::Runnable = nullptr;
@@ -27,7 +27,7 @@ bool FGPClient::Init()
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);//2.2 
 	if (iResult)
 	{
-		UE_LOG(LogGProject, Warning, TEXT("WSAStartup failed, code: %d"), WSAGetLastError());
+		UE_LOG(LogGProject, Warning, TEXT("WSAStartup failed, code: %d"), iResult);
 		return false;
 	}
 
@@ -38,11 +38,9 @@ bool FGPClient::Init()
 		return false;
 	}
 
-	//UE_LOG(LogGProject, Warning, TEXT("WSAStartup!"));
-
 	SOCKADDR_IN sa;
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons(9000);
+	sa.sin_port = htons(GP_PORT);
 	sa.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	//connect to server
@@ -54,28 +52,24 @@ bool FGPClient::Init()
 
 	UE_LOG(LogGProject, Warning, TEXT("Connected to server."));
 
-	//test
+	//test LogIn
 	char sendbuf[MAX_PKT_SIZ];
 	Packet* pckt = (Packet*)sendbuf;
-	pckt->header.type = PT_MSG;
 
-	char test[] = "Hello, world!";
-	pckt->header.size = sizeof(PacketH) + sizeof(test);
-	memcpy(&pckt->data, test, sizeof(test));
+	pckt->header.type = PT_USER_LOGIN;
 
-	iResult = send(Socket, sendbuf, pckt->header.size, 0);
-	if (iResult == SOCKET_ERROR) {
-		GP_LOG(Warning, TEXT("send failed, code : %d"), WSAGetLastError());
-		return false;
-	}
-	return true; //FRunnable::Create 호출로 Init이 호출 된 경우 true를 리턴하면 스레드에서 Run이 실행되는 것으로 보임.
+	FString id = FString::FromInt(FMath::Rand());
+	pckt->header.size = sizeof(PacketH) + id.Len() + 1;
+	memcpy(&pckt->data, TCHAR_TO_ANSI(*id), id.Len() + 1);
+
+	GP_LOG(Warning, TEXT("%s, %d"), *id, pckt->header.size);
+		
+	return Send(sendbuf, pckt->header.size); //FRunnable::Create 호출로 Init이 호출 된 경우 true를 리턴하면 스레드에서 Run이 실행되는 것으로 보임.
 }
 
 uint32 FGPClient::Run()
 {
-	//GetQueuedCompletionStatus()
 	GP_LOG_C(Warning);
-	
 
 	int iResult;
 	char recvbuf[MAX_PKT_SIZ];
@@ -106,7 +100,7 @@ uint32 FGPClient::Run()
 			case PT_MSG:
 			case PT_USER_LOGIN:
 			case PT_USER_LOGOUT:
-				GP_LOG(Warning, TEXT("Message: %s"), *FString((char*)&pckt->data)/**FString(ANSI_TO_TCHAR(recvbuf+sizeof(PacketH))*//**/);
+				GP_LOG(Warning, TEXT("Message: %s"), *FString((char*)&pckt->data));
 				break;
 
 			default:
@@ -145,13 +139,43 @@ void FGPClient::Shutdown()
 	}
 }
 
+bool FGPClient::Login()
+{
+	return false;
+}
+
+bool FGPClient::Send(char* buf, int len)
+{
+	int iResult = send(Socket, buf, len, 0);
+	if (iResult == SOCKET_ERROR) {
+		GP_LOG(Warning, TEXT("send failed, code : %d"), WSAGetLastError());
+		return false;
+	}
+	return true;
+}
+
+bool FGPClient::SendChat(FString str)
+{
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+
+	pckt->header.size = sizeof(PacketH) + str.Len() + 1;
+	pckt->header.type = PT_MSG;
+	memcpy(&pckt->data, TCHAR_TO_ANSI(*str), str.Len() + 1);
+
+	Send(sendbuf, pckt->header.size);
+	return false;
+}
+
 FGPClient* FGPClient::InitClient()
 {
-/*	if (Runnable)
+	if (Runnable)
 	{
-		Runnable->Init();
+		GP_LOG_C(Warning);
+
+		//Runnable->Init();
 	}
-	else */if (!Runnable && FPlatformProcess::SupportsMultithreading())
+	else if (/*!Runnable &&*/ FPlatformProcess::SupportsMultithreading())
 	{
 		Runnable = new FGPClient(); 
 	}

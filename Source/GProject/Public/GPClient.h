@@ -39,6 +39,11 @@ public:
 
 	void Shutdown();
 
+	bool Login(); // todo //현재는 가상의 로그인 과정. //TODO DB
+
+	bool Send(char* buf, int len);
+	bool SendChat(FString str);
+
 	/*
 		Start the thread and the worker from static (easy access)!
 		This code ensures only thread will be able to run at a time.
