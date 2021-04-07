@@ -140,7 +140,6 @@ void ClientSession::Disconnect()
 	pckt->header.size = i + len + 1; // +1 for '\0'.
 
 	GPServerManager::getSingleton()->SendToAll(sendbuf, pckt->header.size);
-
 }
 
 void ClientSession::OnChat()
@@ -155,8 +154,7 @@ void ClientSession::OnChat()
 	//int bufLen = strlen(mBuf)+1;
 	//memcpy(sendBuf, mBuf, bufLen);//
 
-	//is this thread-safe?
-	GPServerManager::getSingleton()->SendToAll(mBuf, pckt->header.size);//
+	GPServerManager::getSingleton()->SendToAll(mBuf, pckt->header.size);
 }
 
 void ClientSession::OnLogin()
@@ -171,7 +169,7 @@ void ClientSession::OnLogin()
 
 	//set client ID
 	char * id = (char*)&pckt->data;
-	cout << id << ", connected." << endl;
+	cout << id << ", logged in." << endl;
 	strcpy_s(mID, id);
 
 	char sendbuf[MAX_PKT_SIZ];
@@ -179,7 +177,7 @@ void ClientSession::OnLogin()
 	pckt = (Packet*)sendbuf;
 
 	//add connection msg
-	const char * msg = ", connected.";
+	const char * msg = ", logged in.";
 	char * pData = (char*)&pckt->data;
 	strcat_s(pData, sizeof(sendbuf) - sizeof(PacketH), msg);
 	//memcpy(sendbuf + pckt->header.size - 1, msg, strlen(msg) + 1);// +1 for '\0'
@@ -200,7 +198,6 @@ void ClientSession::OnLogout()
 	}
 
 	cout << mID << ", disconnecting." << endl;
-
 
 	GPServerManager::getSingleton()->DeleteClient(this); //Disconnect();
 }

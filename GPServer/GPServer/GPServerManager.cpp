@@ -149,18 +149,11 @@ ClientSession* GPServerManager::CreateClient(SOCKET sock)
 void GPServerManager::DeleteClient(ClientSession* client)
 {
 	CSLock lock(mClientsCS);//
-	for (auto iter = mClients.begin(); iter != mClients.end(); ) {
-		if (*iter == client) {
-			//
-			client->Disconnect();
-			
-			iter = mClients.erase(iter);
-			cout << "ClientSession removed." << endl;
-		}
-		else {
-			iter++;
-		}
-	}
+
+	client->Disconnect();
+	mClients.erase(client);
+	cout << "ClientSession removed." << endl;
+
 }
 
 void GPServerManager::SendToAll(const char* buf, int buflen)
@@ -204,10 +197,11 @@ DWORD WINAPI GPServerManager::IocpSockRecvProc(PVOID pParam)
 			if (dwTrBytes == 0)//클라 소켓 닫힘
 				mgr->DeleteClient(pcl);
 
+			pcl->ParsePacket();
 			// 수신 메시지 에코 송신 테스트
-			cout << "Bytes : " << dwTrBytes << endl;
+			//cout << "Bytes : " << dwTrBytes << endl;
 			//pcl->mBuf[dwTrBytes] = 0;
-			mgr->SendToAll(pcl->mBuf, dwTrBytes);
+			//mgr->SendToAll(pcl->mBuf, dwTrBytes);
 		}
 
 		//수신 시작

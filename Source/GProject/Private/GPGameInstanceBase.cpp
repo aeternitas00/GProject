@@ -8,15 +8,10 @@ UGPGameInstanceBase::UGPGameInstanceBase()
 	//, SaveUserIndex(0)
 	: GPClient(nullptr)
 {
-	//GPClient = FGPClient::InitClient();
-
 }
 
 UGPGameInstanceBase::~UGPGameInstanceBase()
 {
-	
-		//delete GPClient;
-		//GPClient->Stop();
 }
 
 bool UGPGameInstanceBase::IsValidItemSlot(FGPItemSlot ItemSlot) const
@@ -36,13 +31,11 @@ bool UGPGameInstanceBase::IsValidItemSlot(FGPItemSlot ItemSlot) const
 void UGPGameInstanceBase::Init()
 {
 	Super::Init();
-	GP_LOG_C(Warning);
 }
 
 void UGPGameInstanceBase::Shutdown()
 {
 	Super::Shutdown();
-	GP_LOG_C(Warning);
 	if (GPClient)
 		GPClient->Shutdown();
 }
@@ -53,4 +46,11 @@ void UGPGameInstanceBase::OnStart()
 	GP_LOG_C(Warning);
 
 	GPClient = FGPClient::InitClient();
+}
+
+bool UGPGameInstanceBase::Send(FString buf)
+{
+	if (!GPClient) return false;
+	
+	return GPClient->SendChat(buf);
 }

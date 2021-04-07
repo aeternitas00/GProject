@@ -111,6 +111,10 @@ public:
 protected:
 	virtual void OnStart();
 
+public:
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	bool Send(FString buf);
+
 protected:
 	FGPClient* GPClient;
 };
