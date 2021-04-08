@@ -2,6 +2,7 @@
 
 
 #include "GPCharacterBase.h"
+#include "Interface/GPMagAbilityInterface.h"
 #include "Item/GPItem.h"
 #include "UObject/Class.h"
 #include "AbilitySystemGlobals.h"
@@ -103,6 +104,16 @@ float AGPCharacterBase::GetMoveSpeed() const
 	return AttributeSet->GetMoveSpeed();
 }
 
+float AGPCharacterBase::GetCurrentMag() const
+{
+	return AttributeSet->GetCurrentMag();
+}
+
+float AGPCharacterBase::GetMagSize() const
+{
+	return AttributeSet->GetMagSize();
+}
+
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
@@ -134,6 +145,23 @@ void AGPCharacterBase::GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArr
 			}
 		}
 	}
+}
+
+UGameplayAbility* AGPCharacterBase::GetSlottedAbilityInstance(FGPItemSlot ItemSlot)
+{
+	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
+
+	if (FoundHandle)
+	{
+		FGameplayAbilitySpec* FoundSpec = AbilitySystemComponent->FindAbilitySpecFromHandle(*FoundHandle);
+
+		//UGameplayAbility* Ability = FoundSpec->Ability;
+
+		//GP_LOG(Warning,TEXT("%s"),*Ability->GetName());
+		
+		return FoundSpec->Ability;
+	}		
+	return NULL;
 }
 
 
@@ -186,6 +214,46 @@ bool AGPCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer Cooldown
 	return false;
 }
 
+void AGPCharacterBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
+{
+	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
+	
+	if (Ability->Implements<UGPMagAbilityInterface>())
+	{
+		float Delta = GetCurrentMag();
+		FGameplayTagContainer TagCon;
+
+		if( inValue < 0.0f )
+			AttributeSet->SetCurrentMag(AttributeSet->GetMagSize());
+		else
+			AttributeSet->SetCurrentMag(inValue);
+
+		Delta = GetCurrentMag()- Delta;
+		HandleCurrentMagChanged(Delta, TagCon);
+	}
+
+}
+
+void AGPCharacterBase::UpdateMagSize()
+{
+	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
+
+	float Delta = GetMagSize();
+	FGameplayTagContainer TagCon;
+
+	if (Ability->Implements<UGPMagAbilityInterface>())
+	{
+		AttributeSet->SetMagSize(IGPMagAbilityInterface::Execute_GetMagSize(Ability));
+	}
+	else
+	{
+		AttributeSet->SetMagSize(0.0f);
+	}
+
+	Delta = GetMagSize() - Delta;
+	HandleMagSizeChanged(Delta, TagCon);
+}
+
 void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs)
 {
 	// First add default ones
@@ -202,7 +270,7 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 	{
 		const TMap<FGPItemSlot, UGPItem*>& SlottedItemMap = InventorySource->GetSlottedItemMap();
 
-		GP_LOG(Warning,TEXT("Slotted Item Maps num is %d"), SlottedItemMap.Num());
+		//GP_LOG(Warning,TEXT("Slotted Item Maps num is %d"), SlottedItemMap.Num());
 
 		for (const TPair<FGPItemSlot, UGPItem*>& ItemPair : SlottedItemMap)
 		{
@@ -223,7 +291,7 @@ void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilit
 					SlottedAbilitySpecs.Add(ItemPair.Key, FGameplayAbilitySpec(SlottedItem->GrantedAbility, AbilityLevel, INDEX_NONE, SlottedItem));
 
 
-					GP_LOG(Warning, TEXT("Slotted Items name is %s"), *SlottedItem->ItemName.ToString());
+					//GP_LOG(Warning, TEXT("Slotted Items name is %s"), *SlottedItem->ItemName.ToString());
 				}
 			}
 			
@@ -272,8 +340,7 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 		if (!SpecHandle.IsValid())
 		{
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
-			FString AbStr(SpecPair.Value.Ability->GetName());
-			GP_LOG(Warning,TEXT("%s Add %s"), *GetName(), *AbStr);
+			
 		}
 	}
 }
@@ -379,6 +446,22 @@ void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGa
 	if (bAbilitiesInitialized)
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
+	}
+}
+
+void AGPCharacterBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		OnCurrentMagChanged(DeltaValue, EventTags);
+	}
+}
+
+void AGPCharacterBase::HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+{
+	if (bAbilitiesInitialized)
+	{
+		OnMagSizeChanged(DeltaValue, EventTags);
 	}
 }
 

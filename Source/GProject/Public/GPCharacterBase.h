@@ -101,6 +101,16 @@ protected:
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 	
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	virtual void HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 public:
 	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
@@ -122,6 +132,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetMoveSpeed() const;
 
+	UFUNCTION(BlueprintCallable)
+	virtual float GetCurrentMag() const;
+
+	UFUNCTION(BlueprintCallable)
+	virtual float GetMagSize() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void UpdateMagSize();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	void UpdateCurrentMag(float inValue = -1.0f);
+
 	/**
 	 * Attempts to activate any ability in the specified item slot. Will return false if no activatable ability found or activation fails
 	 * Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
@@ -133,6 +155,9 @@ public:
 	/** Returns a list of active abilities bound to the item slot. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities);
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	UGameplayAbility* GetSlottedAbilityInstance(FGPItemSlot ItemSlot);
 
 	/**
 	 * Attempts to activate all abilities that match the specified tags

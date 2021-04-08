@@ -67,6 +67,15 @@ public:
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(UGPAttributeSet, Damage)
 
+	UPROPERTY(BlueprintReadOnly, Category = "Magazine")
+	FGameplayAttributeData CurrentMag;
+	ATTRIBUTE_ACCESSORS(UGPAttributeSet, CurrentMag)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Magazine")
+	FGameplayAttributeData MagSize;
+	ATTRIBUTE_ACCESSORS(UGPAttributeSet, MagSize)
+
+
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
 	void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
@@ -92,4 +101,10 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_CurrentMag(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_MagSize(const FGameplayAttributeData& OldValue);
 };
