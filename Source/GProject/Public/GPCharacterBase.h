@@ -28,7 +28,7 @@ public:
 	virtual void UnPossessed() override;
 	virtual void OnRep_Controller() override;
 	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void PreInitializeComponents() override;
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

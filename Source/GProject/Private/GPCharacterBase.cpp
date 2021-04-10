@@ -16,11 +16,20 @@ AGPCharacterBase::AGPCharacterBase()
 	AbilitySystemComponent->SetIsReplicated(true);
 
 	// Create the attribute set, this replicates by default
-	AttributeSet = CreateDefaultSubobject<UGPAttributeSet>(TEXT("AttributeSet"));
-
+	// 
+	// 엔진 버그 때문에 PreInitializeComponents() 로 넘김.
+	// 
+	//AttributeSet = CreateDefaultSubobject<UGPAttributeSet>(TEXT("AttributeSet"));
+	
 	bAbilitiesInitialized = false;
 }
+void AGPCharacterBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
 
+	// Engine Bug Fix
+	AttributeSet = NewObject<UGPAttributeSet>(this,TEXT("AttributeSet"));
+}
 void AGPCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -117,13 +126,21 @@ float AGPCharacterBase::GetMagSize() const
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
+	
+	UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
+
+	bool rv=false;
 
 	if (FoundHandle && AbilitySystemComponent)
 	{
-		return AbilitySystemComponent->TryActivateAbility(*FoundHandle, bAllowRemoteActivation);
+		rv = AbilitySystemComponent->TryActivateAbility(*FoundHandle, bAllowRemoteActivation);
 	}
 
-	return false;
+	if (rv)
+	{
+		rv=true;
+	}
+	return rv;
 }
 
 void AGPCharacterBase::GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities)
@@ -240,6 +257,8 @@ void AGPCharacterBase::UpdateMagSize()
 
 	float Delta = GetMagSize();
 	FGameplayTagContainer TagCon;
+
+	//if (!Ability) return;
 
 	if (Ability->Implements<UGPMagAbilityInterface>())
 	{
