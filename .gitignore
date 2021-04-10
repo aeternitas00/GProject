@@ -78,3 +78,7 @@ DerivedDataCache/*
 GPServer/ClientConsoleApp1/*
 GPServer/Debug/*
 GPServer/GPServer/Debug/*
+
+# Resources
+Content/Mannequin/ParagonSevarog/*
+Content/Geometry/ModularSFPack/*
