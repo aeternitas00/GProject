@@ -22,6 +22,9 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsWaitingToKill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UProjectileMovementComponent* ProjMovementComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
