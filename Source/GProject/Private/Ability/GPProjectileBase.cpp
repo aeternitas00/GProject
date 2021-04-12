@@ -30,11 +30,9 @@ AGPProjectileBase::AGPProjectileBase()
 
 }
 
-// Called when the game starts or when spawned
 void AGPProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
-
 	SphereCollision->IgnoreActorWhenMoving(GetInstigator(), true);
 }
 
@@ -57,6 +55,9 @@ void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActo
 
 	UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(
 	UGPBPFuncLibrary::AddTargetsToEffectContainerSpec(EffectContainerSpec,EmptyResult,TempActor));
+
+	
+	//SetActorEnableCollision(false);
 	//GP_LOG(Warning, TEXT("Success"));
 }
 
