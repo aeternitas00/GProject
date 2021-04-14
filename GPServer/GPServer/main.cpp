@@ -16,9 +16,5 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 2;
 	}
 
-	mtsMgr->CloseServer();
-
-	cout << "Server closed." << endl;
-
 	return 0;
 }

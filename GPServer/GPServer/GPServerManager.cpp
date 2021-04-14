@@ -18,6 +18,7 @@ GPServerManager* GPServerManager::getSingleton()
 	return mtsm;
 }
 
+//
 #define IOKEY_LISTEN	1
 #define IOKEY_CHILD		2
 
@@ -32,7 +33,7 @@ bool GPServerManager::InitServer()
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);//2.2 
 	if (iResult)
 	{
-		cout << "WSAStartup failed, Error : " << WSAGetLastError() <<endl;
+		cout << "WSAStartup failed, error : " << iResult << endl;
 		return false;
 	}
 
@@ -40,14 +41,14 @@ bool GPServerManager::InitServer()
 	mListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (mListenSocket == INVALID_SOCKET)
 	{
-		cout << "Invalid socket, Error : " << WSAGetLastError() << endl;		
+		cout << "Invalid socket, error : " << WSAGetLastError() << endl;		
 		return false;
 	}
 
 	//서버 주소 정보.
 	SOCKADDR_IN serveraddr;
 	serveraddr.sin_family = AF_INET;
-	serveraddr.sin_port = htons(GP_PORT); //
+	serveraddr.sin_port = htons(GP_PORT);
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY); //TODO ip
 
 	//서버 소켓을 주소와 연결.
@@ -90,7 +91,7 @@ void GPServerManager::CloseServer()
 		closesocket(cl->mSocket);
 		delete cl;
 	}
-	closesocket(mListenSocket);//
+	closesocket(mListenSocket);
 	cout << "Server closed." << endl;
 
 	WSACleanup();
@@ -100,7 +101,7 @@ void GPServerManager::CloseServer()
 //
 bool GPServerManager::AcceptLoop()
 {
-	while (true)
+	while (true) //ctrl?
 	{
 		//접속 소켓 생성.
 		SOCKET acceptSock = accept(mListenSocket, NULL, NULL);
@@ -114,7 +115,6 @@ bool GPServerManager::AcceptLoop()
 		ClientSession * client = CreateClient(acceptSock);
 		client->Recv();
 	}
-	//ctrl?
 	
 	//Cleanup
 
@@ -167,47 +167,53 @@ void GPServerManager::SendToAll(const char* buf, int buflen)
 
 DWORD WINAPI GPServerManager::IocpSockRecvProc(PVOID pParam)
 {
-	GPServerManager* mgr = (GPServerManager*) pParam;//
+	GPServerManager* mngr = (GPServerManager*) pParam;
+
+	DWORD dwErr = ERROR_SUCCESS;
 
 	DWORD		dwTrBytes = 0;
 	ULONG_PTR	upDevKey = 0;
-	ClientSession* pcl = nullptr;
+	ClientSession* pCl = nullptr;
 
 	while (true)
 	{
+		bool bIsClDCed = false;
 
 		BOOL bIsOK = GetQueuedCompletionStatus
 		(
-			mgr->mIocp, &dwTrBytes, &upDevKey, (LPOVERLAPPED*) &pcl, INFINITE
+			mngr->mIocp, &dwTrBytes, &upDevKey, (LPOVERLAPPED*) &pCl, INFINITE
 		);
 		if (bIsOK == FALSE)
 		{
-			//
-			cout << "GQCS error: " << WSAGetLastError() << endl;
-			break;
+			dwErr = GetLastError();
+
+			if (dwErr != ERROR_NETNAME_DELETED)
+			{
+				cout << "GQCS error: " << dwErr << endl;
+				break;
+			}
 		}
 
-		//
-		if (upDevKey == IOKEY_LISTEN)
+		//현재 다른 키를 사용하고 있지 않아서 쓸모 없음.
+		/*if (upDevKey == IOKEY_LISTEN)
 		{
 			continue;
-		}
-		else //수신 받음. CHILD
+		}*/
+
+		//수신 받음. IOKEY_CHILD
+		if (dwTrBytes != 0) 
 		{
-			if (dwTrBytes == 0)//클라 소켓 닫힘
-				mgr->DeleteClient(pcl);
+			pCl->ParsePacket();
 
-			pcl->ParsePacket();
-			// 수신 메시지 에코 송신 테스트
-			//cout << "Bytes : " << dwTrBytes << endl;
-			//pcl->mBuf[dwTrBytes] = 0;
-			//mgr->SendToAll(pcl->mBuf, dwTrBytes);
+			//다시 수신 시작
+			if (!pCl->Recv())
+				break;//실패 시 종료
+
+			continue;
 		}
-
-		//수신 시작
-		if (!pcl->Recv())
-			break;
-	
+		
+		//클라 소켓 닫힘(dwTrBytes == 0) or 종료(dwErr == ERROR_NETNAME_DELETED)//
+		mngr->DeleteClient(pCl);	
 	}
 
 	return 0;
