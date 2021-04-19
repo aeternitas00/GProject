@@ -125,6 +125,24 @@ struct GPROJECT_API FGPItemData
 	}
 };
 
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPAssetDataStruct
+{
+	GENERATED_BODY()
+
+		/** Constructor, -1 means an invalid slot */
+	FGPAssetDataStruct()
+	{}
+
+	/** The type of items that can go in this slot */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	FPrimaryAssetType ItemType;
+
+	/** The number of this slot, 0 indexed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	int32 SlotNumber;
+};
+
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, UGPItem*, FGPItemData);

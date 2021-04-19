@@ -27,7 +27,6 @@ AGPProjectileBase::AGPProjectileBase()
 	ArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 
 	ArrowComp->SetupAttachment(RootComponent);
-
 }
 
 void AGPProjectileBase::BeginPlay()

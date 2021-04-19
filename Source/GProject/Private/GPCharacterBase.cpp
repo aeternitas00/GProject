@@ -136,10 +136,6 @@ bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool 
 		rv = AbilitySystemComponent->TryActivateAbility(*FoundHandle, bAllowRemoteActivation);
 	}
 
-	if (rv)
-	{
-		rv=true;
-	}
 	return rv;
 }
 
@@ -235,6 +231,8 @@ void AGPCharacterBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
 {
 	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
 	
+	if (!Ability) return;
+
 	if (Ability->Implements<UGPMagAbilityInterface>())
 	{
 		float Delta = GetCurrentMag();
@@ -258,7 +256,7 @@ void AGPCharacterBase::UpdateMagSize()
 	float Delta = GetMagSize();
 	FGameplayTagContainer TagCon;
 
-	//if (!Ability) return;
+	if (!Ability) return;
 
 	if (Ability->Implements<UGPMagAbilityInterface>())
 	{

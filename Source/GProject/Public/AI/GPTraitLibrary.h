@@ -4,10 +4,9 @@
 
 #include "GProject.h"
 #include "Engine/DataAsset.h"
+#include "GameplayTagContainer.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "GPTraitLibrary.generated.h"
-
-struct FGameplayTag;
 
 /**
  * 
@@ -27,5 +26,5 @@ public:
 	//UBehaviorTree* SubBehaviorTree;
 
 	UFUNCTION(BlueprintCallable, Category = AI)
-	FORCEINLINE UBehaviorTree* FindBTByTrait(const FGameplayTag& inTag);
+	UBehaviorTree* FindBTByTrait(const FGameplayTag& inTag);
 };
