@@ -54,3 +54,10 @@ bool UGPGameInstanceBase::Send(FString buf)
 	
 	return GPClient->SendChat(buf);
 }
+
+bool UGPGameInstanceBase::Connect()
+{
+	if (!GPClient) return false;
+
+	return GPClient->Connect();
+}

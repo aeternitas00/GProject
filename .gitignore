@@ -75,9 +75,11 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # GPServer solution debug files and test client
-GPServer/ClientConsoleApp1/*
-GPServer/Debug/*
-GPServer/GPServer/Debug/*
+GPServer/*
+!GPServer/common/GPPacket.h
+#GPServer/ClientConsoleApp1/*
+#GPServer/Debug/*
+#GPServer/GPServer/Debug/*
 
 # Resources
 Content/Mannequin/ParagonSevarog/*

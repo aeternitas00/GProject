@@ -18,7 +18,8 @@ typedef struct PACKET
 	void*	data;
 }Packet;
 
-#define MAX_DAT_SIZ 256
+#define MAX_ID_SIZ  24
+#define MAX_DAT_SIZ 1024
 #define MAX_PKT_SIZ sizeof(PacketH) + MAX_DAT_SIZ
 
 #define GP_PORT 9000
