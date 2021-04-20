@@ -75,7 +75,7 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 
 # GPServer solution debug files and test client
-GPServer/**
+GPServer/*
 !GPServer/common/GPPacket.h
 
 # Resources
