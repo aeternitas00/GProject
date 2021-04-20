@@ -9,6 +9,8 @@
 // ----------------------------------------------------------------------------------------------------------------
 
 #include "UObject/PrimaryAssetId.h"
+//#include "GPCharacterBase.h"
+//#include "GPCharacterDataAsset.h"
 #include "GPTypes.generated.h"
 
 class UGPItem;
@@ -125,22 +127,29 @@ struct GPROJECT_API FGPItemData
 	}
 };
 
+class AGPCharacterBase;
+
 USTRUCT(BlueprintType)
-struct GPROJECT_API FGPAssetDataStruct
+struct GPROJECT_API FGPCharacterAssetStruct
 {
 	GENERATED_BODY()
 
-		/** Constructor, -1 means an invalid slot */
-	FGPAssetDataStruct()
+	FGPCharacterAssetStruct():EnemyAssetData(nullptr), MinLevel(0), MaxLevel(0), CharacterClass(nullptr)
 	{}
 
 	/** The type of items that can go in this slot */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	FPrimaryAssetType ItemType;
+	class UGPCharacterDataAsset* EnemyAssetData;
 
 	/** The number of this slot, 0 indexed */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int32 SlotNumber;
+	int32 MinLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	int32 MaxLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TSubclassOf<AGPCharacterBase> CharacterClass;
 };
 
 /** Delegate called when an inventory item changes */
