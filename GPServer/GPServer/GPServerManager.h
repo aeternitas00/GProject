@@ -32,6 +32,15 @@ private:
 	//클라이언트 삭제 및 추가 시 동기화를 위한 임계영역
 	CriticalSection mClientsCS;
 
+
+	//클라이언트가 보낸 패킷에 따른 반응 함수들 
+
+	void OnChat(ClientSession* client);
+	void OnLogin(ClientSession* client);
+	void OnLogout(ClientSession* client);
+
+	////
+
 	//IOCP 테스트 스레드
 	static DWORD WINAPI IocpSockRecvProc(PVOID pParam);
 

@@ -28,9 +28,9 @@ bool ClientSession::OnConnect()
 	char time[LOG_TIME_LEN];
 	GetCTime(time, LOG_TIME_LEN);
 
-	stringstream str;
-	str << "[" << time << "] Client connected : IP = " << inet_ntoa(mAddr.sin_addr) << ",  Port = " << ntohs(mAddr.sin_port) << endl;
-	cout << str.rdbuf();
+	stringstream ss;
+	ss << "[" << time << "] Client connected : IP = " << inet_ntoa(mAddr.sin_addr) << ",  Port = " << ntohs(mAddr.sin_port) << endl;
+	cout << ss.rdbuf();
 	//MyLog::GetSingletonPtr()->WriteLog(str.str());//TODO 비동기
 
 	return true;
@@ -53,7 +53,7 @@ bool ClientSession::Send(const char * buf, int len)
 
 bool ClientSession::Recv()
 {
-	if (!IsConnected()) return false;
+	if (!IsConnected()) return false; //
 
 	int iResult;
 	
@@ -78,27 +78,12 @@ bool ClientSession::Recv()
 	return true;
 }
 
-bool ClientSession::ParsePacket()
+GPPacketType ClientSession::ParsePacket()
 {
 	Packet* pckt = (Packet*)mBuf;
 	GPPacketType type = pckt->header.type;
 	
-	switch (type)
-	{
-	case PT_USER_LOGIN:
-		OnLogin();//
-		break;
-	case PT_USER_LOGOUT:
-		OnLogout();//
-		break;
-	case PT_MSG:
-		OnChat();//
-		break;
-	default:
-		return false;
-	}
-
-	return true;
+	return type;
 }
 
 void ClientSession::Disconnect()
@@ -115,7 +100,7 @@ void ClientSession::Disconnect()
 
 	mConnected = false;
 
-	//disconnection time
+	//disconnection time //getlocaltime
 	char time[LOG_TIME_LEN];
 	GetCTime(time, LOG_TIME_LEN);
 
@@ -124,83 +109,4 @@ void ClientSession::Disconnect()
 	cout << str.rdbuf();
 	//MyLog::GetSingletonPtr()->WriteLog(str.str()); //todo 비동기
 
-	//send disconnection message to all.
-	static const char * msg = ", disconnectd.";
-	char sendbuf[MAX_PKT_SIZ];
-	Packet *pckt = (Packet*)sendbuf;
-	pckt->header.type = PT_MSG;
-
-	//
-	int i = sizeof(PacketH);
-	int len = strlen(mID);
-	memcpy(sendbuf + i, mID, len);
-	i += len;
-	len = strlen(msg);
-	memcpy(sendbuf + i, msg, len + 1); // +1 for '\0'.
-
-	pckt->header.size = i + len + 1; // +1 for '\0'.
-
-	GPServerManager::getSingleton()->SendToAll(sendbuf, pckt->header.size);
-}
-
-void ClientSession::OnChat()
-{
-	Packet* pckt = (Packet*)mBuf;
-	if (pckt->header.type != PT_MSG)
-	{
-		cout << "Packet type is not PT_MSG." << endl;
-		return;
-	}
-
-	//todo id 
-	//pckt->header.size += strlen(mID);
-	//
-
-	GPServerManager::getSingleton()->SendToAll(mBuf, pckt->header.size);
-}
-
-void ClientSession::OnLogin()
-{
-	Packet* pckt = (Packet*)mBuf;
-
-	if (pckt->header.type != PT_USER_LOGIN)
-	{
-		cout << "Packet type is not PT_USER_LOGIN." << endl;
-		return;
-	}
-
-	static const char* msg = ", logged in.";
-
-	//set client ID
-	char * id = (char*)&pckt->data;
-	cout << id << msg << endl;
-	strcpy_s(mID, id);
-
-	char sendbuf[MAX_PKT_SIZ];
-	memcpy(sendbuf, pckt, pckt->header.size);
-	pckt = (Packet*)sendbuf;
-
-	//add connection msg
-	char * pData = (char*)&pckt->data;
-	strcat_s(pData, sizeof(sendbuf) - sizeof(PacketH), msg);
-	//memcpy(sendbuf + pckt->header.size - 1, msg, strlen(msg) + 1);// +1 for '\0'
-	//set packet's size
-	pckt->header.size = sizeof(PacketH) + strlen(pData) + 1; // +1 for '\0'
-	pckt->header.type = PT_MSG;
-
-	GPServerManager::getSingleton()->SendToAll(sendbuf, pckt->header.size);
-}
-
-void ClientSession::OnLogout()
-{
-	Packet* pckt = (Packet*)mBuf;
-	if (pckt->header.type != PT_USER_LOGOUT)
-	{
-		cout << "Packcet type is not PT_USER_LOGOUT." << endl;
-		return;
-	}
-
-	cout << mID << ", disconnecting." << endl;
-
-	GPServerManager::getSingleton()->DeleteClient(this);
 }

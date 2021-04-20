@@ -17,27 +17,24 @@ public:
 
 	bool Recv(); //비동기식. TODO 예외 처리
 
-	bool ParsePacket();
+	GPPacketType ParsePacket();
 
 	void Disconnect();
 
 	SOCKADDR_IN getAddr() const { return mAddr; }
 
-private:
+protected:
 	//only GPServerManager can manage ClientSession.
 	friend class GPServerManager;
 	
 	ClientSession(SOCKET asock);
 
 	bool OnConnect();
-	void OnChat();
-	void OnLogin();
-	void OnLogout();
 
 	bool			mConnected;
 	SOCKET			mSocket; //Accepted Socket.
 	SOCKADDR_IN		mAddr;
-	char 			mID[MAX_DAT_SIZ]; //Client's name
+	char 			mID[MAX_ID_SIZ]; //Client's name //TODO DB
 
-	char 			mBuf[MAX_PKT_SIZ]; // Recv/Send buf. // 
+	char 			mBuf[MAX_PKT_SIZ]; // Recv/Send buf.
 };

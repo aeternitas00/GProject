@@ -148,12 +148,28 @@ ClientSession* GPServerManager::CreateClient(SOCKET sock)
 
 void GPServerManager::DeleteClient(ClientSession* client)
 {
-	CSLock lock(mClientsCS);//
+	CSLock lock(mClientsCS);
 
 	client->Disconnect();
-	mClients.erase(client);
-	cout << "ClientSession removed." << endl;
 
+	//create disconnection message
+	static const char msg[] = ", disconnectd.";
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+	pckt->header.type = PT_MSG;
+
+	int i = sizeof(PacketH);
+	int len = strlen(client->mID);
+	memcpy(sendbuf + i, client->mID, len);
+	i += len;
+	memcpy(sendbuf + i, msg, sizeof(msg));
+
+	pckt->header.size = i + sizeof(msg);
+
+	mClients.erase(client);
+	//cout << "ClientSession removed." << endl;
+
+	SendToAll(sendbuf, pckt->header.size);
 }
 
 void GPServerManager::SendToAll(const char* buf, int buflen)
@@ -163,6 +179,53 @@ void GPServerManager::SendToAll(const char* buf, int buflen)
 		auto client = *iter;
 		client->Send(buf, buflen);
 	}
+}
+
+void GPServerManager::OnChat(ClientSession* client)
+{
+	Packet* pckt = (Packet*)client->mBuf;
+
+	//
+	stringstream ss;
+	ss << client->mID << ": " << (char*)&pckt->data << endl;
+	pckt->header.size = sizeof(PacketH) + ss.str().length();//
+	ss.getline((char*)&pckt->data, MAX_DAT_SIZ);
+	cout << (char*)&pckt->data << endl;
+
+	SendToAll(client->mBuf, pckt->header.size);
+}
+
+void GPServerManager::OnLogin(ClientSession* client)
+{
+	Packet* pckt = (Packet*)client->mBuf;
+
+	static const char msg[] = ", logged in.";
+
+	//set client ID //todo func, length check
+	char* id = (char*)&pckt->data;
+	cout << id << msg << endl;
+	strcpy_s(client->mID, id);
+
+	//char sendbuf[MAX_PKT_SIZ];
+	//memcpy(sendbuf, pckt, pckt->header.size);
+	//pckt = (Packet*)sendbuf;
+
+	//add connection msg
+	//char* pData = (char*)&pckt->data;
+	strcat_s(id, MAX_DAT_SIZ, msg);
+	//memcpy(sendbuf + pckt->header.size - 1, msg, strlen(msg) + 1);// +1 for '\0'
+
+	pckt->header.size += sizeof(msg); //-1?
+	pckt->header.type = PT_MSG;
+
+	SendToAll(client->mBuf, pckt->header.size);
+}
+
+void GPServerManager::OnLogout(ClientSession* client)
+{
+	//cout << client->mID << ", disconnecting." << endl;
+
+	DeleteClient(client); //
 }
 
 DWORD WINAPI GPServerManager::IocpSockRecvProc(PVOID pParam)
@@ -177,8 +240,6 @@ DWORD WINAPI GPServerManager::IocpSockRecvProc(PVOID pParam)
 
 	while (true)
 	{
-		bool bIsClDCed = false;
-
 		BOOL bIsOK = GetQueuedCompletionStatus
 		(
 			mngr->mIocp, &dwTrBytes, &upDevKey, (LPOVERLAPPED*) &pCl, INFINITE
@@ -203,7 +264,14 @@ DWORD WINAPI GPServerManager::IocpSockRecvProc(PVOID pParam)
 		//수신 받음. IOKEY_CHILD
 		if (dwTrBytes != 0) 
 		{
-			pCl->ParsePacket();
+			switch (pCl->ParsePacket())
+			{
+			case PT_MSG:
+				mngr->OnChat(pCl);
+				break;
+			case PT_USER_LOGIN:
+				mngr->OnLogin(pCl);
+			}
 
 			//다시 수신 시작
 			if (!pCl->Recv())
