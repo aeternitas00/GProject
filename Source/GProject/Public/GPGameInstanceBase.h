@@ -106,14 +106,17 @@ public:
 	/** Called when the async save happens */
 	//virtual void HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess);
 public:
-	virtual void Init();
-	virtual void Shutdown();
+	virtual void Init() override;
+	virtual void Shutdown() override;
 protected:
-	virtual void OnStart();
+	virtual void OnStart() override;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Send(FString buf);
+
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	bool Connect(); //todo Port, IP
 
 protected:
 	FGPClient* GPClient;

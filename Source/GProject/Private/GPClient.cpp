@@ -1,21 +1,29 @@
 #include "GPClient.h"
-#include "../GPServer/common/GPPacket.h"
 
 //Thread Worker Starts as NULL, prior to being instanced
 FGPClient* FGPClient::Runnable = nullptr;
 
 FGPClient::FGPClient()
 {
-	//생성되면 Init()을 호출함 //?에디터에서는 한번 생성되면 다음 변화가 있기 전까지 소멸하지 않음.
+	//?에디터에서는 한번 생성되면 다음 변화가 있기 전까지 소멸하지 않음. static 인스턴스로 만들어서?
 	Thread = FRunnableThread::Create(this, TEXT("FGPClient"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
 
 FGPClient::~FGPClient()
 {
 	GP_LOG_C(Warning);
-	delete Thread; //이 때 FRunnable::Stop을 호출하는 것으로 보임.
-	GP_LOG_C(Warning);
+	delete Thread; //FRunnableThreadWin::Kill(true)
 	Thread = nullptr;
+}
+
+FGPClient* FGPClient::InitClient()
+{
+	if (!Runnable && FPlatformProcess::SupportsMultithreading())
+	{
+		Runnable = new FGPClient();
+	}
+
+	return Runnable;
 }
 
 bool FGPClient::Init()
@@ -38,38 +46,16 @@ bool FGPClient::Init()
 		return false;
 	}
 
-	SOCKADDR_IN sa;
-	sa.sin_family = AF_INET;
-	sa.sin_port = htons(GP_PORT);
-	sa.sin_addr.s_addr = inet_addr("127.0.0.1");
+	ConnEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-	//connect to server
-	if (connect(Socket, (SOCKADDR*)&sa, sizeof(sa)) == SOCKET_ERROR)
-	{
-		UE_LOG(LogGProject, Warning, TEXT("connect failed, code : %d"), WSAGetLastError());
-		return false;
-	}
-
-	UE_LOG(LogGProject, Warning, TEXT("Connected to server."));
-
-	//test LogIn
-	char sendbuf[MAX_PKT_SIZ];
-	Packet* pckt = (Packet*)sendbuf;
-
-	pckt->header.type = PT_USER_LOGIN;
-
-	FString id = FString::FromInt(FMath::Rand());
-	pckt->header.size = sizeof(PacketH) + id.Len() + 1;
-	memcpy(&pckt->data, TCHAR_TO_ANSI(*id), id.Len() + 1);
-
-	GP_LOG(Warning, TEXT("%s, %d"), *id, pckt->header.size);
-		
-	return Send(sendbuf, pckt->header.size); //FRunnable::Create 호출로 Init이 호출 된 경우 true를 리턴하면 스레드에서 Run이 실행되는 것으로 보임.
+	return true;
 }
 
 uint32 FGPClient::Run()
 {
 	GP_LOG_C(Warning);
+
+	WaitForSingleObject(ConnEvent, INFINITE);
 
 	int iResult;
 	char recvbuf[MAX_PKT_SIZ];
@@ -81,12 +67,12 @@ uint32 FGPClient::Run()
 		if (iResult == SOCKET_ERROR)
 		{
 			GP_LOG(Warning, TEXT("recv faild, code : %d"), WSAGetLastError());
-			return false;
+			return 2;
 		}
 		else if (iResult == 0) //the connection has been gracefully closed.
 		{
 			GP_LOG(Warning, TEXT("recv is done. Session disconnected."));
-			return true;
+			return 0;
 		}
 		int size = 0;
 		while (size < iResult) //버퍼가 많을 수도 있으니 반복 처리 시도.
@@ -109,31 +95,40 @@ uint32 FGPClient::Run()
 
 			size += pckt->header.size;
 		}
-	} while (iResult > 0);
+	} while (iResult > 0); //
 	
 	return 0;
+}
+
+void FGPClient::Exit()
+{
+	closesocket(Socket);
+	WSACleanup();
 }
 
 void FGPClient::Stop()
 {
 	GP_LOG_C(Warning);
+
+	int iResult = shutdown(Socket, SD_SEND);
+	if (iResult == SOCKET_ERROR) {
+		GP_LOG(Warning, TEXT("shutdown failed: %d"), WSAGetLastError());
+	}
+	//shutdown되어 정상적으로 서버에서 0바이트를 수신하면 다시 0바이트를 보낼 것이므로 recv루프가 탈출 될 것.
 }
 
-void FGPClient::EnsureCompletion()
-{
-	GP_LOG_C(Warning);
-	Stop();
-	Thread->WaitForCompletion();
-}
+//void FGPClient::EnsureCompletion()
+//{
+//	GP_LOG_C(Warning);
+//	Stop();
+//	Thread->WaitForCompletion();
+//}
 
 void FGPClient::Shutdown()
 {
-	closesocket(Socket);
-	WSACleanup();
-
 	if (Runnable)
 	{
-		Runnable->EnsureCompletion();
+		//Runnable->EnsureCompletion();
 		delete Runnable; 
 		Runnable = nullptr;
 	}
@@ -141,7 +136,39 @@ void FGPClient::Shutdown()
 
 bool FGPClient::Login()
 {
-	return false;
+	//test LogIn
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+
+	pckt->header.type = PT_USER_LOGIN;
+
+	FString id = FString::FromInt(FMath::Rand());
+	pckt->header.size = sizeof(PacketH) + id.Len() + 1;
+	memcpy(&pckt->data, TCHAR_TO_ANSI(*id), id.Len() + 1);
+
+	GP_LOG(Warning, TEXT("%s, %d"), *id, pckt->header.size);
+
+	return Send(sendbuf, pckt->header.size);
+}
+
+bool FGPClient::Connect(u_short port, char* ip)
+{
+	SOCKADDR_IN sa;
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons(port);
+	sa.sin_addr.s_addr = inet_addr(ip);
+
+	if (connect(Socket, (SOCKADDR*)&sa, sizeof(sa)) == SOCKET_ERROR)
+	{
+		GP_LOG(Warning, TEXT("connect failed, code : %d"), WSAGetLastError());
+		return false;
+	}
+
+	GP_LOG(Display, TEXT("Connected to server."));
+
+	SetEvent(ConnEvent);
+
+	return true;
 }
 
 bool FGPClient::Send(char* buf, int len)
@@ -163,22 +190,6 @@ bool FGPClient::SendChat(FString str)
 	pckt->header.type = PT_MSG;
 	memcpy(&pckt->data, TCHAR_TO_ANSI(*str), str.Len() + 1);
 
-	Send(sendbuf, pckt->header.size);
-	return false;
+	return Send(sendbuf, pckt->header.size);
 }
 
-FGPClient* FGPClient::InitClient()
-{
-	if (Runnable)
-	{
-		GP_LOG_C(Warning);
-
-		//Runnable->Init();
-	}
-	else if (/*!Runnable &&*/ FPlatformProcess::SupportsMultithreading())
-	{
-		Runnable = new FGPClient(); 
-	}
-
-	return Runnable;
-}
