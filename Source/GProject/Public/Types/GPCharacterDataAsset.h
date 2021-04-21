@@ -4,17 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Abilities/GameplayAbility.h"
+
 #include "GPCharacterDataAsset.generated.h"
 
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFXSpawnDelegate, UObject*, FXSys);
+
 UCLASS(Blueprintable)
 class GPROJECT_API UGPCharacterDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 
 	DECLARE_EVENT(UGPCharacterDataAsset, FLoadCompletedSignature);
+
+
 
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -29,11 +35,19 @@ protected:
 	UPROPERTY(Transient)
 	TArray<UObject*> HardRef;
 
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
+	//TArray<class UGPAbilityDataAsset*> AbilityData;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
-	TArray<class UGPAbilityDataAsset*> AbilityData;
+	TArray<TSoftClassPtr<UGameplayAbility>> AbilityClasses;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Loading")
+	//TSoftClassPtr<TSubclassOf<UGameplayAbility>> AbilityClasse;
+
 
 public:
 	FLoadCompletedSignature OnLoadCompleted;
+	FFXSpawnDelegate FXSpawnCall;
 
 	virtual void PostLoad() override;
 
@@ -41,6 +55,10 @@ public:
 	virtual void LoadResources();
 	UFUNCTION()
 	void LoadResourcesDeffered();
+
+	void RecursiveLoadCheck(UClass* inClass);
+
+	//void FXWarmupSpawn(UObject* FXSys);
 
 	FORCEINLINE bool IsInitialzied() const { return bIsInitialized; }
 
