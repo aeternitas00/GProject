@@ -16,7 +16,6 @@ class AGProjectGameMode : public AGameModeBase
 public:
 	AGProjectGameMode();
 
-<<<<<<< HEAD
 	//virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override; //before AActor::PreInitializeComponents
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
@@ -24,7 +23,7 @@ public:
 	virtual void StartPlay() override;
 
 	//virtual void StartToLeaveMap() override;
-=======
+
 	UPROPERTY(BlueprintAssignable, Category = "Load")
 	FFullyLoadedDelegate OnLoadCompleted;
 
@@ -37,7 +36,6 @@ protected:
 
 	UFUNCTION()
 	void FXWarmupSpawn(UObject* FXSys);
->>>>>>> f5ed9af0209248da7e78c3445368ab9a204376ca
 };
 
 
