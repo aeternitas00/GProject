@@ -13,6 +13,14 @@ class AGProjectGameMode : public AGameModeBase
 
 public:
 	AGProjectGameMode();
+
+	//virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override; //before AActor::PreInitializeComponents
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	virtual void StartPlay() override;
+
+	//virtual void StartToLeaveMap() override;
 };
 
 

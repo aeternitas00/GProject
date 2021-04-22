@@ -21,8 +21,7 @@ protected:
 	SOCKET Socket;
 	HANDLE ConnEvent; //연결 대기 이벤트.
 
-	/** Makes sure this thread has stopped properly */
-	//void EnsureCompletion(); //FRunnableThreadWin의 소멸 중 WaitForSingleObject가 호출되기 때문에 필요 없음. 오히려 쓸모 없이 Stop이 중복 호출 됨.
+	char RecvBuf[MAX_PKT_SIZ]; //
 
 public:
 	FGPClient();
@@ -38,8 +37,8 @@ public:
 
 	////
 
-	//recv loop를 탈출하고 send shutdown.
-	virtual void Stop() override; // FRunnableThreadWin이 소멸할 때 스레드를 중지하기 위해 호출.
+	//Run을 끝내(길 바라)는 메소드.
+	virtual void Stop() override; // FRunnableThreadWin이 소멸할 때 스레드(Run)를 중지하기 위해 호출.
 
 	// End FRunnable interface
 
@@ -49,7 +48,7 @@ public:
 
 	// Winsock api 
 
-	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1");
+	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1"); //todo async
 	bool Send(char* buf, int len);
 	bool SendChat(FString str);
 
@@ -64,7 +63,4 @@ public:
 		This function returns a handle to the newly started instance.
 	*/
 	static FGPClient* InitClient();
-
-	/** Shuts down the thread. Static so it can easily be called from outside the thread context */
-	//static void Shutdown();
 };

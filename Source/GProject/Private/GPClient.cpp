@@ -54,16 +54,13 @@ bool FGPClient::Init()
 uint32 FGPClient::Run()
 {
 	GP_LOG_C(Warning);
-
 	WaitForSingleObject(ConnEvent, INFINITE);
 
 	int iResult;
-	char recvbuf[MAX_PKT_SIZ];
-	int recvbuflen = MAX_PKT_SIZ;
 
 	do
 	{
-		iResult = recv(Socket, recvbuf, recvbuflen, 0);
+		iResult = recv(Socket, RecvBuf, sizeof(RecvBuf), 0);
 		if (iResult == SOCKET_ERROR)
 		{
 			GP_LOG(Warning, TEXT("recv faild, code : %d"), WSAGetLastError());
@@ -78,7 +75,7 @@ uint32 FGPClient::Run()
 		while (size < iResult) //버퍼가 많을 수도 있으니 반복 처리 시도.
 		{
 			GP_LOG(Warning, TEXT("Bytes: %d"), iResult);
-			Packet* pckt = (Packet*)(recvbuf + size);
+			Packet* pckt = (Packet*)(RecvBuf + size);
 			GPPacketType pt = pckt->header.type;
 
 			switch (pt)
@@ -86,11 +83,14 @@ uint32 FGPClient::Run()
 			case PT_MSG:
 			case PT_USER_LOGIN:
 			case PT_USER_LOGOUT:
-				GP_LOG(Warning, TEXT("Message: %s"), *FString((char*)&pckt->data));
+				//ANSI_TO_TCHAR((char*)&pckt->data);
+				//FText::AsCultureInvariant(msg);
+				FString msg((char*)&pckt->data);
+				GP_LOG(Warning, TEXT("Message: %s"), *msg);
 				break;
 
-			default:
-				GP_LOG(Warning, TEXT("Error Packet type: %d"), pckt->header.type);
+			/*default:
+				GP_LOG(Warning, TEXT("Error Packet type: %d"), pckt->header.type);*/
 			}
 
 			size += pckt->header.size;
@@ -115,20 +115,14 @@ void FGPClient::Stop()
 		GP_LOG(Warning, TEXT("shutdown failed: %d"), WSAGetLastError());
 	}
 	//shutdown되어 정상적으로 서버에서 0바이트를 수신하면 다시 0바이트를 보낼 것이므로 recv루프가 탈출 될 것.
-}
 
-//void FGPClient::EnsureCompletion()
-//{
-//	GP_LOG_C(Warning);
-//	Stop();
-//	Thread->WaitForCompletion();
-//}
+	SetEvent(ConnEvent); //아직 연결이 되지 않은 상태일 때 Run의 대기를 풀어줌. 
+}
 
 void FGPClient::Shutdown()
 {
 	if (Runnable)
 	{
-		//Runnable->EnsureCompletion();
 		delete Runnable; 
 		Runnable = nullptr;
 	}
