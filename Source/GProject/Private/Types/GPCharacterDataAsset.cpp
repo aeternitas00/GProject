@@ -67,37 +67,6 @@ void UGPCharacterDataAsset::LoadResourcesDeffered()
 			HardRef.Add(AbilityClass);
 			
 			RecursiveLoadCheck(AbilityClass);
-
-
-			//UObject* AbilityCDO = AbilityClass->GetDefaultObject();
-
-			//for (TFieldIterator<FProperty> It(AbilityClass); It; ++It)
-			//{
-			//	//GP_LOG(Warning, TEXT("Field : %s , PropertyClass : %s"), *It->GetName(), *It->GetClass()->GetName());
-
-			//	// 한 클래스의 오브젝트형 필드의 정보를 담는 FObjectProperty
-			//	FObjectProperty* ObjProperty = FindFProperty<FObjectProperty>(AbilityClass, *It->GetName());
-			//	
-			//	if (!ObjProperty) continue;
-			//	
-			//	GP_LOG(Warning, TEXT("Name : %s / UClass : %s"), *It->GetName(), *ObjProperty->PropertyClass->GetName());
-
-			//	if (ObjProperty->PropertyClass->IsChildOf<UClass>())
-			//	{
-			//		GP_LOG(Warning, TEXT("Class Type"));
-
-			//		UClass* ObjValue = Cast<UClass>(ObjProperty->GetPropertyValue_InContainer(AbilityCDO));
-
-			//		if (ObjValue->IsValidLowLevel()) continue;
-			//
-			//		GP_LOG(Warning, TEXT("Value objects name : %s"), *ObjValue->GetName());
-
-			//		if ( ObjValue->IsChildOf<AActor>())
-			//		{ }
-			//		else if (ObjValue->IsChildOf<UFXSystemAsset>())
-			//		{ }
-			//	}
-			//}
 		}
 	}
 
@@ -143,8 +112,6 @@ void UGPCharacterDataAsset::RecursiveLoadCheck(UClass* inClass)
 
 			
 			FXSpawnCall.Broadcast(ObjectValue);
-			//FX.AddUnique(ObjectValue);
-			//FXWarmupSpawn(ObjectValue);
 		}
 	}
 }

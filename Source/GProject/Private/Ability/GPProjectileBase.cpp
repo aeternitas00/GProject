@@ -28,7 +28,7 @@ AGPProjectileBase::AGPProjectileBase()
 
 	ArrowComp->SetupAttachment(RootComponent);
 
-	InitialLifeSpan = 7.777f;
+	//InitialLifeSpan = 7.777f;
 }
 
 void AGPProjectileBase::BeginPlay()
