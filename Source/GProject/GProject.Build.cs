@@ -21,6 +21,7 @@ public class GProject : ModuleRules
 			"GameplayTasks", 
 			"GameplayAbilities",
 			"SlateCore",
+			"Niagara",
 			/*,"OnlineSubsystem",
 			 * "UMG"*/ 
 			//"Sockets",

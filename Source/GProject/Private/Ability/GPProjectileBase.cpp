@@ -27,6 +27,8 @@ AGPProjectileBase::AGPProjectileBase()
 	ArrowComp = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
 
 	ArrowComp->SetupAttachment(RootComponent);
+
+	//InitialLifeSpan = 7.777f;
 }
 
 void AGPProjectileBase::BeginPlay()

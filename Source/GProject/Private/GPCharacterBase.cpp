@@ -171,7 +171,7 @@ UGameplayAbility* AGPCharacterBase::GetSlottedAbilityInstance(FGPItemSlot ItemSl
 		//UGameplayAbility* Ability = FoundSpec->Ability;
 
 		//GP_LOG(Warning,TEXT("%s"),*Ability->GetName());
-		
+
 		return FoundSpec->Ability;
 	}		
 	return NULL;
