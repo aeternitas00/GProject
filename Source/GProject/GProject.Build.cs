@@ -14,18 +14,13 @@ public class GProject : ModuleRules
 			"CoreUObject", 
 			"Engine", 
 			"InputCore", 
-			/*"HeadMountedDisplay",*/ 
 			"NavigationSystem", 
 			"AIModule", 
 			"GameplayTags", 
 			"GameplayTasks", 
 			"GameplayAbilities",
 			"SlateCore",
-			"Niagara",
-			/*,"OnlineSubsystem",
-			 * "UMG"*/ 
-			//"Sockets",
-			//"Networking"
+			"Niagara"
 		});
     }
 }

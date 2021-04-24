@@ -5,8 +5,8 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Types/GPCharacterDataAsset.h"
 #include "Particles/ParticleSystem.h"
-//#include "NiagaraSystem.h"
-//#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h" 
+#include "NiagaraFunctionLibrary.h"
 
 
 AGProjectGameMode::AGProjectGameMode()
@@ -71,20 +71,21 @@ void AGProjectGameMode::OnCharacterDataLoaded()
 void AGProjectGameMode::FXWarmupSpawn(UObject* FXSys)
 {
 	GP_LOG(Warning, TEXT("FXWarmpUpStart"));
-	/*	if(UNiagaraSystem* NiagaraSys = Cast<UNiagaraSystem>(FXSys))
-		{
-			const FTransform Trsf(FVector(0, 0, -500.0f));
-			AActor* Temp = GEngine->GetWorld()->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
-			Temp->SetLifeSpan(2.0f);
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GEngine->GetWorld(), NiagaraSys, Trsf.GetLocation(),Trsf.Rotator())->AttachTo(Temp->GetRootComponent());
-		}
-		else */if (UParticleSystem* ParticleSys = Cast<UParticleSystem>(FXSys))
-		{
-			/*	GEngine->GetWorldFromContextObject()*/
-			const FTransform Trsf(FVector(0, 0, -500.0f));
-			UWorld* World = GetWorld();
-			AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
-			Temp->SetLifeSpan(2.0f);
-			UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachTo(Temp->GetRootComponent());
-		}
+	if(UNiagaraSystem* NiagaraSys = Cast<UNiagaraSystem>(FXSys))
+	{
+		const FTransform Trsf(FVector(0, 0, -900.0f));
+		UWorld* World = GetWorld();
+		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
+		Temp->SetLifeSpan(2.0f);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, NiagaraSys, Trsf.GetLocation(),Trsf.Rotator())->AttachTo(Temp->GetRootComponent());
+	}
+	else if (UParticleSystem* ParticleSys = Cast<UParticleSystem>(FXSys))
+	{
+		/*	GEngine->GetWorldFromContextObject()*/
+		const FTransform Trsf(FVector(0, 0, -900.0f));
+		UWorld* World = GetWorld();
+		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
+		Temp->SetLifeSpan(2.0f);
+		UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachTo(Temp->GetRootComponent());
+	}
 }
