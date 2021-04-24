@@ -1,10 +1,15 @@
 #include "GPClient.h"
+#include "GProjectPlayerController.h"
+//#include "GProjectGameMode.h"
 
 //Thread Worker Starts as NULL, prior to being instanced
 FGPClient* FGPClient::Runnable = nullptr;
 
 FGPClient::FGPClient()
 {
+	PlayerCon = nullptr;
+	//GameMode = nullptr;
+
 	//?에디터에서는 한번 생성되면 다음 변화가 있기 전까지 소멸하지 않음. static 인스턴스로 만들어서?
 	Thread = FRunnableThread::Create(this, TEXT("FGPClient"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
@@ -46,6 +51,7 @@ bool FGPClient::Init()
 		return false;
 	}
 
+	//서버와의 연결을 알리는 자동 리셋 이벤트 생성.
 	ConnEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 	return true;
@@ -54,13 +60,16 @@ bool FGPClient::Init()
 uint32 FGPClient::Run()
 {
 	GP_LOG_C(Warning);
+
+	//서버와의 연결을 기다림.
 	WaitForSingleObject(ConnEvent, INFINITE);
 
-	int iResult;
+	int iResult; //recv 결과 바이트.
 
 	do
 	{
 		iResult = recv(Socket, RecvBuf, sizeof(RecvBuf), 0);
+
 		if (iResult == SOCKET_ERROR)
 		{
 			GP_LOG(Warning, TEXT("recv faild, code : %d"), WSAGetLastError());
@@ -71,6 +80,7 @@ uint32 FGPClient::Run()
 			GP_LOG(Warning, TEXT("recv is done. Session disconnected."));
 			return 0;
 		}
+
 		int size = 0;
 		while (size < iResult) //버퍼가 많을 수도 있으니 반복 처리 시도.
 		{
@@ -87,6 +97,11 @@ uint32 FGPClient::Run()
 				//FText::AsCultureInvariant(msg);
 				FString msg((char*)&pckt->data);
 				GP_LOG(Warning, TEXT("Message: %s"), *msg);
+				if (PlayerCon)
+				{
+					//GP_LOG(Warning, TEXT("%x"), PlayerCon);
+					PlayerCon->AddChat(msg);
+				}
 				break;
 
 			/*default:
@@ -95,7 +110,7 @@ uint32 FGPClient::Run()
 
 			size += pckt->header.size;
 		}
-	} while (iResult > 0); //
+	} while (iResult > 0); // recv가 정상적으로 처리되면 반복.
 	
 	return 0;
 }
@@ -110,8 +125,7 @@ void FGPClient::Stop()
 {
 	GP_LOG_C(Warning);
 
-	int iResult = shutdown(Socket, SD_SEND);
-	if (iResult == SOCKET_ERROR) {
+	if (shutdown(Socket, SD_SEND) == SOCKET_ERROR) {
 		GP_LOG(Warning, TEXT("shutdown failed: %d"), WSAGetLastError());
 	}
 	//shutdown되어 정상적으로 서버에서 0바이트를 수신하면 다시 0바이트를 보낼 것이므로 recv루프가 탈출 될 것.
@@ -128,23 +142,6 @@ void FGPClient::Shutdown()
 	}
 }
 
-bool FGPClient::Login()
-{
-	//test LogIn
-	char sendbuf[MAX_PKT_SIZ];
-	Packet* pckt = (Packet*)sendbuf;
-
-	pckt->header.type = PT_USER_LOGIN;
-
-	FString id = FString::FromInt(FMath::Rand());
-	pckt->header.size = sizeof(PacketH) + id.Len() + 1;
-	memcpy(&pckt->data, TCHAR_TO_ANSI(*id), id.Len() + 1);
-
-	GP_LOG(Warning, TEXT("%s, %d"), *id, pckt->header.size);
-
-	return Send(sendbuf, pckt->header.size);
-}
-
 bool FGPClient::Connect(u_short port, char* ip)
 {
 	SOCKADDR_IN sa;
@@ -154,7 +151,10 @@ bool FGPClient::Connect(u_short port, char* ip)
 
 	if (connect(Socket, (SOCKADDR*)&sa, sizeof(sa)) == SOCKET_ERROR)
 	{
-		GP_LOG(Warning, TEXT("connect failed, code : %d"), WSAGetLastError());
+		int err = WSAGetLastError(); 
+		if (err == WSAEISCONN) return true; //already connected.
+
+		GP_LOG(Warning, TEXT("connect failed, code : %d"), err);
 		return false;
 	}
 
@@ -175,15 +175,32 @@ bool FGPClient::Send(char* buf, int len)
 	return true;
 }
 
-bool FGPClient::SendChat(FString str)
+bool FGPClient::SendChat(FString Chat)
 {
 	char sendbuf[MAX_PKT_SIZ];
 	Packet* pckt = (Packet*)sendbuf;
 
-	pckt->header.size = sizeof(PacketH) + str.Len() + 1;
+	pckt->header.size = sizeof(PacketH) + Chat.Len() + 1;
 	pckt->header.type = PT_MSG;
-	memcpy(&pckt->data, TCHAR_TO_ANSI(*str), str.Len() + 1);
+	memcpy(&pckt->data, TCHAR_TO_ANSI(*Chat), Chat.Len() + 1);
 
 	return Send(sendbuf, pckt->header.size);
 }
 
+bool FGPClient::Login()
+{
+	//test Log in
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+
+	pckt->header.type = PT_USER_LOGIN;
+
+	sendbuf[sizeof(PacketH)] = rand() % 9 + '1';
+	sendbuf[sizeof(PacketH) + 1] = 0;
+
+	pckt->header.size = sizeof(PacketH) + 2;
+
+	GP_LOG(Warning, TEXT("Test ID: %s, Bytes: %d"), ANSI_TO_TCHAR((char*)&pckt->data), pckt->header.size);
+
+	return Send(sendbuf, pckt->header.size);
+}

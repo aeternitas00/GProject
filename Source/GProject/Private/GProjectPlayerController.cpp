@@ -4,6 +4,8 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "Item/GPItem.h"
+#include "UI/ChatWindow.h"
+#include "GPClient.h"
 //#include "Engine/World.h"
 
 AGProjectPlayerController::AGProjectPlayerController()
@@ -12,9 +14,23 @@ AGProjectPlayerController::AGProjectPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
+void AGProjectPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (IsLocalPlayerController())
+	{
+		FGPClient* Client = FGPClient::InitClient();
+		Client->SetPlayerController(this);
+		Client->Login();//test
+	}
+}
+
 void AGProjectPlayerController::PlayerTick(float DeltaTime)
 {
-	Super::PlayerTick(DeltaTime);	
+	Super::PlayerTick(DeltaTime);
+
+	UpdateChat();
 }
 
 void AGProjectPlayerController::SetupInputComponent()
@@ -295,4 +311,24 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 
 	// Call BP update event
 	SlottedItemChanged(ItemSlot, Item);
+}
+
+void AGProjectPlayerController::UpdateChat()
+{
+	if (ChatWindow)
+	{
+		FString Chat;
+
+		if (ChatMessages.Dequeue(Chat))
+		{
+			ChatWindow->AddChat(Chat);
+		}
+	}
+}
+
+void AGProjectPlayerController::AddChat(const FString& ChatMsg)
+{
+	ChatMessages.Enqueue(ChatMsg);
+
+	//bShouldUpdateChat = true;
 }

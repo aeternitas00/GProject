@@ -77,7 +77,7 @@ void AGProjectGameMode::FXWarmupSpawn(UObject* FXSys)
 		UWorld* World = GetWorld();
 		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
 		Temp->SetLifeSpan(2.0f);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, NiagaraSys, Trsf.GetLocation(),Trsf.Rotator())->AttachTo(Temp->GetRootComponent());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, NiagaraSys, Trsf.GetLocation(),Trsf.Rotator())->AttachToComponent(Temp->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 	else if (UParticleSystem* ParticleSys = Cast<UParticleSystem>(FXSys))
 	{
@@ -86,6 +86,6 @@ void AGProjectGameMode::FXWarmupSpawn(UObject* FXSys)
 		UWorld* World = GetWorld();
 		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
 		Temp->SetLifeSpan(2.0f);
-		UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachTo(Temp->GetRootComponent());
+		UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachToComponent(Temp->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 }

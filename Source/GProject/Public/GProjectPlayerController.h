@@ -121,6 +121,7 @@ protected:
 	uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
+	virtual void BeginPlay() override;
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
@@ -133,6 +134,20 @@ protected:
 	/** Calls the inventory update callbacks */
 	void NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
+
+
+protected:
+	//uint32 bShouldUpdateChat : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UChatWindow* ChatWindow;
+
+	TQueue<FString, EQueueMode::Mpsc> ChatMessages;
+
+	void UpdateChat();
+
+public:
+	void AddChat(const FString& ChatMsg);
 };
 
 
