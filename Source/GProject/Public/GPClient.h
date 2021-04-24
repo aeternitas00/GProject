@@ -4,7 +4,9 @@
 #include "HAL/Runnable.h"
 #include "../GPServer/common/GPPacket.h"
 
+#include "Windows/AllowWindowsPlatformAtomics.h"
 #include <WinSock2.h>
+#include "Windows/HideWindowsPlatformAtomics.h"
 #pragma comment(lib,"ws2_32")
 
 
