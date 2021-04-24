@@ -57,7 +57,7 @@ void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActo
 	UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(
 	UGPBPFuncLibrary::AddTargetsToEffectContainerSpec(EffectContainerSpec,EmptyResult,TempActor));
 
-	
+
 	//SetActorEnableCollision(false);
 	//GP_LOG(Warning, TEXT("Success"));
 }

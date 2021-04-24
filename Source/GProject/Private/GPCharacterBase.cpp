@@ -172,9 +172,12 @@ UGameplayAbility* AGPCharacterBase::GetSlottedAbilityInstance(FGPItemSlot ItemSl
 
 		//GP_LOG(Warning,TEXT("%s"),*Ability->GetName());
 
-		return FoundSpec->Ability;
+		if (!FoundSpec) return nullptr;
+
+		if (FoundSpec->Ability->IsValidLowLevel())
+			return FoundSpec->Ability;
 	}		
-	return NULL;
+	return nullptr;
 }
 
 
@@ -459,7 +462,7 @@ void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGa
 {
 	// Update the character movement's walk speed
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
-
+	GP_LOG(Warning, TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed);
 	if (bAbilitiesInitialized)
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
