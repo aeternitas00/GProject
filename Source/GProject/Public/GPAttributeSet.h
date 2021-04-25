@@ -67,11 +67,11 @@ public:
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(UGPAttributeSet, Damage)
 
-	UPROPERTY(BlueprintReadOnly, Category = "Magazine")
+	UPROPERTY(BlueprintReadOnly, Category = "Magazine", ReplicatedUsing = OnRep_CurrentMag)
 	FGameplayAttributeData CurrentMag;
 	ATTRIBUTE_ACCESSORS(UGPAttributeSet, CurrentMag)
 
-	UPROPERTY(BlueprintReadOnly, Category = "Magazine")
+	UPROPERTY(BlueprintReadOnly, Category = "Magazine", ReplicatedUsing = OnRep_MagSize)
 	FGameplayAttributeData MagSize;
 	ATTRIBUTE_ACCESSORS(UGPAttributeSet, MagSize)
 
