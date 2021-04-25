@@ -17,7 +17,7 @@ class UGPGameplayAbility;
 class UGameplayEffect;
 
 UCLASS()
-class GPROJECT_API AGPCharacterBase : public ACharacter, public IAbilitySystemInterface
+class GPROJECT_API AGPCharacterBase : public ACharacter, public IAbilitySystemInterface , public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -111,6 +111,9 @@ protected:
 
 	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnTagUpdated(const FGameplayTag& Tag, bool TagExists);
+
 public:
 	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
@@ -175,6 +178,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 
+	UFUNCTION(BlueprintCallable, Category = GameplayTags)
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override { TagContainer = CharacterGameplayTags; return; }
+
+
 protected:
 	UPROPERTY()
 	UGPAbilitySystemComponent* AbilitySystemComponent;
@@ -214,6 +221,9 @@ protected:
 	/** Cached pointer to the inventory source for this character, can be null */
 	UPROPERTY()
 	TScriptInterface<IGPInventoryInterface> InventorySource;
+
+	UPROPERTY()
+	FGameplayTagContainer CharacterGameplayTags;
 
 	/** Delegate handles */
 	FDelegateHandle InventoryUpdateHandle;

@@ -14,10 +14,13 @@ class UGPGameplayAbility;
  * 
  */
 
+
 UCLASS()
 class GPROJECT_API UGPAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnTagUpdated, const FGameplayTag&, Tag, bool, TagExists);
 
 public:
 	// Constructors and overrides
@@ -31,4 +34,9 @@ public:
 
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	static UGPAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);
+
+	virtual void OnTagUpdated(const FGameplayTag& Tag, bool TagExists) override;
+
+	//UPROPERTY(BlueprintAssignable)
+	FOnTagUpdated OnTagUpdatedDelegate;
 };

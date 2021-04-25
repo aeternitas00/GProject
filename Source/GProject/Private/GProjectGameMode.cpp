@@ -70,22 +70,18 @@ void AGProjectGameMode::OnCharacterDataLoaded()
 
 void AGProjectGameMode::FXWarmupSpawn(UObject* FXSys)
 {
+	const FTransform Trsf(FVector(0, 0, -900.0f));
+	UWorld* World = GetWorld();
+	AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
+	Temp->SetLifeSpan(2.0f);
+
 	GP_LOG(Warning, TEXT("FXWarmpUpStart"));
 	if(UNiagaraSystem* NiagaraSys = Cast<UNiagaraSystem>(FXSys))
 	{
-		const FTransform Trsf(FVector(0, 0, -900.0f));
-		UWorld* World = GetWorld();
-		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
-		Temp->SetLifeSpan(2.0f);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(World, NiagaraSys, Trsf.GetLocation(),Trsf.Rotator())->AttachToComponent(Temp->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 	else if (UParticleSystem* ParticleSys = Cast<UParticleSystem>(FXSys))
 	{
-		/*	GEngine->GetWorldFromContextObject()*/
-		const FTransform Trsf(FVector(0, 0, -900.0f));
-		UWorld* World = GetWorld();
-		AActor* Temp = World->SpawnActor<AActor>(AActor::StaticClass(), Trsf);
-		Temp->SetLifeSpan(2.0f);
 		UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachToComponent(Temp->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 }

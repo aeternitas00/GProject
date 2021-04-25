@@ -40,3 +40,8 @@ UGPAbilitySystemComponent* UGPAbilitySystemComponent::GetAbilitySystemComponentF
 {
 	return Cast<UGPAbilitySystemComponent>(UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(Actor, LookForComponent));
 }
+
+void UGPAbilitySystemComponent::OnTagUpdated(const FGameplayTag& Tag, bool TagExists)
+{
+	OnTagUpdatedDelegate.Broadcast(Tag, TagExists);
+}

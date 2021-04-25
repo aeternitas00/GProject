@@ -14,7 +14,7 @@ AGPCharacterBase::AGPCharacterBase()
 	// Create ability system component, and set it to be explicitly replicated
 	AbilitySystemComponent = CreateDefaultSubobject<UGPAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
-
+	AbilitySystemComponent->OnTagUpdatedDelegate.AddDynamic(this, &AGPCharacterBase::OnTagUpdated);
 	// Create the attribute set, this replicates by default
 	// 
 	// 엔진 버그 때문에 PreInitializeComponents() 로 넘김.
