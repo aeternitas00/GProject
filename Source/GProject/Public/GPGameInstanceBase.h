@@ -120,5 +120,21 @@ public:
 
 protected:
 	FGPClient* GPClient;
+
+public:
+		DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFullyLoadedDelegate);
+
+		UPROPERTY(BlueprintAssignable, Category = "Load")
+		FFullyLoadedDelegate OnLoadCompleted;
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Load")
+	void LoadCharacterData(const TArray<UGPCharacterDataAsset*>& InData);
+
+	int8 UnloadedDataNum;
+	void OnCharacterDataLoaded();
+
+	UFUNCTION()
+	void FXWarmupSpawn(UObject* FXSys);
 };
 
