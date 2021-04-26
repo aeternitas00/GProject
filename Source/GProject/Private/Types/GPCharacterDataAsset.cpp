@@ -97,8 +97,8 @@ void UGPCharacterDataAsset::RecursiveLoadCheck(UClass* inClass)
 		{
 			UClass* ClassValue = Cast<UClass>(ObjectValue);
 
-			GP_LOG(Warning, TEXT("Class Type"));
-			GP_LOG(Warning, TEXT("Class name : %s"), *ClassValue->GetName());
+			//GP_LOG(Warning, TEXT("Class Type"));
+			//GP_LOG(Warning, TEXT("Class name : %s"), *ClassValue->GetName());
 
 			if (ClassValue->IsChildOf<AActor>())
 			{
@@ -107,8 +107,8 @@ void UGPCharacterDataAsset::RecursiveLoadCheck(UClass* inClass)
 		}
 		else if (ObjProperty->PropertyClass->IsChildOf<UFXSystemAsset>())
 		{
-			GP_LOG(Warning, TEXT("FX Type"));
-			GP_LOG(Warning, TEXT("Class name : %s"), *ObjectValue->GetName());
+			//GP_LOG(Warning, TEXT("FX Type"));
+			//GP_LOG(Warning, TEXT("Class name : %s"), *ObjectValue->GetName());
 
 			
 			FXSpawnCall.Broadcast(ObjectValue);

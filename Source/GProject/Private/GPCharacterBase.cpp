@@ -36,11 +36,11 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 
 	// Try setting the inventory source, this will fail for AI
 	InventorySource = NewController;
-	GP_LOG(Warning, TEXT("PossessedBy Called"));
+	//GP_LOG(Warning, TEXT("PossessedBy Called"));
 
 	if (InventorySource)
 	{
-		GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
+		//GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
 		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
 		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
 	}
@@ -462,7 +462,7 @@ void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGa
 {
 	// Update the character movement's walk speed
 	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
-	GP_LOG(Warning, TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed);
+	//GP_LOG(Warning, TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed);
 	if (bAbilitiesInitialized)
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
