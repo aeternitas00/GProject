@@ -9,7 +9,7 @@
 // ----------------------------------------------------------------------------------------------------------------
 
 #include "UObject/PrimaryAssetId.h"
-//#include "GPCharacterBase.h"
+#include "Engine/Datatable.h"
 //#include "GPCharacterDataAsset.h"
 #include "GPTypes.generated.h"
 
@@ -130,25 +130,25 @@ struct GPROJECT_API FGPItemData
 class AGPCharacterBase;
 
 USTRUCT(BlueprintType)
-struct GPROJECT_API FGPCharacterAssetStruct
+struct GPROJECT_API FGPCharacterAssetStruct : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	FGPCharacterAssetStruct():EnemyAssetData(nullptr), MinLevel(0), MaxLevel(0), CharacterClass(nullptr)
+	FGPCharacterAssetStruct():EnemyAssetData(nullptr), MinDifficulty(0), MaxDifficulty(0), CharacterClass(nullptr)
 	{}
 
 	/** The type of items that can go in this slot */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
 	class UGPCharacterDataAsset* EnemyAssetData;
 
 	/** The number of this slot, 0 indexed */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int32 MinLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
+	int32 MinDifficulty;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	int32 MaxLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
+	int32 MaxDifficulty;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Character)
 	TSubclassOf<AGPCharacterBase> CharacterClass;
 };
 
