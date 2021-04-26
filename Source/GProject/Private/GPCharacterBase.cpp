@@ -22,6 +22,8 @@ AGPCharacterBase::AGPCharacterBase()
 	//AttributeSet = CreateDefaultSubobject<UGPAttributeSet>(TEXT("AttributeSet"));
 	
 	bAbilitiesInitialized = false;
+
+	bNetLoadOnClient = false;
 }
 void AGPCharacterBase::PreInitializeComponents()
 {
