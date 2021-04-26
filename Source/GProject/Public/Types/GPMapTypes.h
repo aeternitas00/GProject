@@ -8,7 +8,9 @@
 // It's also a good place to put things like data table row structs
 // ----------------------------------------------------------------------------------------------------------------
 
+#include "GProject.h"
 #include "Engine/Datatable.h"
+#include "Engine/LevelStreamingDynamic.h"
 #include "GPMapTypes.generated.h"
 
 USTRUCT(BlueprintType)
@@ -16,19 +18,25 @@ struct GPROJECT_API FGPMapConnectionData
 {
 	GENERATED_BODY()
 
-	FGPMapConnectionData(){}
+	FGPMapConnectionData():ConnectionType(TEXT("")), PossibleConnectionType({}), PossibleMapType({}), OffsetFromCenterOfMap(FVector::ZeroVector), RotationOfConnectionPoint(FRotator::ZeroRotator){}
 
-	/** The type of items that can go in this slot */
+	// Type of connection point
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FName ConnectionType;
 
+	// This connection point can be connected with other connection point with these types of one
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	TArray<FName> RestrictedMapType;
+	TArray<FName> PossibleConnectionType;
 
-	/** The number of this slot, 0 indexed */
+	// This connection point cannot be connected with other connection point with these types of one
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TArray<FName> PossibleMapType;
+
+	// This connection pointer's world location in sublevel
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FVector OffsetFromCenterOfMap;
 
+	// This connection pointer's world rotation in sublevel
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FRotator RotationOfConnectionPoint;
 };
@@ -38,12 +46,13 @@ struct GPROJECT_API FGPMapData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	FGPMapData() {}
+	FGPMapData():MapConnections({}),MapType(TEXT("")), MinDifficulty(0), MaxDifficulty(0), MapAsset(nullptr){}
 
-	/** The type of items that can go in this slot */
+	// Data of connection point
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	TArray<FGPMapConnectionData> MapConnections;
 
+	// Type of map , maybe tag
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FName MapType;
 
@@ -53,7 +62,7 @@ struct GPROJECT_API FGPMapData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	int32 MaxDifficulty;
 
-	/** The number of this slot, 0 indexed */
+	// Load target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	TSoftObjectPtr<UWorld> MapAsset;
 };
@@ -63,17 +72,28 @@ struct GPROJECT_API FGPLevelNode
 {
 	GENERATED_BODY()
 
-	FGPLevelNode() {}
+	FGPLevelNode():ConnectedLevelIndex({}),LevelObject(nullptr), MapAssetName(TEXT("")), isLoaded(false) {}
 
-	/** The type of items that can go in this slot */
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	//TArray<FGPMapConnectionData> MapConnections;
+	// Index of where we have to go
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TArray<int32> ConnectedLevelIndex;
 
-	/** The number of this slot, 0 indexed */
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	//ULevelStreamingDynamic LevelObject;
+	// Index of other level's connection point 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TArray<int32> ConnectionPointIndex;
+
+	// Loaded level object
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	ULevelStreamingDynamic* LevelObject;
+
+	// Load target
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FString MapAssetName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	bool isLoaded;
+
+	//UFUNCTION(BlueprintCallable, Category = "Load")
+	//void NotifyLoaded(ULevelStreamingDynamic* inLevelDynamic);
 };
 
