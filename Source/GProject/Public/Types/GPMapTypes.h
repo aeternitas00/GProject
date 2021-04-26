@@ -66,12 +66,12 @@ struct GPROJECT_API FGPLevelNode
 	FGPLevelNode() {}
 
 	/** The type of items that can go in this slot */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	TArray<FGPMapConnectionData> MapConnections;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	//TArray<FGPMapConnectionData> MapConnections;
 
 	/** The number of this slot, 0 indexed */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	ULevelStreamingDynamic LevelObject;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	//ULevelStreamingDynamic LevelObject;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	bool isLoaded;
