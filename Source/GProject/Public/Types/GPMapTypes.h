@@ -72,7 +72,7 @@ struct GPROJECT_API FGPLevelNode
 {
 	GENERATED_BODY()
 
-	FGPLevelNode():ConnectedLevelIndex({}),LevelObject(nullptr), MapAssetName(TEXT("")), isLoaded(false) {}
+	FGPLevelNode():ConnectedLevelIndex({}),LevelObject(nullptr), MapTableRowName(TEXT("")), isLoaded(false) {}
 
 	// Index of where we have to go
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
@@ -88,7 +88,7 @@ struct GPROJECT_API FGPLevelNode
 
 	// Load target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	FString MapAssetName;
+	FName MapTableRowName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	bool isLoaded;
