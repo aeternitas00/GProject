@@ -48,5 +48,5 @@ public:
 	static TArray<FActiveGameplayEffectHandle> ApplyExternalEffectContainerSpec(const FGPGameplayEffectContainerSpec& ContainerSpec);
 
 	UFUNCTION(BlueprintCallable, Category = Ability)
-	static AGPProjectileBase* SpawnProjectileFromAbility(UGPGameplayAbility* SpawningAbility, TSubclassOf<AGPProjectileBase> ProjectileClass, FGameplayTag GameplayTag, const FGameplayEventData& EventData, const FTransform& OverrideTransform = FTransform());
+	static AGPProjectileBase* SpawnProjectileFromAbility(UGPGameplayAbility* SpawningAbility, TSubclassOf<AGPProjectileBase> ProjectileClass, FGameplayTag GameplayTag, const FGameplayEventData& EventData, const FTransform& inTransform, bool bOverrideTransform);
 };

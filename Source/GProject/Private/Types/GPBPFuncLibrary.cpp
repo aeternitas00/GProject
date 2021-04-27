@@ -67,7 +67,7 @@ TArray<FActiveGameplayEffectHandle> UGPBPFuncLibrary::ApplyExternalEffectContain
 }
 
 
-AGPProjectileBase* UGPBPFuncLibrary::SpawnProjectileFromAbility(UGPGameplayAbility* SpawningAbility, TSubclassOf<AGPProjectileBase> ProjectileClass, FGameplayTag GameplayTag, const FGameplayEventData& EventData, const FTransform& OverrideTransform = FTransform())
+AGPProjectileBase* UGPBPFuncLibrary::SpawnProjectileFromAbility(UGPGameplayAbility* SpawningAbility, TSubclassOf<AGPProjectileBase> ProjectileClass, FGameplayTag GameplayTag, const FGameplayEventData& EventData, const FTransform& inTransform = FTransform(),bool bOverrideTransform = false)
 {
 	FGPGameplayEffectContainerSpec Spec = SpawningAbility->MakeEffectContainerSpec(GameplayTag, EventData, -1);
 	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(SpawningAbility->GetOwningActorFromActorInfo());
@@ -78,10 +78,9 @@ AGPProjectileBase* UGPBPFuncLibrary::SpawnProjectileFromAbility(UGPGameplayAbili
 
 	if (UGPBPFuncLibrary::DoesEffectContainerSpecHaveEffects(Spec) && UKismetSystemLibrary::IsValidClass(ProjectileClass))
 	{
-		FTransform Trsf = OverrideTransform;
-		
-		if(Trsf.Equals(FTransform()))
-			Trsf= OwningCharacter->GetActorTransform();
+		FTransform Trsf = OwningCharacter->GetActorTransform();
+		if (bOverrideTransform)
+			Trsf = inTransform;
 
 		Trsf.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
 		FActorSpawnParameters SpawnParameters;
