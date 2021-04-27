@@ -145,9 +145,13 @@ protected:
 	TQueue<FString, EQueueMode::Mpsc> ChatMessages;
 
 	void UpdateChat();
-
 public:
 	void AddChat(const FString& ChatMsg);
+
+protected:
+	FTimerHandle SendTimer;
+
+	void SendData();
 };
 
 

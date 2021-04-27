@@ -6,6 +6,7 @@
 #include "Item/GPItem.h"
 #include "UI/ChatWindow.h"
 #include "GPClient.h"
+#include <sstream>
 //#include "Engine/World.h"
 
 AGProjectPlayerController::AGProjectPlayerController()
@@ -22,7 +23,10 @@ void AGProjectPlayerController::BeginPlay()
 	{
 		FGPClient* Client = FGPClient::InitClient();
 		Client->SetPlayerController(this);
-		Client->Login();//test
+		//if (Client->Login()) //test
+		{
+			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 0.0167f, true);
+		}
 	}
 }
 
@@ -331,4 +335,12 @@ void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 	ChatMessages.Enqueue(ChatMsg);
 
 	//bShouldUpdateChat = true;
+}
+
+void AGProjectPlayerController::SendData()
+{
+	if (GetPawn())
+	{
+		
+	}
 }
