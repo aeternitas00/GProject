@@ -55,4 +55,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	FORCEINLINE void AddIgnoreActorWhenMoving(AActor* inActor);
 };

@@ -69,3 +69,7 @@ void AGPProjectileBase::Tick(float DeltaTime)
 
 }
 
+FORCEINLINE void AGPProjectileBase::AddIgnoreActorWhenMoving(AActor* inActor)
+{
+	SphereCollision->IgnoreActorWhenMoving(inActor,true);
+}

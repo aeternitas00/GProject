@@ -3,6 +3,10 @@
 
 #include "Types/GPBPFuncLibrary.h"
 #include "Types/GPTypes.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Ability/GPGameplayAbility.h"
+#include "Ability/GPProjectileBase.h"
+#include "GPCharacterBase.h"
 
 bool UGPBPFuncLibrary::EqualEqual_GPItemSlot(const FGPItemSlot& A, const FGPItemSlot& B)
 {
@@ -60,4 +64,34 @@ TArray<FActiveGameplayEffectHandle> UGPBPFuncLibrary::ApplyExternalEffectContain
 		}
 	}
 	return AllEffects;
+}
+
+
+AGPProjectileBase* UGPBPFuncLibrary::SpawnProjectileFromAbility(UGPGameplayAbility* SpawningAbility, TSubclassOf<AGPProjectileBase> ProjectileClass, FGameplayTag GameplayTag, const FGameplayEventData& EventData, const FTransform& OverrideTransform = FTransform())
+{
+	FGPGameplayEffectContainerSpec Spec = SpawningAbility->MakeEffectContainerSpec(GameplayTag, EventData, -1);
+	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(SpawningAbility->GetOwningActorFromActorInfo());
+
+	AGPProjectileBase* Projectile = nullptr;
+
+	if (!OwningCharacter->IsValidLowLevel()) return nullptr;
+
+	if (UGPBPFuncLibrary::DoesEffectContainerSpecHaveEffects(Spec) && UKismetSystemLibrary::IsValidClass(ProjectileClass))
+	{
+		FTransform Trsf = OverrideTransform;
+		
+		if(Trsf.Equals(FTransform()))
+			Trsf= OwningCharacter->GetActorTransform();
+
+		Trsf.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Instigator = OwningCharacter;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		Projectile = OwningCharacter->GetWorld()->SpawnActor<AGPProjectileBase>(ProjectileClass, Trsf, SpawnParameters);
+
+		Projectile->AddIgnoreActorWhenMoving(OwningCharacter);
+	}
+
+	return Projectile;
 }
