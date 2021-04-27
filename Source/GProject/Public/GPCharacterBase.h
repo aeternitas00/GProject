@@ -29,6 +29,7 @@ public:
 	virtual void OnRep_Controller() override;
 	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreInitializeComponents() override;
+	//virtual void BeginPlay() override;
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

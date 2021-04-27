@@ -25,6 +25,7 @@ AGPCharacterBase::AGPCharacterBase()
 
 	bNetLoadOnClient = false;
 }
+
 void AGPCharacterBase::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
@@ -32,6 +33,7 @@ void AGPCharacterBase::PreInitializeComponents()
 	// Engine Bug Fix
 	AttributeSet = NewObject<UGPAttributeSet>(this,TEXT("AttributeSet"));
 }
+
 void AGPCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
