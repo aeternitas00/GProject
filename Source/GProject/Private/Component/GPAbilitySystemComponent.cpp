@@ -45,3 +45,22 @@ void UGPAbilitySystemComponent::OnTagUpdated(const FGameplayTag& Tag, bool TagEx
 {
 	OnTagUpdatedDelegate.Broadcast(Tag, TagExists);
 }
+
+void UGPAbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	GP_LOG(Warning,TEXT("%s"), *GetOwnerActor()->GetName());//AI는 안함.
+
+	Super::OnRep_ActivateAbilities();
+
+	//for (auto& Spec : ActivatableAbilities.Items)
+	
+	
+	Cast<AGPCharacterBase>(GetOwnerActor())->SetSlottedAbilitiesByRep();
+}
+
+void UGPAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	GP_LOG(Warning,TEXT("%s"), *GetOwnerActor()->GetName());//AI는 안함.
+
+	Super::OnGiveAbility(AbilitySpec);
+}

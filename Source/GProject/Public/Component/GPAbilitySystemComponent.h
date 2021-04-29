@@ -39,4 +39,8 @@ public:
 
 	//UPROPERTY(BlueprintAssignable)
 	FOnTagUpdated OnTagUpdatedDelegate;
+
+protected:
+	virtual void OnRep_ActivateAbilities() override;
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
 };
