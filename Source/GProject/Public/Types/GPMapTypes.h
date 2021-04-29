@@ -36,7 +36,7 @@ struct GPROJECT_API FGPMapConnectionData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FVector OffsetFromCenterOfMap;
 
-	// This connection pointer's world rotation in sublevel
+	// This connection pointer's world rotation in sublevel , ** ROTATION FROM X AXIS VECTOR **
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FRotator RotationOfConnectionPoint;
 };
