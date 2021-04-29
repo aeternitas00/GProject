@@ -34,6 +34,8 @@ public:
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	void SetSlottedAbilitiesByRep();//
+
 protected:
 
 	/** Remove slotted gameplay abilities, if force is false it only removes invalid ones */

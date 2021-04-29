@@ -47,17 +47,10 @@ void AGPCharacterBase::Restart()
 
 	Super::Restart();
 
-	if (GetController())
+	/*if (GetController())
 	{
-		GP_LOG(Warning, TEXT("InitAS: %s"), *GetName());
-		// Initialize our abilities
-		if (AbilitySystemComponent)
-		{
-			AbilitySystemComponent->InitAbilityActorInfo(this, this);
-			//AddSlottedGameplayAbilities();
-			AddStartupGameplayAbilities();
-		}
-	}
+		
+	}*/
 }
 
 void AGPCharacterBase::PossessedBy(AController* NewController)
@@ -68,13 +61,20 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 
 	// Try setting the inventory source, this will fail for AI
 	InventorySource = NewController;
-	//GP_LOG(Warning, TEXT("PossessedBy Called"));
 
 	if (InventorySource)
 	{
 		//GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
 		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
 		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
+	}
+
+	// Initialize our abilities
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		//AddSlottedGameplayAbilities();
+		AddStartupGameplayAbilities();
 	}
 }
 
@@ -107,6 +107,25 @@ void AGPCharacterBase::OnRep_Controller()
 UAbilitySystemComponent* AGPCharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void AGPCharacterBase::SetSlottedAbilitiesByRep()
+{
+	auto& Specs = GetAbilitySystemComponent()->GetActivatableAbilities();
+	for (const auto& Spec : Specs)
+	{
+		const auto* Slot = DefaultSlottedAbilities.FindKey(Spec.Ability->GetClass());
+		if (Slot && Slot->IsValid())
+		{
+			SlottedAbilities.Add(*Slot, Spec.Handle);
+			GP_LOG(Warning, TEXT("H: %s, GA: %s"), *Spec.Handle.ToString(), *Spec.Ability->GetName());
+		}
+	}
+
+	/*for (const auto& DefaultSlot : DefaultSlottedAbilities)
+	{
+		
+	}*/
 }
 
 float AGPCharacterBase::GetHealth() const
@@ -149,9 +168,9 @@ float AGPCharacterBase::GetMagSize() const
 
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
-	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
+	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //이 핸들이 GAS의 Replicated된 Container안의 Spec을 가리켜야함.
 	
-	UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
+	//UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
 
 	bool rv=false;
 
@@ -381,10 +400,9 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 	{
 		FGameplayAbilitySpecHandle& SpecHandle = SlottedAbilities.FindOrAdd(SpecPair.Key);
 
-		if (!SpecHandle.IsValid() && GetLocalRole() == ROLE_Authority)
+		if (!SpecHandle.IsValid())
 		{
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
-			
 		}
 	}
 }
@@ -433,15 +451,12 @@ void AGPCharacterBase::AddStartupGameplayAbilities()
 {
 	check(AbilitySystemComponent);
 
-	if (!bAbilitiesInitialized)
+	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
 	{
 		// Grant abilities, but only on the server	
-		if (GetLocalRole() == ROLE_Authority)
+		for (TPair<TSubclassOf<UGPGameplayAbility>, int32>& StartupAbility : GameplayAbilities)
 		{
-			for (TPair<TSubclassOf<UGPGameplayAbility>, int32>& StartupAbility : GameplayAbilities)
-			{
-				AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility.Key, StartupAbility.Value, INDEX_NONE, this));
-			}
+			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility.Key, StartupAbility.Value, INDEX_NONE, this));
 		}
 		
 		// Now apply passives
