@@ -29,7 +29,8 @@ public:
 	virtual void OnRep_Controller() override;
 	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreInitializeComponents() override;
-	//virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
+	virtual void Restart() override;
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -100,7 +101,9 @@ protected:
 
 	// Called from RPGAttributeSet, these call BP events above
 	virtual void HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
-	
+
+	// Update movement when MoveSpeed is changed. Called from Handle~ for server, OnRep_~ for clients.
+	virtual void SetMovementSpeed(float Speed);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
@@ -216,8 +219,8 @@ protected:
 	int32 bAbilitiesInitialized;
 
 	/** List of attributes modified by the ability system */
-	UPROPERTY()
-	UGPAttributeSet* AttributeSet;
+	UPROPERTY(BlueprintReadOnly)
+	UGPAttributeSet* AttributeSet; //이 객체와 실제로 GAS에서 처리하는 객체(replicated)는 다름.
 
 	/** Cached pointer to the inventory source for this character, can be null */
 	UPROPERTY()

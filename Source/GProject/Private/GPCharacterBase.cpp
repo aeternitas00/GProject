@@ -34,8 +34,36 @@ void AGPCharacterBase::PreInitializeComponents()
 	AttributeSet = NewObject<UGPAttributeSet>(this,TEXT("AttributeSet"));
 }
 
+void AGPCharacterBase::BeginPlay()
+{
+	GP_LOG(Warning, TEXT("%s"), *GetName());
+
+	Super::BeginPlay();
+}
+
+void AGPCharacterBase::Restart()
+{
+	GP_LOG(Warning, TEXT("%s"), *GetName());
+
+	Super::Restart();
+
+	if (GetController())
+	{
+		GP_LOG(Warning, TEXT("InitAS: %s"), *GetName());
+		// Initialize our abilities
+		if (AbilitySystemComponent)
+		{
+			AbilitySystemComponent->InitAbilityActorInfo(this, this);
+			//AddSlottedGameplayAbilities();
+			AddStartupGameplayAbilities();
+		}
+	}
+}
+
 void AGPCharacterBase::PossessedBy(AController* NewController)
 {
+	GP_LOG(Warning, TEXT("%s"), *GetName());
+
 	Super::PossessedBy(NewController);
 
 	// Try setting the inventory source, this will fail for AI
@@ -47,14 +75,6 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 		//GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
 		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
 		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
-	}
-
-	// Initialize our abilities
-	if (AbilitySystemComponent)
-	{
-		AbilitySystemComponent->InitAbilityActorInfo(this, this);
-		//AddSlottedGameplayAbilities();
-		AddStartupGameplayAbilities();
 	}
 }
 
@@ -361,7 +381,7 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 	{
 		FGameplayAbilitySpecHandle& SpecHandle = SlottedAbilities.FindOrAdd(SpecPair.Key);
 
-		if (!SpecHandle.IsValid())
+		if (!SpecHandle.IsValid() && GetLocalRole() == ROLE_Authority)
 		{
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
 			
@@ -413,14 +433,17 @@ void AGPCharacterBase::AddStartupGameplayAbilities()
 {
 	check(AbilitySystemComponent);
 
-	if (GetLocalRole() == ROLE_Authority && !bAbilitiesInitialized)
+	if (!bAbilitiesInitialized)
 	{
 		// Grant abilities, but only on the server	
-		for (TPair<TSubclassOf<UGPGameplayAbility>, int32>& StartupAbility : GameplayAbilities)
+		if (GetLocalRole() == ROLE_Authority)
 		{
-			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility.Key, StartupAbility.Value, INDEX_NONE, this));
+			for (TPair<TSubclassOf<UGPGameplayAbility>, int32>& StartupAbility : GameplayAbilities)
+			{
+				AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(StartupAbility.Key, StartupAbility.Value, INDEX_NONE, this));
+			}
 		}
-
+		
 		// Now apply passives
 		for (TSubclassOf<UGameplayEffect>& GameplayEffect : PassiveGameplayEffects)
 		{
@@ -464,13 +487,20 @@ void AGPCharacterBase::HandleManaChanged(float DeltaValue, const struct FGamepla
 
 void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	// Update the character movement's walk speed
-	GetCharacterMovement()->MaxWalkSpeed = GetMoveSpeed();
-	//GP_LOG(Warning, TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed);
+	GP_LOG(Warning, TEXT("C: %f, B: %f"), GetMoveSpeed(), AttributeSet->MoveSpeed.GetBaseValue());
+	SetMovementSpeed(GetMoveSpeed());
+
 	if (bAbilitiesInitialized)
 	{
 		OnMoveSpeedChanged(DeltaValue, EventTags);
 	}
+}
+
+void AGPCharacterBase::SetMovementSpeed(float Speed)
+{
+	GP_LOG(Warning, TEXT("R: %f, Ch: %f"), Speed, GetMoveSpeed());
+
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
 void AGPCharacterBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)

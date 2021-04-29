@@ -15,8 +15,16 @@ AGProjectPlayerController::AGProjectPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 }
 
+void AGProjectPlayerController::OnPossess(APawn* InPawn)
+{
+	GP_LOG(Warning, TEXT("%s"), *GetName());
+	Super::OnPossess(InPawn);
+}
+
 void AGProjectPlayerController::BeginPlay()
 {
+	GP_LOG(Warning, TEXT("%s"), *GetName());
+
 	Super::BeginPlay();
 
 	if (IsLocalPlayerController())
@@ -25,7 +33,7 @@ void AGProjectPlayerController::BeginPlay()
 		Client->SetPlayerController(this);
 		//if (Client->Login()) //test
 		{
-			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 0.0167f, true);
+			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 1.f, true);
 		}
 	}
 }
@@ -35,6 +43,13 @@ void AGProjectPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	UpdateChat();
+}
+
+void AGProjectPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 }
 
 void AGProjectPlayerController::SetupInputComponent()
@@ -341,6 +356,16 @@ void AGProjectPlayerController::SendData()
 {
 	if (GetPawn())
 	{
-		
+		//todo thread
+
+		std::stringstream ss;
+		const FVector& Location = GetPawn()->GetActorLocation();
+		const FRotator& Rotation = GetPawn()->GetActorRotation();
+
+		ss << Location.X << Location.Y << Location.Z;
+		float test = 0.f;
+		float test2 = 0.f;
+		ss >> test >> test2;
+		GP_LOG(Display, TEXT("%f,%f, %s"), test, test2, ANSI_TO_TCHAR(ss.str().c_str()))
 	}
 }

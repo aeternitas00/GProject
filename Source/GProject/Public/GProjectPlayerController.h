@@ -121,8 +121,10 @@ protected:
 	uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
+	virtual void OnPossess(APawn* InPawn) override; //Possess 자체는 final이라 override 못함. setpawn
 	virtual void BeginPlay() override;
 	virtual void PlayerTick(float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
