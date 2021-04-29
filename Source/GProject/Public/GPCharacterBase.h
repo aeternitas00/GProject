@@ -34,7 +34,10 @@ public:
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	void SetSlottedAbilitiesByRep();//
+	virtual void OnGiveAbility(const FGameplayAbilitySpec& Spec); // Called from GA::OnGiveAbility
+
+	UFUNCTION(Client, reliable)
+	virtual void ClientSlottedAbilityChanged(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle); // for client set SlottedAbilities //TPair·Î ¸øÁÜ.
 
 protected:
 

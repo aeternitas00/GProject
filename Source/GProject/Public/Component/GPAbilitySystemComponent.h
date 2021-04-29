@@ -41,6 +41,7 @@ public:
 	FOnTagUpdated OnTagUpdatedDelegate;
 
 protected:
-	virtual void OnRep_ActivateAbilities() override;
-	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;
+	//AI는 레플레이션 관련 함수들을 호출 안하도록 되어있는 듯.
+	/*virtual void OnRep_ActivateAbilities() override;
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;*/
 };

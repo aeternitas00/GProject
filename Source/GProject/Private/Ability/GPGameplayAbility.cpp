@@ -89,3 +89,11 @@ TArray<FActiveGameplayEffectHandle> UGPGameplayAbility::ApplyEffectContainer(FGa
 	FGPGameplayEffectContainerSpec Spec = MakeEffectContainerSpec(ContainerTag, EventData, OverrideGameplayLevel);
 	return ApplyEffectContainerSpec(Spec);
 }
+
+void UGPGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnGiveAbility(ActorInfo, Spec);
+
+	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(ActorInfo->OwnerActor);
+	OwningCharacter->OnGiveAbility(Spec);
+}

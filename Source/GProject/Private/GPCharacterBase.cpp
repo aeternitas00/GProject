@@ -46,11 +46,6 @@ void AGPCharacterBase::Restart()
 	GP_LOG(Warning, TEXT("%s"), *GetName());
 
 	Super::Restart();
-
-	/*if (GetController())
-	{
-		
-	}*/
 }
 
 void AGPCharacterBase::PossessedBy(AController* NewController)
@@ -109,23 +104,35 @@ UAbilitySystemComponent* AGPCharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AGPCharacterBase::SetSlottedAbilitiesByRep()
+void AGPCharacterBase::OnGiveAbility(const FGameplayAbilitySpec& Spec)
 {
-	auto& Specs = GetAbilitySystemComponent()->GetActivatableAbilities();
-	for (const auto& Spec : Specs)
-	{
-		const auto* Slot = DefaultSlottedAbilities.FindKey(Spec.Ability->GetClass());
-		if (Slot && Slot->IsValid())
-		{
-			SlottedAbilities.Add(*Slot, Spec.Handle);
-			GP_LOG(Warning, TEXT("H: %s, GA: %s"), *Spec.Handle.ToString(), *Spec.Ability->GetName());
-		}
-	}
+	//if (!GetController()->IsLocalPlayerController()) return; //Just avoiding SlottedAbilities reset on server.
+	// 
+	//Give client vaild slotted ability. Currently default slotted item ability only.
+	GP_LOG(Warning, TEXT("H: %s, GA: %s"), *Spec.Handle.ToString(), *Spec.Ability->GetName());
 
-	/*for (const auto& DefaultSlot : DefaultSlottedAbilities)
+	/*const auto* Slot = DefaultSlottedAbilities.FindKey(Spec.Ability->GetClass());
+	if (Slot && Slot->IsValid())
 	{
-		
+		SlottedAbilities.Add(*Slot, Spec.Handle);
+		return;
 	}*/
+
+	//for (auto& SlottedAbility : SlottedAbilities)
+	//{
+	//	//Find empty slot
+	//	if (SlottedAbility.Value == FGameplayAbilitySpecHandle())
+	//	{
+	//		SlottedAbility.Value = Spec.Handle;
+	//		GP_LOG(Warning, TEXT("H: %s, GA: %s"), *Spec.Handle.ToString(), *Spec.Ability->GetName());
+	//	}
+	//}
+}
+
+void AGPCharacterBase::ClientSlottedAbilityChanged_Implementation(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle)
+{
+	GP_LOG_C(Warning);
+	SlottedAbilities.Add(Slot, SpecHandle);
 }
 
 float AGPCharacterBase::GetHealth() const
@@ -403,6 +410,10 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 		if (!SpecHandle.IsValid())
 		{
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
+
+			// Give remote client the slot.
+			if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
+				ClientSlottedAbilityChanged(SpecPair.Key, SpecHandle);
 		}
 	}
 }
@@ -443,6 +454,10 @@ void AGPCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 
 			// Make sure handle is cleared even if ability wasn't found
 			ExistingPair.Value = FGameplayAbilitySpecHandle();
+
+			// Invalidate remote client's slot.
+			if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
+				ClientSlottedAbilityChanged(ExistingPair.Key, ExistingPair.Value);
 		}
 	}
 }
