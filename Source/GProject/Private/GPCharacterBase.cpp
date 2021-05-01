@@ -140,12 +140,16 @@ float AGPCharacterBase::GetHealth() const
 	if (!AttributeSet)
 		return 1.f;
 
-	return AttributeSet->GetHealth();
+
+	
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetHealthAttribute());
+	//return AttributeSet->GetHealth();
 }
 
 float AGPCharacterBase::GetMaxHealth() const
 {
-	return AttributeSet->GetMaxHealth();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetMaxHealthAttribute());
+	//return AttributeSet->GetMaxHealth();
 }
 
 float AGPCharacterBase::GetMana() const
@@ -165,12 +169,14 @@ float AGPCharacterBase::GetMoveSpeed() const
 
 float AGPCharacterBase::GetCurrentMag() const
 {
-	return AttributeSet->GetCurrentMag();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetCurrentMagAttribute());
+	//return AttributeSet->GetCurrentMag();
 }
 
 float AGPCharacterBase::GetMagSize() const
 {
-	return AttributeSet->GetMagSize();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetMagSizeAttribute());
+	//return AttributeSet->GetMagSize();
 }
 
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
