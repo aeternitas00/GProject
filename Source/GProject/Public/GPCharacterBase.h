@@ -27,14 +27,14 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 	virtual void OnRep_Controller() override;
-	//virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreInitializeComponents() override;
 	virtual void BeginPlay() override;
 	virtual void Restart() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnGiveAbility(const FGameplayAbilitySpec& Spec); // Called from GA::OnGiveAbility
+	
 	// Implement IAbilitySystemInterface
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	virtual void OnGiveAbility(const FGameplayAbilitySpec& Spec); // Called from GA::OnGiveAbility
 
 	UFUNCTION(Client, reliable)
 	virtual void ClientSlottedAbilityChanged(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle); // for client set SlottedAbilities //TPair·Î ¸øÁÜ.
@@ -123,6 +123,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTagUpdated(const FGameplayTag& Tag, bool TagExists);
 
+	UFUNCTION()
+	virtual void OnRep_WeaponActor(const AActor* OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_WeaponSlot(const FGPItemSlot& OldValue);
 public:
 	/** Returns current health, will be 0 if dead */
 	UFUNCTION(BlueprintCallable)
@@ -213,10 +218,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FGPItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponActor, EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
 	AActor* CurrentWeaponActor;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
+	UPROPERTY(ReplicatedUsing = OnRep_WeaponSlot,EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
 	FGPItemSlot CurrentWeaponSlot;
 
 	/** If true we have initialized our abilities */

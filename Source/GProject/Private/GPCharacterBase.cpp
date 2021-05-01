@@ -412,8 +412,8 @@ void AGPCharacterBase::AddSlottedGameplayAbilities()
 			SpecHandle = AbilitySystemComponent->GiveAbility(SpecPair.Value);
 
 			// Give remote client the slot.
-			if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
-				ClientSlottedAbilityChanged(SpecPair.Key, SpecHandle);
+			// if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
+			ClientSlottedAbilityChanged(SpecPair.Key, SpecHandle);
 		}
 	}
 }
@@ -456,8 +456,8 @@ void AGPCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 			ExistingPair.Value = FGameplayAbilitySpecHandle();
 
 			// Invalidate remote client's slot.
-			if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
-				ClientSlottedAbilityChanged(ExistingPair.Key, ExistingPair.Value);
+			// if (/*GetController()->IsPlayerController() && */!IsLocallyControlled())
+			ClientSlottedAbilityChanged(ExistingPair.Key, ExistingPair.Value);
 		}
 	}
 }
@@ -549,3 +549,20 @@ void AGPCharacterBase::HandleMagSizeChanged(float DeltaValue, const struct FGame
 	}
 }
 
+void AGPCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGPCharacterBase, CurrentWeaponActor);
+	DOREPLIFETIME(AGPCharacterBase, CurrentWeaponSlot);
+}
+
+void AGPCharacterBase::OnRep_WeaponActor(const AActor* OldValue)
+{
+	return;
+}
+
+void AGPCharacterBase::OnRep_WeaponSlot(const FGPItemSlot& OldValue)
+{
+	return;
+}
