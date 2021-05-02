@@ -169,6 +169,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation = true);
 
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void CancelAbilitiesWithItemSlot(FGPItemSlot ItemSlot);
+
 	/** Returns a list of active abilities bound to the item slot. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities);

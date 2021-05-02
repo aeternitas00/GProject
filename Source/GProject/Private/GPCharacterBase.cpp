@@ -195,6 +195,20 @@ bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool 
 	return rv;
 }
 
+void AGPCharacterBase::CancelAbilitiesWithItemSlot(FGPItemSlot ItemSlot)
+{
+	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //이 핸들이 GAS의 Replicated된 Container안의 Spec을 가리켜야함.
+
+	//UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
+
+
+	if (FoundHandle && AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAbilityHandle(*FoundHandle);
+	}
+
+}
+
 void AGPCharacterBase::GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities)
 {
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
