@@ -48,9 +48,7 @@ void UGPGameInstanceBase::Shutdown()
 void UGPGameInstanceBase::OnStart()
 {
 	//Super::OnStart(); //blank.
-	GP_LOG_C(Warning);
-
-	GPClient = FGPClient::InitClient();
+	//GP_LOG_C(Warning);
 }
 
 bool UGPGameInstanceBase::Send(FString buf)
@@ -62,9 +60,10 @@ bool UGPGameInstanceBase::Send(FString buf)
 
 bool UGPGameInstanceBase::Connect()
 {
+	GPClient = FGPClient::GetGPClient();
 	if (!GPClient) return false;
 
-	return GPClient->Connect();
+	return GPClient->Connect();//
 }
 
 

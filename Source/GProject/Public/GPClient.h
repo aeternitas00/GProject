@@ -31,7 +31,7 @@ public:
 		This code ensures only thread will be able to run at a time.
 		This function returns a handle to the newly started instance.
 	*/
-	static FGPClient* InitClient();
+	static FGPClient* GetGPClient();
 
 public:
 	// Begin FRunnable interface. 
@@ -68,7 +68,7 @@ public:
 
 protected:
 	SOCKET Socket;
-	HANDLE ConnEvent; //연결 대기 이벤트.
+	//HANDLE ConnEvent; //연결 대기 이벤트.
 
 	char RecvBuf[MAX_PKT_SIZ]; //
 	
@@ -77,10 +77,17 @@ public:
 
 	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1"); //todo async //현재 이 서버와 게임을 분리하기 위해 GPEntry에서만 Connect해주고 있음.
 	bool Send(char* buf, int len);
+
+	////
+
+	// GI features.
+
+	bool Login(); // todo //현재는 가상의 로그인 과정. //TODO DB
 	bool SendChat(FString Chat);
 
 	////
 
-	bool Login(); // todo //현재는 가상의 로그인 과정. //TODO DB
+	// Player features.
 
+	bool SendPlayerData();
 };

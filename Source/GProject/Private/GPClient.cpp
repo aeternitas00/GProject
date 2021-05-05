@@ -1,6 +1,7 @@
 #include "GPClient.h"
 #include "GProjectPlayerController.h"
 //#include "GProjectGameMode.h"
+#include "UI/ChatWindow.h"//
 
 //Thread Worker Starts as NULL, prior to being instanced
 FGPClient* FGPClient::Runnable = nullptr;
@@ -21,7 +22,7 @@ FGPClient::~FGPClient()
 	Thread = nullptr;
 }
 
-FGPClient* FGPClient::InitClient()
+FGPClient* FGPClient::GetGPClient()
 {
 	if (!Runnable && FPlatformProcess::SupportsMultithreading())
 	{
@@ -52,9 +53,9 @@ bool FGPClient::Init()
 	}
 
 	//서버와의 연결을 알리는 자동 리셋 이벤트 생성.
-	ConnEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	//ConnEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
-	return true;
+	return Connect(); //Init 자체가 Connect가 없다면 필요없다고 판단하여 불필요한 Connect대기를 없애기 위해 여기서 Connect.
 }
 
 uint32 FGPClient::Run()
@@ -62,7 +63,7 @@ uint32 FGPClient::Run()
 	GP_LOG_C(Warning);
 
 	//서버와의 연결을 기다림.
-	WaitForSingleObject(ConnEvent, INFINITE);
+	//WaitForSingleObject(ConnEvent, INFINITE);
 
 	int iResult; //recv 결과 바이트.
 
@@ -93,15 +94,19 @@ uint32 FGPClient::Run()
 			case PT_MSG:
 			case PT_USER_LOGIN:
 			case PT_USER_LOGOUT:
-				//ANSI_TO_TCHAR((char*)&pckt->data);
 				//FText::AsCultureInvariant(msg);
-				FString msg((char*)&pckt->data);
-				GP_LOG(Warning, TEXT("Message: %s"), *msg);
+				FString msg(RecvBuf + size + sizeof(PacketH));
+				GP_LOG(Display, TEXT("Message: %s"), *msg);//
 				if (PlayerCon)
 				{
-					//GP_LOG(Warning, TEXT("%x"), PlayerCon);
-					PlayerCon->AddChat(msg);
+					////GP_LOG(Warning, TEXT("%x"), PlayerCon);
+					//PlayerCon->AddChat(msg);
+					AsyncTask(ENamedThreads::GameThread, [this, msg]()
+						{
+							PlayerCon->ChatWindow->AddChat(msg);//test
+						});
 				}
+				
 				break;
 
 			/*default:
@@ -117,6 +122,8 @@ uint32 FGPClient::Run()
 
 void FGPClient::Exit()
 {
+	GP_LOG_C(Warning);
+
 	closesocket(Socket);
 	WSACleanup();
 }
@@ -130,7 +137,7 @@ void FGPClient::Stop()
 	}
 	//shutdown되어 정상적으로 서버에서 0바이트를 수신하면 다시 0바이트를 보낼 것이므로 recv루프가 탈출 될 것.
 
-	SetEvent(ConnEvent); //아직 연결이 되지 않은 상태일 때 Run의 대기를 풀어줌. 
+	//SetEvent(ConnEvent); //아직 연결이 되지 않은 상태일 때 Run의 대기를 풀어줌. 
 }
 
 void FGPClient::Shutdown()
@@ -160,7 +167,7 @@ bool FGPClient::Connect(u_short port, char* ip)
 
 	GP_LOG(Display, TEXT("Connected to server."));
 
-	SetEvent(ConnEvent);
+	//SetEvent(ConnEvent);
 
 	return true;
 }
@@ -182,7 +189,8 @@ bool FGPClient::SendChat(FString Chat)
 
 	pckt->header.size = sizeof(PacketH) + Chat.Len() + 1;
 	pckt->header.type = PT_MSG;
-	memcpy(&pckt->data, TCHAR_TO_ANSI(*Chat), Chat.Len() + 1);
+	memcpy(sendbuf + sizeof(PacketH), TCHAR_TO_ANSI(*Chat), Chat.Len() + 1);
+	//GP_LOG(Warning, TEXT("%s, buf: %x %d, data: %x %d"), ANSI_TO_TCHAR((char*)&pckt->data), sendbuf + sizeof(PacketH), sizeof(PacketH), &pckt->data, sizeof(Packet))
 
 	return Send(sendbuf, pckt->header.size);
 }
@@ -200,7 +208,7 @@ bool FGPClient::Login()
 
 	pckt->header.size = sizeof(PacketH) + 2;
 
-	GP_LOG(Warning, TEXT("Test ID: %s, Bytes: %d"), ANSI_TO_TCHAR((char*)&pckt->data), pckt->header.size);
+	//GP_LOG(Warning, TEXT("Test ID: %s, Bytes: %d"), ANSI_TO_TCHAR((char*)&pckt->data), pckt->header.size)
 
 	return Send(sendbuf, pckt->header.size);
 }

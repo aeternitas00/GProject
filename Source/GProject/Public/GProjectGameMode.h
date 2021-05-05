@@ -11,8 +11,6 @@ class AGProjectGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	
-
 public:
 	AGProjectGameMode();
 
@@ -20,11 +18,11 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	//virtual void GenericPlayerInitialization(AController* C) override; //Handles all player initialization that is shared between the travel methods (for client)
+
 	virtual void StartPlay() override;
 
 	//virtual void StartToLeaveMap() override;
-
-
 };
 
 
