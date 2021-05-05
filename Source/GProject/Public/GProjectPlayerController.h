@@ -138,16 +138,25 @@ protected:
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
 
 
+private:
+	FGPClient* Client;
+
+protected:
+	UFUNCTION()
+	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
+
 protected:
 	//uint32 bShouldUpdateChat : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UChatWindow* ChatWindow;
+	
 
 	TQueue<FString, EQueueMode::Mpsc> ChatMessages;
 
 	void UpdateChat();
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UChatWindow* ChatWindow; //err gced
+
 	void AddChat(const FString& ChatMsg);
 
 protected:

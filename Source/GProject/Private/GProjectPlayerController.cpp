@@ -7,18 +7,24 @@
 #include "UI/ChatWindow.h"
 #include "GPClient.h"
 #include <sstream>
-//#include "Engine/World.h"
 
 AGProjectPlayerController::AGProjectPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
+	Client = nullptr;
+
 }
 
 void AGProjectPlayerController::OnPossess(APawn* InPawn)
 {
 	GP_LOG(Warning, TEXT("%s"), *GetName());
 	Super::OnPossess(InPawn);
+
+	if (InPawn)// Client?
+	{
+		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
+	}
 }
 
 void AGProjectPlayerController::BeginPlay()
@@ -27,13 +33,13 @@ void AGProjectPlayerController::BeginPlay()
 
 	Super::BeginPlay();
 
-	if (IsLocalPlayerController())
+	if (IsLocalPlayerController()) //
 	{
-		FGPClient* Client = FGPClient::InitClient();
+		Client = FGPClient::GetGPClient();
 		Client->SetPlayerController(this);
 		//if (Client->Login()) //test
 		{
-			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 1.f, true);
+			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
 		}
 	}
 }
@@ -42,7 +48,7 @@ void AGProjectPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	UpdateChat();
+	UpdateChat();//
 }
 
 void AGProjectPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -332,6 +338,12 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 	SlottedItemChanged(ItemSlot, Item);
 }
 
+void AGProjectPlayerController::SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
+{
+	GP_LOG(Display, TEXT("old: %s, %s, cur: %s, %s"), *OldLocation.ToString(), *OldVelocity.ToString(), *GetPawn()->GetActorLocation().ToString(), *GetPawn()->GetVelocity().ToString())
+
+}
+
 void AGProjectPlayerController::UpdateChat()
 {
 	if (ChatWindow)
@@ -362,10 +374,8 @@ void AGProjectPlayerController::SendData()
 		const FVector& Location = GetPawn()->GetActorLocation();
 		const FRotator& Rotation = GetPawn()->GetActorRotation();
 
-		ss << Location.X << Location.Y << Location.Z;
-		float test = 0.f;
-		float test2 = 0.f;
-		ss >> test >> test2;
-		GP_LOG(Display, TEXT("%f,%f, %s"), test, test2, ANSI_TO_TCHAR(ss.str().c_str()))
+		ss << Location.X << " " << Location.Y << " " << Location.Z;
+		
+		GP_LOG(Display, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()), ss.tellg())
 	}
 }

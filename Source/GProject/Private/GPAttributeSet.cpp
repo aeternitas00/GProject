@@ -70,8 +70,6 @@ void UGPAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPAttributeSet, MoveSpeed, OldValue);
 
 	Cast<AGPCharacterBase>(GetOwningActor())->SetMovementSpeed(GetMoveSpeed());//
-
-	GP_LOG(Warning, TEXT("C: %f, B: %f"), GetMoveSpeed(), MoveSpeed.GetBaseValue());
 }
 
 void UGPAttributeSet::OnRep_CurrentMag(const FGameplayAttributeData& OldValue)
