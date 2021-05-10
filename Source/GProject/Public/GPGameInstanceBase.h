@@ -108,8 +108,22 @@ public:
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
+
+	//overrided for GP client as standalone to Pre-CreateGM cleanup level.(thing like level.cpp is doing on InitializeNetworkActors)
+	virtual class AGameModeBase* CreateGameModeForURL(FURL InURL, UWorld* InWorld) override;
+
 protected:
 	virtual void OnStart() override;
+
+	//GPServer
+protected:
+	FGPClient* GPClient;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsGPHost;
+
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	bool IsConnected();
 
 public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
@@ -117,15 +131,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Connect(); //todo Port, IP
-
-protected:
-	FGPClient* GPClient;
+	
+	////
 
 public:
-		DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFullyLoadedDelegate);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFullyLoadedDelegate);
 
-		UPROPERTY(BlueprintAssignable, Category = "Load")
-		FFullyLoadedDelegate OnLoadCompleted;
+	UPROPERTY(BlueprintAssignable, Category = "Load")
+	FFullyLoadedDelegate OnLoadCompleted;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Load")

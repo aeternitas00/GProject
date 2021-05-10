@@ -103,7 +103,7 @@ uint32 FGPClient::Run()
 					//PlayerCon->AddChat(msg);
 					AsyncTask(ENamedThreads::GameThread, [this, msg]()
 						{
-							PlayerCon->ChatWindow->AddChat(msg);//test
+							PlayerCon->AddChat(msg);//test
 						});
 				}
 				

@@ -146,17 +146,13 @@ protected:
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
 
 protected:
-	//uint32 bShouldUpdateChat : 1;
+	TQueue<FString, EQueueMode::Spsc> ChatMessages;
+public:
 
-	
-
-	TQueue<FString, EQueueMode::Mpsc> ChatMessages;
+	UPROPERTY(BlueprintReadWrite)
+	class UChatWindow* ChatWindow; //err gced //currently BP class does CreateWidget on BeginPlay.
 
 	void UpdateChat();
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		class UChatWindow* ChatWindow; //err gced
-
 	void AddChat(const FString& ChatMsg);
 
 protected:

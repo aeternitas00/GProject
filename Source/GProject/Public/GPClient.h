@@ -10,7 +10,6 @@
 #pragma comment(lib,"ws2_32")
 
 
-
 class GPROJECT_API FGPClient : public FRunnable
 {
 

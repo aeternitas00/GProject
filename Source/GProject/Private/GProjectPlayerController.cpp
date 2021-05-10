@@ -48,7 +48,6 @@ void AGProjectPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	UpdateChat();//
 }
 
 void AGProjectPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -340,8 +339,28 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 
 void AGProjectPlayerController::SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
 {
+	if (OldVelocity.IsNearlyZero() && GetPawn()->GetVelocity().IsNearlyZero()) return;
 	GP_LOG(Display, TEXT("old: %s, %s, cur: %s, %s"), *OldLocation.ToString(), *OldVelocity.ToString(), *GetPawn()->GetActorLocation().ToString(), *GetPawn()->GetVelocity().ToString())
+	
+	SendData();
+}
 
+void AGProjectPlayerController::SendData()
+{
+	if (GetPawn() && Client)
+	{
+		//todo thread
+		//test
+
+		//std::stringstream ss;
+		const FVector& Location = GetPawn()->GetActorLocation();
+		//const FRotator& Rotation = GetPawn()->GetActorRotation();
+
+		//ss << Location.X << " " << Location.Y << " " << Location.Z << std::endl;
+		//Client->Send(ss.rdbuf(), ss.tellg());
+		Client->SendChat(Location.ToString());
+		//GP_LOG(Display, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()), ss.tellg())
+	}
 }
 
 void AGProjectPlayerController::UpdateChat()
@@ -350,7 +369,7 @@ void AGProjectPlayerController::UpdateChat()
 	{
 		FString Chat;
 
-		if (ChatMessages.Dequeue(Chat))
+		while (ChatMessages.Dequeue(Chat))
 		{
 			ChatWindow->AddChat(Chat);
 		}
@@ -359,23 +378,13 @@ void AGProjectPlayerController::UpdateChat()
 
 void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 {
-	ChatMessages.Enqueue(ChatMsg);
-
-	//bShouldUpdateChat = true;
-}
-
-void AGProjectPlayerController::SendData()
-{
-	if (GetPawn())
+	if (ChatWindow)
 	{
-		//todo thread
-
-		std::stringstream ss;
-		const FVector& Location = GetPawn()->GetActorLocation();
-		const FRotator& Rotation = GetPawn()->GetActorRotation();
-
-		ss << Location.X << " " << Location.Y << " " << Location.Z;
-		
-		GP_LOG(Display, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()), ss.tellg())
+		ChatWindow->AddChat(ChatMsg);
+	}
+	else
+	{
+		ChatMessages.Enqueue(ChatMsg);
+		//bShouldUpdateChat = true;
 	}
 }
