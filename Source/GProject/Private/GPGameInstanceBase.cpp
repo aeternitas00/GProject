@@ -45,10 +45,32 @@ void UGPGameInstanceBase::Shutdown()
 		GPClient->Shutdown();
 }
 
+AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InWorld)
+{
+	const bool bIsGPClient = IsConnected() && !bIsGPHost;
+	
+	// Kill non relevant client actors
+	if (bIsGPClient && GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
+	{
+		for (auto Level : GetWorld()->GetLevels())//
+		{
+			for (auto Actor : Level->Actors)//
+			{
+				if (!Actor->bNetLoadOnClient)
+				{
+					GP_LOG(Warning, TEXT("%s"), *Actor->GetName())
+					Actor->Destroy();
+				}
+			}
+		}
+	}
+	return 	Super::CreateGameModeForURL(InURL, InWorld);
+}
+
 void UGPGameInstanceBase::OnStart()
 {
 	//Super::OnStart(); //blank.
-	//GP_LOG_C(Warning);
+	GP_LOG_C(Warning)
 }
 
 bool UGPGameInstanceBase::Send(FString buf)
@@ -64,6 +86,11 @@ bool UGPGameInstanceBase::Connect()
 	if (!GPClient) return false;
 
 	return GPClient->Connect();//
+}
+
+bool UGPGameInstanceBase::IsConnected()
+{
+	return GPClient ? true : false;
 }
 
 
