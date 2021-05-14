@@ -121,7 +121,7 @@ protected:
 	uint32 bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
-	virtual void OnPossess(APawn* InPawn) override; //Possess ÀÚÃ¼´Â finalÀÌ¶ó override ¸øÇÔ. setpawn
+	virtual void OnPossess(APawn* InPawn) override; //Possess ï¿½ï¿½Ã¼ï¿½ï¿½ finalï¿½Ì¶ï¿½ override ï¿½ï¿½ï¿½ï¿½. setpawn
 	virtual void BeginPlay() override;
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

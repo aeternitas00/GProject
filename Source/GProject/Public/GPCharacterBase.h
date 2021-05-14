@@ -37,7 +37,7 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UFUNCTION(Client, reliable)
-	virtual void ClientSlottedAbilityChanged(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle); // for client set SlottedAbilities //TPair·Î ¸øÁÜ.
+	virtual void ClientSlottedAbilityChanged(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle); // for client set SlottedAbilities //TPairï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 
 protected:
 
@@ -204,7 +204,7 @@ protected:
 	UGPAbilitySystemComponent* AbilitySystemComponent;
 
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
-	// NPC ½ºÅ³ °°Àº °Íµé, ¹Ù¿îµå ÇÏ°Ô °³Á¶ °¡´É
+	// NPC ï¿½ï¿½Å³ ï¿½ï¿½ï¿½ï¿½ ï¿½Íµï¿½, ï¿½Ù¿ï¿½ï¿½ ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<TSubclassOf<UGPGameplayAbility>,int32> GameplayAbilities;
 	// TODO : with Ability level data
@@ -233,7 +233,7 @@ protected:
 
 	/** List of attributes modified by the ability system */
 	UPROPERTY(BlueprintReadOnly)
-	UGPAttributeSet* AttributeSet; //ÀÌ °´Ã¼¿Í ½ÇÁ¦·Î GAS¿¡¼­ Ã³¸®ÇÏ´Â °´Ã¼(replicated)´Â ´Ù¸§.
+	UGPAttributeSet* AttributeSet; //ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ GASï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½Ã¼(replicated)ï¿½ï¿½ ï¿½Ù¸ï¿½.
 
 	/** Cached pointer to the inventory source for this character, can be null */
 	UPROPERTY()
