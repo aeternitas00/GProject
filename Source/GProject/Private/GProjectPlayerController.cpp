@@ -12,7 +12,7 @@ AGProjectPlayerController::AGProjectPlayerController()
 {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
-	Client = nullptr;
+	GPClient = nullptr;
 
 }
 
@@ -21,7 +21,7 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 	GP_LOG(Warning, TEXT("%s"), *GetName());
 	Super::OnPossess(InPawn);
 
-	if (InPawn)// Client?
+	if (InPawn && GPClient)//
 	{
 		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
 	}
@@ -35,8 +35,8 @@ void AGProjectPlayerController::BeginPlay()
 
 	if (IsLocalPlayerController()) //
 	{
-		Client = FGPClient::GetGPClient();
-		Client->SetPlayerController(this);
+		GPClient = FGPClient::GetGPClient();
+		GPClient->SetPlayerController(this);
 		//if (Client->Login()) //test
 		{
 			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
@@ -340,26 +340,29 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 void AGProjectPlayerController::SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
 {
 	if (OldVelocity.IsNearlyZero() && GetPawn()->GetVelocity().IsNearlyZero()) return;
-	GP_LOG(Display, TEXT("old: %s, %s, cur: %s, %s"), *OldLocation.ToString(), *OldVelocity.ToString(), *GetPawn()->GetActorLocation().ToString(), *GetPawn()->GetVelocity().ToString())
+	//GP_LOG(Display, TEXT("old: %s, %s, cur: %s, %s"), *OldLocation.ToString(), *OldVelocity.ToString(), *GetPawn()->GetActorLocation().ToString(), *GetPawn()->GetVelocity().ToString())
 	
 	SendData();
 }
 
 void AGProjectPlayerController::SendData()
 {
-	if (GetPawn() && Client)
+	if (GetPawn() && GPClient)
 	{
-		//todo thread
+		//todo thread?
 		//test
 
-		//std::stringstream ss;
+		std::stringstream ss;
 		const FVector& Location = GetPawn()->GetActorLocation();
+		const FVector& Velocity = GetPawn()->GetVelocity();
 		//const FRotator& Rotation = GetPawn()->GetActorRotation();
+		ss << Location.X << " " << Location.Y << " " << Location.Z << std::endl;
+		ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << std::endl;
+		//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << std::endl;
+		//GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
 
-		//ss << Location.X << " " << Location.Y << " " << Location.Z << std::endl;
-		//Client->Send(ss.rdbuf(), ss.tellg());
-		Client->SendChat(Location.ToString());
-		//GP_LOG(Display, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()), ss.tellg())
+		GPClient->SendStream(ss, PT_PLAYER_UPDATE);
+		//GPClient->SendChat(Location.ToString());
 	}
 }
 

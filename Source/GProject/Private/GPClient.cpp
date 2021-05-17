@@ -1,6 +1,7 @@
 #include "GPClient.h"
+#include "GPGameInstanceBase.h"
 #include "GProjectPlayerController.h"
-//#include "GProjectGameMode.h"
+#include "GProjectGameMode.h"
 #include "UI/ChatWindow.h"//
 
 //Thread Worker Starts as NULL, prior to being instanced
@@ -9,7 +10,8 @@ FGPClient* FGPClient::Runnable = nullptr;
 FGPClient::FGPClient()
 {
 	PlayerCon = nullptr;
-	//GameMode = nullptr;
+	GameMode = nullptr;
+	Game = nullptr;
 
 	//?에디터에서는 한번 생성되면 다음 변화가 있기 전까지 소멸하지 않음. static 인스턴스로 만들어서?
 	Thread = FRunnableThread::Create(this, TEXT("FGPClient"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
@@ -95,18 +97,32 @@ uint32 FGPClient::Run()
 			case PT_USER_LOGIN:
 			case PT_USER_LOGOUT:
 				//FText::AsCultureInvariant(msg);
+			{
 				FString msg(RecvBuf + size + sizeof(PacketH));
 				GP_LOG(Display, TEXT("Message: %s"), *msg);//
 				if (PlayerCon)
 				{
-					////GP_LOG(Warning, TEXT("%x"), PlayerCon);
-					//PlayerCon->AddChat(msg);
 					AsyncTask(ENamedThreads::GameThread, [this, msg]()
 						{
 							PlayerCon->AddChat(msg);//test
 						});
 				}
-				
+			}
+				break;
+			case PT_BE_HOST:
+				if (Game)
+				{
+					Game->BeGPHost();
+				}
+				break;
+			case PT_PLAYER_START:
+				if (GameMode && PlayerCon)
+				{
+					AsyncTask(ENamedThreads::GameThread, [this]()
+						{
+							GameMode->RestartPlayer(PlayerCon);//test
+						});
+				}
 				break;
 
 			/*default:
@@ -149,6 +165,11 @@ void FGPClient::Shutdown()
 	}
 }
 
+void FGPClient::CreateAsyncSendTask(std::stringstream& ss, GPPacketType pt)
+{
+	(new FAutoDeleteAsyncTask<FGPSendTask>(ss, pt))->StartBackgroundTask();
+}
+
 bool FGPClient::Connect(u_short port, char* ip)
 {
 	SOCKADDR_IN sa;
@@ -180,6 +201,16 @@ bool FGPClient::Send(char* buf, int len)
 		return false;
 	}
 	return true;
+}
+
+bool FGPClient::SendStream(std::stringstream& ss, GPPacketType pt)
+{
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+	pckt->header.size = sizeof(PacketH) + ss.fail() ? ss.str().length() : ss.tellp();//
+	pckt->header.type = pt;
+	ss >> (char*)&pckt->data;
+	return Send(sendbuf, pckt->header.size);
 }
 
 bool FGPClient::SendChat(FString Chat)

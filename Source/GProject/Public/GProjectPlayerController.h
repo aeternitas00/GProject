@@ -139,7 +139,7 @@ protected:
 
 
 private:
-	FGPClient* Client;
+	FGPClient* GPClient;
 
 protected:
 	UFUNCTION()

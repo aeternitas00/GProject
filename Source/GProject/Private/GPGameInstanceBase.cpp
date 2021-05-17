@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "GPGameInstanceBase.h"
+#include "GProjectGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Types/GPCharacterDataAsset.h"
 #include "Particles/ParticleSystem.h"
@@ -56,9 +57,9 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 		{
 			for (auto Actor : Level->Actors)//
 			{
-				if (!Actor->bNetLoadOnClient)
+				if (Actor && !Actor->bNetLoadOnClient)
 				{
-					GP_LOG(Warning, TEXT("%s"), *Actor->GetName())
+					//GP_LOG(Display, TEXT("%s"), *Actor->GetName())
 					Actor->Destroy();
 				}
 			}
@@ -85,12 +86,28 @@ bool UGPGameInstanceBase::Connect()
 	GPClient = FGPClient::GetGPClient();
 	if (!GPClient) return false;
 
+	GPClient->SetGameInstance(this);
+
 	return GPClient->Connect();//
 }
 
-bool UGPGameInstanceBase::IsConnected()
+void UGPGameInstanceBase::BeGPHost()
 {
-	return GPClient ? true : false;
+	if (!IsConnected() || !GetWorld()) return; //
+
+	AGProjectGameMode* GM = GetWorld()->GetAuthGameMode<AGProjectGameMode>();
+	if (!GM) return;
+
+	GPClient->SetGameMode(GM);
+	//todo sync update 
+
+	bIsGPHost = true;
+	//
+}
+
+bool UGPGameInstanceBase::IsConnected() const
+{
+	return GPClient ? true : false;//
 }
 
 
