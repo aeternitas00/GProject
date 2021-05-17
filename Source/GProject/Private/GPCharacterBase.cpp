@@ -17,7 +17,7 @@ AGPCharacterBase::AGPCharacterBase()
 	AbilitySystemComponent->OnTagUpdatedDelegate.AddDynamic(this, &AGPCharacterBase::OnTagUpdated);
 	// Create the attribute set, this replicates by default
 	// 
-	// ¿£Áø ¹ö±× ¶§¹®¿¡ PreInitializeComponents() ·Î ³Ñ±è.
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ PreInitializeComponents() ï¿½ï¿½ ï¿½Ñ±ï¿½.
 	// 
 	//AttributeSet = CreateDefaultSubobject<UGPAttributeSet>(TEXT("AttributeSet"));
 	
@@ -181,7 +181,7 @@ float AGPCharacterBase::GetMagSize() const
 
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
-	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //ÀÌ ÇÚµéÀÌ GASÀÇ ReplicatedµÈ Container¾ÈÀÇ SpecÀ» °¡¸®ÄÑ¾ßÇÔ.
+	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ GASï¿½ï¿½ Replicatedï¿½ï¿½ Containerï¿½ï¿½ï¿½ï¿½ Specï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½.
 	
 	//UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
 
@@ -197,7 +197,7 @@ bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool 
 
 void AGPCharacterBase::CancelAbilitiesWithItemSlot(FGPItemSlot ItemSlot)
 {
-	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //ÀÌ ÇÚµéÀÌ GASÀÇ ReplicatedµÈ Container¾ÈÀÇ SpecÀ» °¡¸®ÄÑ¾ßÇÔ.
+	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ GASï¿½ï¿½ Replicatedï¿½ï¿½ Containerï¿½ï¿½ï¿½ï¿½ Specï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½.
 
 	//UGameplayAbility* Ability = GetSlottedAbilityInstance(ItemSlot);
 
@@ -329,7 +329,7 @@ void AGPCharacterBase::UpdateMagSize()
 	float Delta = GetMagSize();
 	FGameplayTagContainer TagCon;
 
-	if (!Ability) return;
+	if (!Ability) {	AttributeSet->SetMagSize(0.0f); return;	}
 
 	if (Ability->Implements<UGPMagAbilityInterface>())
 	{

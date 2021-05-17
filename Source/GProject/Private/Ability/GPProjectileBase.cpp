@@ -20,6 +20,7 @@ AGPProjectileBase::AGPProjectileBase()
 	RootComponent = SphereCollision;
 	SphereCollision->InitSphereRadius(40.0f);
 
+	SphereCollision->SetCanEverAffectNavigation(false);
 	SphereCollision->SetCollisionProfileName(TEXT("WorldDynamic"));
 	SphereCollision->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 	SphereCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Ignore);
