@@ -145,6 +145,7 @@ protected:
 	UFUNCTION()
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
 
+	bool LoadoutCommit();
 protected:
 	TQueue<FString, EQueueMode::Spsc> ChatMessages;
 public:
@@ -153,6 +154,8 @@ public:
 
 	void UpdateChat();
 	void AddChat(const FString& ChatMsg);
+
+	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
 
 protected:
 	FTimerHandle SendTimer;

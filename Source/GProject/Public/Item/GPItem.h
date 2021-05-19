@@ -22,7 +22,8 @@ public:
 		, MaxCount(1)
 		, MaxLevel(1)
 		, AbilityLevel(1)
-	{}
+	{
+	}
 
 	/** Type of this item, set in native parent class */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Item)

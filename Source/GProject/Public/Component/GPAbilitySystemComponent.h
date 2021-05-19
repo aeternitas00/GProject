@@ -41,7 +41,7 @@ public:
 	FOnTagUpdated OnTagUpdatedDelegate;
 
 protected:
-	//AI´Â ·¹ÇÃ·¹ÀÌ¼Ç °ü·Ã ÇÔ¼öµéÀ» È£Ãâ ¾ÈÇÏµµ·Ï µÇ¾îÀÖ´Â µí.
+	//AIï¿½ï¿½ ï¿½ï¿½ï¿½Ã·ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½.
 	/*virtual void OnRep_ActivateAbilities() override;
 	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec) override;*/
 };

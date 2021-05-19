@@ -24,6 +24,11 @@ public:
 
 	virtual void StartPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	void ProcessServerTravel(const FString& URL, bool bAbsolute);
+	
+	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
+
 	//virtual void StartToLeaveMap() override;
 };
 
