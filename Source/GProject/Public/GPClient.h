@@ -8,7 +8,7 @@
 #include <WinSock2.h>
 #include "Windows/HideWindowsPlatformAtomics.h"
 #pragma comment(lib,"ws2_32")
-
+#include <sstream>
 
 class GPROJECT_API FGPClient : public FRunnable
 {
@@ -35,7 +35,7 @@ public:
 public:
 	// Begin FRunnable interface. 
 
-	// 이 함수들은 FRunnableThreadWin::Run에 의해 호출 됨. 즉 스레드 문맥에 있음.
+	// 이 함수들은 FRunnableThreadWin::Run에 의해 호출 됨.
 
 	virtual bool Init() override; //true를 리턴하면 Run.
 	virtual uint32 Run() override; //recv loop
@@ -51,19 +51,21 @@ public:
 	// Runnable 인스턴스 소멸.
 	void Shutdown();
 
+	void CreateAsyncSendTask(std::stringstream& ss, GPPacketType pt);
+
 private:
 	class AGProjectPlayerController* PlayerCon;
-	//class AGProjectGameMode* GameMode;
+	class AGProjectGameMode* GameMode;
+	class UGPGameInstanceBase* Game;
 
 public:
-	void SetPlayerController(AGProjectPlayerController* PC) {
-		PlayerCon = PC;
-		//GP_LOG(Warning, TEXT("%x"), PlayerCon);
-	}
-	/*void SetGameMode(AGProjectGameMode* GM) {
-		GameMode = GM;
-	}*/
+	//convenient setters
 
+	void SetPlayerController(AGProjectPlayerController* PC) { PlayerCon = PC; }
+	void SetGameMode(AGProjectGameMode* GM) { GameMode = GM; }
+	void SetGameInstance(UGPGameInstanceBase* GI) { Game = GI; }
+
+	////
 
 protected:
 	SOCKET Socket;
@@ -76,6 +78,7 @@ public:
 
 	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1"); //todo async //현재 이 서버와 게임을 분리하기 위해 GPEntry에서만 Connect해주고 있음.
 	bool Send(char* buf, int len);
+	bool SendStream(std::stringstream& ss, GPPacketType pt);
 
 	////
 
@@ -89,4 +92,28 @@ public:
 	// Player features.
 
 	bool SendPlayerData();
+};
+
+
+class FGPSendTask : public FNonAbandonableTask
+{
+	friend class FAutoDeleteAsyncTask<FGPSendTask>;
+
+	std::stringstream StringStream;
+	GPPacketType PacketType;
+
+	FGPSendTask(std::stringstream& InStream, GPPacketType InPacketType)
+		: StringStream(std::move(InStream)), PacketType(InPacketType)
+	{
+	}
+
+	void DoWork()
+	{
+		FGPClient::GetGPClient()->SendStream(StringStream, PacketType);
+	}
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FGPSendTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
 };

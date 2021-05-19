@@ -8,6 +8,7 @@
 #include "GPClient.h"
 #include "GPGameInstanceBase.generated.h"
 
+
 /**
  * Base class for GameInstance, should be blueprinted
  * Most games will need to make a game-specific subclass of GameInstance
@@ -126,7 +127,7 @@ protected:
 	bool bIsGPHost;
 
 	UFUNCTION(BlueprintCallable, Category = GPClient)
-	bool IsConnected();
+	bool IsConnected() const;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
@@ -135,6 +136,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Connect(); //todo Port, IP
 	
+	bool IsGPHost() const { return bIsGPHost; }
+
+	void BeGPHost();
 	////
 
 public:
