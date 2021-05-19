@@ -6,6 +6,8 @@
 #include "Item/GPItem.h"
 #include "UI/ChatWindow.h"
 #include "GPClient.h"
+#include "GPGameInstanceBase.h"
+#include "GameFramework/PlayerState.h"
 #include <sstream>
 
 AGProjectPlayerController::AGProjectPlayerController()
@@ -25,6 +27,8 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 	{
 		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
 	}
+
+	
 }
 
 void AGProjectPlayerController::BeginPlay()
@@ -32,6 +36,8 @@ void AGProjectPlayerController::BeginPlay()
 	GP_LOG(Warning, TEXT("%s"), *GetName());
 
 	Super::BeginPlay();
+
+	LoadoutCommit();
 
 	if (IsLocalPlayerController()) //
 	{
@@ -42,6 +48,66 @@ void AGProjectPlayerController::BeginPlay()
 			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
 		}
 	}
+}
+
+
+bool AGProjectPlayerController::LoadoutCommit()
+{
+	InventoryData.Reset();
+	SlottedItems.Reset();
+
+	UWorld* World = GetWorld();
+	UGPGameInstanceBase* GameInstance = World ? World->GetGameInstance<UGPGameInstanceBase>() : nullptr;
+
+	if (!GameInstance)
+	{
+		return false;
+	}
+
+	for (const TPair<FPrimaryAssetType, int32>& Pair : GameInstance->ItemSlotsPerType)
+	{
+		for (int32 SlotNumber = 0; SlotNumber < Pair.Value; SlotNumber++)
+		{
+			SlottedItems.Add(FGPItemSlot(Pair.Key, SlotNumber), nullptr);
+		}
+	}
+
+	UGPAssetManager& AssetManager = UGPAssetManager::Get();
+
+	bool bFoundAnySlots = false;
+	for (const TPair<FPrimaryAssetId, FGPItemData>& ItemPair : GameInstance->DefaultInventory)
+	{
+		UGPItem* LoadedItem = AssetManager.ForceLoadItem(ItemPair.Key);
+
+		if (LoadedItem != nullptr)
+		{
+			InventoryData.Add(LoadedItem, ItemPair.Value);
+			NotifyInventoryItemChanged(LoadedItem, ItemPair.Value);
+		}
+	}
+
+	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : GameInstance->DefaultSlottedItems)
+	{
+		if (SlotPair.Value.IsValid())
+		{
+			UGPItem* LoadedItem = AssetManager.ForceLoadItem(SlotPair.Value);
+			if (GameInstance->IsValidItemSlot(SlotPair.Key) && LoadedItem)
+			{
+				SlottedItems.Add(SlotPair.Key, LoadedItem);
+				NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
+				bFoundAnySlots = true;
+			}
+		}
+	}
+
+	if (!bFoundAnySlots)
+	{
+		// Auto slot items as no slots were saved
+		FillEmptySlots();
+	}
+	
+
+	return true;
 }
 
 void AGProjectPlayerController::PlayerTick(float DeltaTime)
@@ -387,4 +453,13 @@ void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 		ChatMessages.Enqueue(ChatMsg);
 		//bShouldUpdateChat = true;
 	}
+}
+
+void AGProjectPlayerController::GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList)
+{
+	Super::GetSeamlessTravelActorList(bToEntry, ActorList);
+
+	ActorList.Add(PlayerState);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("PC ActorList")));
+
 }

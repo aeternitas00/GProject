@@ -115,7 +115,7 @@ void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>
 		CharacterData->LoadResources();
 	}
 
-	//·ÎµåÇÒ °ÍÀÌ ¾øÀ» ¶§ ¿Ï·á.
+	//ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ï·ï¿½.
 	if (AlreadyLoadedNum == InDataArr.Num())
 	{
 		//GP_LOG(Warning, TEXT("No data to load"));
@@ -123,7 +123,7 @@ void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>
 	}
 }
 
-//CommonÀÌ ·ÎµåµÉ ¶§¸¶´Ù ÀüºÎ ¿Ï·á‰ç´ÂÁö Ã¼Å©.
+//Commonï¿½ï¿½ ï¿½Îµï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¼Å©.
 void UGPGameInstanceBase::OnCharacterDataLoaded()
 {
 	//GP_LOG(Warning, TEXT("Loading remain : %d"), UnloadedDataNum - 1);

@@ -24,13 +24,16 @@ public:
 	~UGPGameInstanceBase();
 
 	/** List of inventory items to add to new players */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	TMap<FPrimaryAssetId, FGPItemData> DefaultInventory;
 
 	/** Number of slots for each type of item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+	TMap<FGPItemSlot, FPrimaryAssetId> DefaultSlottedItems;
+	
 	///** The slot name used for saving */
 	//UPROPERTY(BlueprintReadWrite, Category = Save)
 	//FString SaveSlot;

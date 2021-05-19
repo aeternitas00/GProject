@@ -2,6 +2,10 @@
 
 #include "GProjectGameMode.h"
 #include "GProjectPlayerController.h"
+#include "GameFramework/PlayerState.h"
+#include "GameFramework/GameSession.h"
+#include "GameFramework/GameState.h"
+
 
 
 AGProjectGameMode::AGProjectGameMode()
@@ -29,4 +33,69 @@ void AGProjectGameMode::StartPlay()
 	//GP_LOG_C(Warning);
 }
 
+void AGProjectGameMode::GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList)
+{
+    Super::GetSeamlessTravelActorList(bToEntry,ActorList);
+    //bToEntry : true if we are going from old level to transition map, false if we are going from transition map to new level
 
+    FString Str = bToEntry ? TEXT("true") : TEXT("false");
+
+    for (AActor* ListedActor : ActorList)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Actor Name : %s"), *ListedActor->GetName()));
+    }
+    GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Entry is %s"), *Str));
+}
+
+void AGProjectGameMode::ProcessServerTravel(const FString& URL, bool bAbsolute)
+{
+	//GP_LOG_C(Warning);
+
+    StartToLeaveMap();
+  
+    // Force an old style load screen if the server has been up for a long time so that TimeSeconds doesn't overflow and break everything
+    bool bSeamless = (bUseSeamlessTravel && GetWorld()->TimeSeconds < 172800.0f); // 172800 seconds == 48 hours
+
+    FString NextMap;
+    if (URL.ToUpper().Contains(TEXT("?RESTART")))
+    {
+        NextMap = UWorld::RemovePIEPrefix(GetOutermost()->GetName());
+    }
+    else
+    {
+        int32 OptionStart = URL.Find(TEXT("?"));
+        if (OptionStart == INDEX_NONE)
+        {
+            NextMap = URL;
+        }
+        else
+        {
+            NextMap = URL.Left(OptionStart);
+        }
+    }
+
+    FGuid NextMapGuid = UEngine::GetPackageGuid(FName(*NextMap), GetWorld()->IsPlayInEditor());
+
+    // Notify clients we're switching level and give them time to receive.
+    FString URLMod = URL;
+    APlayerController* LocalPlayer = ProcessClientTravel(URLMod, NextMapGuid, bSeamless, bAbsolute);
+
+    UE_LOG(LogGameMode, Log, TEXT("ProcessServerTravel: %s"), *URL);
+    UWorld* World = GetWorld();
+    check(World);
+    World->NextURL = URL;
+    ENetMode NetMode = GetNetMode();
+
+    if (bSeamless)
+    {
+        World->SeamlessTravel(World->NextURL, bAbsolute);
+        World->NextURL = TEXT("");
+    }
+    // Switch immediately if not networking.
+    else if (NetMode != NM_DedicatedServer && NetMode != NM_ListenServer)
+    {
+        World->NextSwitchCountdown = 0.0f;
+    }
+	
+	//GP_LOG_C(Warning);
+}
