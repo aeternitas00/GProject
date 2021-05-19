@@ -2,6 +2,7 @@
 
 #include "GProjectGameMode.h"
 #include "GProjectPlayerController.h"
+#include "GPGameInstanceBase.h"
 
 
 AGProjectGameMode::AGProjectGameMode()
@@ -17,9 +18,17 @@ void AGProjectGameMode::InitGame(const FString& MapName, const FString& Options,
 
 void AGProjectGameMode::PostLogin(APlayerController* NewPlayer)
 {
-	//GP_LOG_C(Warning);
+	GP_LOG_C(Warning);
 	Super::PostLogin(NewPlayer);
-	//GP_LOG_C(Warning);
+	GP_LOG_C(Warning);
+}
+
+void AGProjectGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	const bool bCanStartPlayer = GetNetMode() != ENetMode::NM_Standalone || GetGameInstance<UGPGameInstanceBase>()->CanStartGPPlayer();
+	if (!bCanStartPlayer) return;
+	GP_LOG_C(Warning);
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void AGProjectGameMode::StartPlay()

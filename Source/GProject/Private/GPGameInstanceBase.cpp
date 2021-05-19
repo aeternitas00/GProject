@@ -87,6 +87,7 @@ bool UGPGameInstanceBase::Connect()
 	if (!GPClient) return false;
 
 	GPClient->SetGameInstance(this);
+	FullyLoadedEvent.AddLambda([this] {GPClient->SendHeader(PT_USER_READY); });
 
 	return GPClient->Connect();//
 }

@@ -8,7 +8,8 @@
 #include <WinSock2.h>
 #include "Windows/HideWindowsPlatformAtomics.h"
 #pragma comment(lib,"ws2_32")
-#include <sstream>
+
+#include <iosfwd>
 
 class GPROJECT_API FGPClient : public FRunnable
 {
@@ -79,41 +80,16 @@ public:
 	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1"); //todo async //현재 이 서버와 게임을 분리하기 위해 GPEntry에서만 Connect해주고 있음.
 	bool Send(char* buf, int len);
 	bool SendStream(std::stringstream& ss, GPPacketType pt);
-
 	////
 
 	// GI features.
 
 	bool Login(); // todo //현재는 가상의 로그인 과정. //TODO DB
 	bool SendChat(FString Chat);
-
+	bool SendHeader(GPPacketType pt);
 	////
 
 	// Player features.
 
 	bool SendPlayerData();
-};
-
-
-class FGPSendTask : public FNonAbandonableTask
-{
-	friend class FAutoDeleteAsyncTask<FGPSendTask>;
-
-	std::stringstream StringStream;
-	GPPacketType PacketType;
-
-	FGPSendTask(std::stringstream& InStream, GPPacketType InPacketType)
-		: StringStream(std::move(InStream)), PacketType(InPacketType)
-	{
-	}
-
-	void DoWork()
-	{
-		FGPClient::GetGPClient()->SendStream(StringStream, PacketType);
-	}
-
-	FORCEINLINE TStatId GetStatId() const
-	{
-		RETURN_QUICK_DECLARE_CYCLE_STAT(FGPSendTask, STATGROUP_ThreadPoolAsyncTasks);
-	}
 };

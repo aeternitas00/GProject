@@ -3,6 +3,30 @@
 #include "GProjectPlayerController.h"
 #include "GProjectGameMode.h"
 #include "UI/ChatWindow.h"//
+#include <sstream>
+
+class FGPSendTask : public FNonAbandonableTask
+{
+	friend class FAutoDeleteAsyncTask<FGPSendTask>;
+
+	std::stringstream StringStream;
+	GPPacketType PacketType;
+
+	FGPSendTask(std::stringstream& InStream, GPPacketType InPacketType)
+	: StringStream(std::move(InStream)), PacketType(InPacketType)
+	{
+	}
+
+	void DoWork()
+	{
+		FGPClient::GetGPClient()->SendStream(StringStream, PacketType);
+	}
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FGPSendTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+};
 
 //Thread Worker Starts as NULL, prior to being instanced
 FGPClient* FGPClient::Runnable = nullptr;
@@ -118,8 +142,10 @@ uint32 FGPClient::Run()
 			case PT_PLAYER_START:
 				if (GameMode && PlayerCon)
 				{
+					GP_LOG_C(Warning);
 					AsyncTask(ENamedThreads::GameThread, [this]()
 						{
+							Game->bGPStartPlayer = true;
 							GameMode->RestartPlayer(PlayerCon);//test
 						});
 				}
@@ -224,6 +250,12 @@ bool FGPClient::SendChat(FString Chat)
 	//GP_LOG(Warning, TEXT("%s, buf: %x %d, data: %x %d"), ANSI_TO_TCHAR((char*)&pckt->data), sendbuf + sizeof(PacketH), sizeof(PacketH), &pckt->data, sizeof(Packet))
 
 	return Send(sendbuf, pckt->header.size);
+}
+
+bool FGPClient::SendHeader(GPPacketType pt)
+{
+	PacketH header{ sizeof(PacketH), pt };
+	return Send((char*)&header, header.size);
 }
 
 bool FGPClient::Login()

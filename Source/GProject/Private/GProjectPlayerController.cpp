@@ -39,7 +39,7 @@ void AGProjectPlayerController::BeginPlay()
 		GPClient->SetPlayerController(this);
 		//if (Client->Login()) //test
 		{
-			GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
+			//GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
 		}
 	}
 }
@@ -349,9 +349,6 @@ void AGProjectPlayerController::SendData()
 {
 	if (GetPawn() && GPClient)
 	{
-		//todo thread?
-		//test
-
 		std::stringstream ss;
 		const FVector& Location = GetPawn()->GetActorLocation();
 		const FVector& Velocity = GetPawn()->GetVelocity();
@@ -361,8 +358,8 @@ void AGProjectPlayerController::SendData()
 		//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << std::endl;
 		//GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
 
-		GPClient->SendStream(ss, PT_PLAYER_UPDATE);
-		//GPClient->SendChat(Location.ToString());
+		//test
+		GPClient->CreateAsyncSendTask(ss, PT_PLAYER_UPDATE);
 	}
 }
 

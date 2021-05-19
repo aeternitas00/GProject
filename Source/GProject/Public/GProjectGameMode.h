@@ -20,6 +20,8 @@ public:
 
 	//virtual void GenericPlayerInitialization(AController* C) override; //Handles all player initialization that is shared between the travel methods (for client)
 
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
 	virtual void StartPlay() override;
 
 	//virtual void StartToLeaveMap() override;

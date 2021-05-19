@@ -148,7 +148,6 @@ protected:
 protected:
 	TQueue<FString, EQueueMode::Spsc> ChatMessages;
 public:
-
 	UPROPERTY(BlueprintReadWrite)
 	class UChatWindow* ChatWindow; //err gced //currently BP class does CreateWidget on BeginPlay.
 
