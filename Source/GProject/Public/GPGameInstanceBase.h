@@ -122,14 +122,15 @@ protected:
 	virtual void OnStart() override;
 
 	//GPServer
-protected:
+private:
 	FGPClient* GPClient;
 
+protected:
 	UPROPERTY(BlueprintReadOnly)
-	bool bIsGPHost;
+	uint32 bIsGPHost : 1;
 
-	UFUNCTION(BlueprintCallable, Category = GPClient)
-	bool IsConnected() const;
+public:
+	uint32 bGPStartPlayer : 1;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
@@ -137,17 +138,27 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Connect(); //todo Port, IP
+
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	bool IsConnected() const;
 	
 	bool IsGPHost() const { return bIsGPHost; }
+
+	bool CanStartGPPlayer() const { return !IsConnected() || bGPStartPlayer; }
 
 	void BeGPHost();
 	////
 
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFullyLoadedDelegate);
+	DECLARE_EVENT(UGPGameInstanceBase, FFullyLoadedEvent)
+	FFullyLoadedEvent& OnFullyLoaded() { return FullyLoadedEvent; }
 
 	UPROPERTY(BlueprintAssignable, Category = "Load")
 	FFullyLoadedDelegate OnLoadCompleted;
+
+private:
+	FFullyLoadedEvent FullyLoadedEvent;
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Load")
