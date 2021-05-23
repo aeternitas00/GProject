@@ -140,7 +140,7 @@ void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>
 	}
 }
 
-//Common�� �ε�� ������ ���� �Ϸ����� üũ.
+//Common�� �ε��?������ ���� �Ϸ����� üũ.
 void UGPGameInstanceBase::OnCharacterDataLoaded()
 {
 	//GP_LOG(Warning, TEXT("Loading remain : %d"), UnloadedDataNum - 1);

@@ -152,6 +152,38 @@ struct GPROJECT_API FGPCharacterAssetStruct : public FTableRowBase
 	TSubclassOf<AGPCharacterBase> CharacterClass;
 };
 
+UENUM(BlueprintType)
+enum class EWAttachmentType : uint8
+{
+	WA_Magazine UMETA(DisplayName = "Magazine"),
+	WA_Barrel UMETA(DisplayName = "Barrel"),
+	WA_Stock UMETA(DisplayName = "Stock"),
+	WA_Optic UMETA(DisplayName = "Optic"),
+	WA_Custom1 UMETA(DisplayName = "Custom1"),
+	WA_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+UENUM(BlueprintType)
+enum class EWFireType : uint8
+{
+	WF_Primary UMETA(DisplayName = "Primary"),
+	WF_Sub UMETA(DisplayName = "Sub"),
+	WF_Special UMETA(DisplayName = "Special"),
+	WF_Custom1 UMETA(DisplayName = "Custom1"),
+	WF_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+UENUM(BlueprintType)
+enum class EWFiringMode : uint8
+{
+	WM_Single UMETA(DisplayName = "Single"),
+	WM_Burst UMETA(DisplayName = "Burst"),
+	WM_Auto UMETA(DisplayName = "Auto"),
+	WM_Custom1 UMETA(DisplayName = "Custom1"),
+	WM_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, UGPItem*, FGPItemData);

@@ -139,7 +139,7 @@ void UGPAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		TargetCharacter = Cast<AGPCharacterBase>(TargetActor);
 	}
 
-	// Ÿ�Ժ� ������ ó�� ���
+	// Ÿ�Ժ� ������ ó�� ���?
 
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{

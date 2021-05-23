@@ -29,8 +29,14 @@ public:
 	/** Returns a list of currently active ability instances that match the tags */
 	void GetActiveAbilitiesWithTags(const FGameplayTagContainer& GameplayTagContainer, TArray<UGPGameplayAbility*>& ActiveAbilities);
 
+	UFUNCTION(BlueprintCallable)
+	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
+
 	/** Returns the default level used for ability activations, derived from the character */
 	int32 GetDefaultAbilityLevel() const;
+
+	UFUNCTION(BlueprintCallable)
+	bool CancelAbilityByClass(TSubclassOf<UGameplayAbility> AbilityClass);
 
 	/** Version of function in AbilitySystemGlobals that returns correct type */
 	static UGPAbilitySystemComponent* GetAbilitySystemComponentFromActor(const AActor* Actor, bool LookForComponent = false);

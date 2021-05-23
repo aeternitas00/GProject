@@ -35,6 +35,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	TMap<FGPItemSlot, FPrimaryAssetId> DefaultSlottedItems;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+	TMap<FGPItemSlot, TSubclassOf<class UGPGameplayAbility>> DefaultSlottedAbilities;
 	///** The slot name used for saving */
 	//UPROPERTY(BlueprintReadWrite, Category = Save)
 	//FString SaveSlot;

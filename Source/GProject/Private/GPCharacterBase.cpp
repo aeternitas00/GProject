@@ -7,6 +7,7 @@
 #include "UObject/Class.h"
 #include "AbilitySystemGlobals.h"
 #include "Ability/GPGameplayAbility.h"
+#include "GPGameInstanceBase.h"
 
 // Sets default values
 AGPCharacterBase::AGPCharacterBase()
@@ -62,15 +63,31 @@ void AGPCharacterBase::PossessedBy(AController* NewController)
 		//GP_LOG(Warning, TEXT("PossessedBy Interface check suc"));
 		InventoryUpdateHandle = InventorySource->GetSlottedItemChangedDelegate().AddUObject(this, &AGPCharacterBase::OnItemSlotChanged);
 		InventoryLoadedHandle = InventorySource->GetInventoryLoadedDelegate().AddUObject(this, &AGPCharacterBase::RefreshSlottedGameplayAbilities);
+		LoadoutCommit();
 	}
 
 	// Initialize our abilities
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+		
 		//AddSlottedGameplayAbilities();
 		AddStartupGameplayAbilities();
 	}
+}
+
+bool AGPCharacterBase::LoadoutCommit()
+{
+	UWorld* World = GetWorld();
+	UGPGameInstanceBase* GameInstance = World ? World->GetGameInstance<UGPGameInstanceBase>() : nullptr;
+
+	if(!GameInstance) return false;
+
+	if (GameInstance->DefaultSlottedAbilities.Num()!=0)
+		DefaultSlottedAbilities = GameInstance->DefaultSlottedAbilities;
+	//GP_LOG(Warning, TEXT("%s"), *GetName());
+
+	return true;
 }
 
 void AGPCharacterBase::UnPossessed()
@@ -273,29 +290,28 @@ bool AGPCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer Cooldown
 {
 	if (AbilitySystemComponent && CooldownTags.Num() > 0)
 	{
-		TimeRemaining = 0.f;
-		CooldownDuration = 0.f;
+		//TimeRemaining = 0.f;
+		//CooldownDuration = 0.f;
 
-		FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
-		TArray< TPair<float, float> > DurationAndTimeRemaining = AbilitySystemComponent->GetActiveEffectsTimeRemainingAndDuration(Query);
-		if (DurationAndTimeRemaining.Num() > 0)
-		{
-			int32 BestIdx = 0;
-			float LongestTime = DurationAndTimeRemaining[0].Key;
-			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
-			{
-				if (DurationAndTimeRemaining[Idx].Key > LongestTime)
-				{
-					LongestTime = DurationAndTimeRemaining[Idx].Key;
-					BestIdx = Idx;
-				}
-			}
+		//FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
+		//TArray< TPair<float, float> > DurationAndTimeRemaining = AbilitySystemComponent->GetActiveEffectsTimeRemainingAndDuration(Query);
+		//if (DurationAndTimeRemaining.Num() > 0)
+		//{
+		//	int32 BestIdx = 0;
+		//	float LongestTime = DurationAndTimeRemaining[0].Key;
+		//	for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
+		//	{
+		//		if (DurationAndTimeRemaining[Idx].Key > LongestTime)
+		//		{
+		//			LongestTime = DurationAndTimeRemaining[Idx].Key;
+		//			BestIdx = Idx;
+		//		}
+		//	}
 
-			TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
-			CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
+		//	TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
+		//	CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
 
-			return true;
-		}
+		return 	AbilitySystemComponent->GetCooldownRemainingForTag(CooldownTags, TimeRemaining, CooldownDuration);
 	}
 	return false;
 }
@@ -319,7 +335,6 @@ void AGPCharacterBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
 		Delta = GetCurrentMag()- Delta;
 		HandleCurrentMagChanged(Delta, TagCon);
 	}
-
 }
 
 void AGPCharacterBase::UpdateMagSize()
@@ -329,7 +344,7 @@ void AGPCharacterBase::UpdateMagSize()
 	float Delta = GetMagSize();
 	FGameplayTagContainer TagCon;
 
-	if (!Ability) {	AttributeSet->SetMagSize(0.0f); return;	}
+	if (!Ability) {	AttributeSet->SetMagSize(0.0f); goto ExecHandle; }
 
 	if (Ability->Implements<UGPMagAbilityInterface>())
 	{
@@ -340,6 +355,7 @@ void AGPCharacterBase::UpdateMagSize()
 		AttributeSet->SetMagSize(0.0f);
 	}
 
+ExecHandle:
 	Delta = GetMagSize() - Delta;
 	HandleMagSizeChanged(Delta, TagCon);
 }
@@ -577,7 +593,7 @@ void AGPCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(AGPCharacterBase, CurrentWeaponSlot);
 }
 
-void AGPCharacterBase::OnRep_WeaponActor(const AActor* OldValue)
+void AGPCharacterBase::OnRep_WeaponActor(const AGPWeaponActorBase* OldValue)
 {
 	return;
 }
