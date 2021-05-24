@@ -16,7 +16,9 @@ UCLASS()
 class GPROJECT_API AGPWeaponActorBase : public AActor, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
-	
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAttributeDelegate, float, DeltaValue, const struct FGameplayTagContainer&, EventTags);
+
 public:	
 	// Sets default values for this actor's properties
 	AGPWeaponActorBase();
@@ -27,15 +29,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadonly)
-	FPrimaryAssetId WeaponItem;
-
-	UPROPERTY(EditAnywhere, BlueprintReadonly)
-	FPrimaryAssetId AmmoItem;
-
-	UPROPERTY(EditAnywhere, BlueprintReadwrite)
-	TMap<EWAttachmentType,class UGPWAttachmentComponent*> AttachmentSlot;
 
 public:	
 	// Called every frame
@@ -86,13 +79,17 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	bool CanActivateWeapon() const;
+
+	UPROPERTY(BlueprintAssignable)
+	FAttributeDelegate OnCurrentMagChanged_D;
+
+	UPROPERTY(BlueprintAssignable)
+	FAttributeDelegate OnMagSizeChanged_D;
+
 protected:
 	bool bInitialized;
 
 	EWFireType CurrentFireMode;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
-	FGameplayTagContainer Tagcon;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TMap<EWFireType, EWFiringMode> FiringModeMap;
@@ -113,6 +110,15 @@ protected:
 	UAnimMontage* WeaponAnimMontage;
 	//TMap<EWFireType, FGameplayAbilitySpecHandle> AbilityHandles;
 
+	UPROPERTY(EditAnywhere, BlueprintReadonly)
+	FPrimaryAssetId WeaponItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly)
+	FPrimaryAssetId AmmoItem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadwrite)
+	TMap<EWAttachmentType, TSubclassOf<class UGPWAttachmentComponent>> AttachmentSlot;
+
 	void GASComponentInitialize();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
@@ -126,4 +132,6 @@ protected:
 	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	friend UGPWeaponAttributeSet;
+
+
 };

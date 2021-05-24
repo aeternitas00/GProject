@@ -8,6 +8,7 @@ const FPrimaryAssetType	UGPAssetManager::ConsumableItemType = TEXT("Consumable")
 const FPrimaryAssetType	UGPAssetManager::SkillItemType = TEXT("Skill");
 const FPrimaryAssetType	UGPAssetManager::TokenItemType = TEXT("Token");
 const FPrimaryAssetType	UGPAssetManager::WeaponItemType = TEXT("Weapon");
+const FPrimaryAssetType	UGPAssetManager::AttachmentItemType = TEXT("Attachment");
 
 UGPAssetManager& UGPAssetManager::Get()
 {

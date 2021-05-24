@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/GPItem.h"
+#include "GPWeaponActorBase.h"
 #include "GPItemWeapon.generated.h"
 
 /**
@@ -22,5 +23,5 @@ public:
 
 	/** Weapon actor to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
-	TSubclassOf<AActor> WeaponActor;
+	TSubclassOf<AGPWeaponActorBase> WeaponActor;
 };

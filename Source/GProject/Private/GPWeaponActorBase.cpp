@@ -83,8 +83,8 @@ void AGPWeaponActorBase::DeactivateWeapon()
 
 void AGPWeaponActorBase::ReloadWeapon(float inValue = -1.0f)
 {
-	AGPCharacterBase* OwningCharacter = GetOwner<AGPCharacterBase>();
-	if(!OwningCharacter) return;
+	//AGPCharacterBase* OwningCharacter = GetOwner<AGPCharacterBase>();
+	//if(!OwningCharacter) return;
 
 	float Delta = GetCurrentMag();
 	FGameplayTagContainer TagCon;
@@ -145,53 +145,51 @@ void AGPWeaponActorBase::GASComponentInitialize()
 	W_AbilitySystemComponent->ClearAllAbilities();
 	W_AbilitySystemComponent->InitAbilityActorInfo(GetOwner(), this);
 	
-	FGameplayEffectContextHandle EffectContext = W_AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
 	for (const TPair<EWFireType, TSubclassOf<UGPGameplayAbility>>& AbilityPair : WeaponAbilities)
 	{
 		if ( AbilityPair.Value->IsValidLowLevel() ) 
 		{
 			FGameplayAbilitySpecHandle NewHandle = W_AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(AbilityPair.Value, 1, INDEX_NONE,this));
-			//GP_LOG(Warning, TEXT("%s"), *AbilityPair.Value->GetName());
-			//AbilityHandles.Add(AbilityPair.Key, NewHandle);
 		}
 	}
-	//GP_LOG(Warning, TEXT("%d"), WeaponAbilities.Num());
 
+	FGameplayEffectContextHandle EffectContext = W_AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
 
 	FGameplayEffectSpecHandle NewHandle = W_AbilitySystemComponent->MakeOutgoingSpec(DefaultAttributes, EffectContext.GetAbilityLevel(), EffectContext);
 	if (NewHandle.IsValid())
 	{
 		FActiveGameplayEffectHandle ActiveGEHandle = W_AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), W_AbilitySystemComponent);
 	}
-}
 
-//void AGPWeaponActorBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
-//{
-//	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
-//
-//	if (!Ability) return;
-//
-//	if (Ability->Implements<UGPMagAbilityInterface>())
-//	{
-//		float Delta = GetCurrentMag();
-//		FGameplayTagContainer TagCon;
-//
-//		if (inValue < 0.0f)
-//			AttributeSet->SetCurrentMag(AttributeSet->GetMagSize());
-//		else
-//			AttributeSet->SetCurrentMag(inValue);
-//
-//		Delta = GetCurrentMag() - Delta;
-//		HandleCurrentMagChanged(Delta, TagCon);
-//	}
-//}
+	for (const TPair<EWAttachmentType, TSubclassOf<class UGPWAttachmentComponent>>& Attachment : AttachmentSlot)
+	{
+		if(!Attachment.Value->IsValidLowLevel()) continue;
+		UGPWAttachmentComponent* createdComp = NewObject<UGPWAttachmentComponent>(this, Attachment.Value);
+		if (createdComp)
+		{
+			if (createdComp->Type == Attachment.Key)
+			{
+				createdComp->RegisterComponent();
+				createdComp->AttachTo(GetRootComponent(), NAME_None);
+
+				createdComp->CommitEffects();
+			}
+			else
+				createdComp->DestroyComponent();
+		}
+	}
+
+	W_AttributeSet->SetCurrentMag(W_AttributeSet->GetMagSize());
+
+	bInitialized=true;
+}
 
 void AGPWeaponActorBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bInitialized)
 	{
+		OnCurrentMagChanged_D.Broadcast(DeltaValue, EventTags);
 		OnCurrentMagChanged(DeltaValue, EventTags);
 	}
 }
@@ -200,6 +198,7 @@ void AGPWeaponActorBase::HandleMagSizeChanged(float DeltaValue, const struct FGa
 {
 	if (bInitialized)
 	{
+		OnMagSizeChanged_D.Broadcast(DeltaValue, EventTags);
 		OnMagSizeChanged(DeltaValue, EventTags);
 	}
 }
