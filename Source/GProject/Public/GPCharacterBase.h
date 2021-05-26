@@ -9,7 +9,7 @@
 #include "GPInventoryInterface.h"
 #include "AbilitySystemInterface.h"
 #include "Component/GPAbilitySystemComponent.h"
-#include "GPAttributeSet.h"
+#include "Attributes/GPAttributeSet.h"
 #include "GPWeaponActorBase.h"
 #include "GPCharacterBase.generated.h"
 
@@ -112,15 +112,15 @@ protected:
 	// Update movement when MoveSpeed is changed. Called from Handle~ for server, OnRep_~ for clients.
 	virtual void SetMovementSpeed(float Speed);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//UFUNCTION(BlueprintImplementableEvent)
+	//void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	virtual void HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//virtual void HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//UFUNCTION(BlueprintImplementableEvent)
+	//void OnMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTagUpdated(const FGameplayTag& Tag, bool TagExists);
@@ -151,17 +151,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetMoveSpeed() const;
 
-	UFUNCTION(BlueprintCallable)
-	virtual float GetCurrentMag() const;
+	//UFUNCTION(BlueprintCallable)
+	//virtual float GetCurrentMag() const;
 
-	UFUNCTION(BlueprintCallable)
-	virtual float GetMagSize() const;
+	//UFUNCTION(BlueprintCallable)
+	//virtual float GetMagSize() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void UpdateMagSize();
+	//UFUNCTION(BlueprintCallable, Category = "Weapon")
+	//void UpdateMagSize();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
-	void UpdateCurrentMag(float inValue = -1.0f);
+	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	//void UpdateCurrentMag(float inValue = -1.0f);
 
 	/**
 	 * Attempts to activate any ability in the specified item slot. Will return false if no activatable ability found or activation fails

@@ -6,6 +6,7 @@
 //#include "Animation/AnimSequence.h"
 #include "GPCharacterBase.h"
 #include "Item/GPItemWeapon.h"
+#include "Item/GPItemAttachment.h"
 #include "Item/GPItemToken.h"
 #include "Component/GPWAttachmentComponent.h"
 #include "AbilitySystemGlobals.h"
@@ -40,6 +41,12 @@ UGPGameplayAbility* AGPWeaponActorBase::TryActivateWeapon()
 	const TSubclassOf<UGPGameplayAbility>& AbilityClass = *WeaponAbilities.Find(CurrentFireMode);
 
 	if (!AbilityClass) return nullptr;
+
+	//FGameplayTagContainer Tagcon;
+	//FGameplayTag Tag(FName(TEXT("Ability.Weapon")));
+	//Tagcon.AddTag(Tag);
+
+	//W_AbilitySystemComponent->GetActiveEffectsWithAllTags()
 
 	if (W_AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass))
 	{
@@ -100,6 +107,7 @@ void AGPWeaponActorBase::ReloadWeapon(float inValue = -1.0f)
 	OnWeaponReloadEnd();
 }
 
+
 bool AGPWeaponActorBase::IsWeaponHasToReload_Implementation() const
 {
 	return (GetCurrentMag() != GetMagSize()) && (AmmoItem.IsValid());
@@ -113,6 +121,21 @@ float AGPWeaponActorBase::GetCurrentMag() const
 float AGPWeaponActorBase::GetMagSize() const
 {
 	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetMagSizeAttribute());
+}
+
+float AGPWeaponActorBase::GetFireRate() const
+{
+	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetFireRateAttribute());
+}
+
+float AGPWeaponActorBase::GetAccuracy() const
+{
+	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetAccuracyAttribute());
+}
+
+float AGPWeaponActorBase::GetReloadSpeed() const
+{
+	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetReloadSpeedAttribute());
 }
 
 EWFiringMode AGPWeaponActorBase::GetCurrentFiringMode() const
@@ -140,10 +163,61 @@ void AGPWeaponActorBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+// Returns replaced item. Add to empty slot will return null
+UGPItemAttachment* AGPWeaponActorBase::AddAttachment(UGPItemAttachment* inAttachmentItem)
+{
+	UGPWAttachmentComponent* CompCDO = inAttachmentItem->AttachmentClass->GetDefaultObject<UGPWAttachmentComponent>();
+	
+	TArray<UGPWAttachmentComponent*> FoundComps;
+	
+	GetComponents<UGPWAttachmentComponent>(FoundComps);
+
+	UGPItemAttachment* ReplacedAttachment = *AttachmentSlot.Find(CompCDO->Type);
+
+	for(UActorComponent* FoundComp : FoundComps)
+	{
+		UGPWAttachmentComponent* CastedComp = Cast<UGPWAttachmentComponent>(FoundComp);
+
+		if( CastedComp->Type == CompCDO->Type )
+		{	
+			GP_LOG(Warning,TEXT("%s"),*CastedComp->GetName());
+			CastedComp->RemoveEffects();
+			CastedComp->DestroyComponent();
+		}
+	}
+
+	// Overwrite
+	AttachmentSlot.Add(CompCDO->Type, inAttachmentItem);
+
+	UGPWAttachmentComponent* createdComp = NewObject<UGPWAttachmentComponent>(this, inAttachmentItem->AttachmentClass);
+	if (createdComp)
+	{
+		createdComp->RegisterComponent();
+		
+		createdComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform, NAME_None);
+
+		createdComp->CommitEffects();
+	}
+	
+	return ReplacedAttachment;
+}
+
+bool AGPWeaponActorBase::IsAttachableItem(UGPItemAttachment* inAttachmentItem) const
+{
+	UGPWAttachmentComponent* CompCDO = inAttachmentItem->AttachmentClass->GetDefaultObject<UGPWAttachmentComponent>();
+	
+	for ( EWeaponType Type : WeaponType )
+	{
+		if ( CompCDO->AttachableWeaponType.Find(Type) != INDEX_NONE ) return true;
+	}
+
+	return false;
+}
+
 void AGPWeaponActorBase::GASComponentInitialize()
 {
 	W_AbilitySystemComponent->ClearAllAbilities();
-	W_AbilitySystemComponent->InitAbilityActorInfo(GetOwner(), this);
+	W_AbilitySystemComponent->InitAbilityActorInfo(this, GetOwner());
 	
 	for (const TPair<EWFireType, TSubclassOf<UGPGameplayAbility>>& AbilityPair : WeaponAbilities)
 	{
@@ -162,21 +236,24 @@ void AGPWeaponActorBase::GASComponentInitialize()
 		FActiveGameplayEffectHandle ActiveGEHandle = W_AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), W_AbilitySystemComponent);
 	}
 
-	for (const TPair<EWAttachmentType, TSubclassOf<class UGPWAttachmentComponent>>& Attachment : AttachmentSlot)
+	for (const TPair<EWAttachmentType, UGPItemAttachment*>& Attachment : AttachmentSlot)
 	{
 		if(!Attachment.Value->IsValidLowLevel()) continue;
-		UGPWAttachmentComponent* createdComp = NewObject<UGPWAttachmentComponent>(this, Attachment.Value);
+		UGPWAttachmentComponent* createdComp = NewObject<UGPWAttachmentComponent>(this, Attachment.Value->AttachmentClass);
 		if (createdComp)
 		{
 			if (createdComp->Type == Attachment.Key)
 			{
 				createdComp->RegisterComponent();
-				createdComp->AttachTo(GetRootComponent(), NAME_None);
+				createdComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform,NAME_None);
 
 				createdComp->CommitEffects();
 			}
 			else
+			{	
 				createdComp->DestroyComponent();
+				AttachmentSlot.Add(Attachment.Key,nullptr);
+			}
 		}
 	}
 

@@ -6,7 +6,6 @@
 #include "Types/GPTypes.h"
 #include "Components/SceneComponent.h"
 #include "GameplayEffect.h"
-#include "GPWeaponActorBase.h"
 #include "GPWAttachmentComponent.generated.h"
 
 
@@ -21,6 +20,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	EWAttachmentType Type;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attachment)
+	TArray<EWeaponType> AttachableWeaponType;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -29,8 +32,8 @@ protected:
 	TArray<TSubclassOf<UGameplayEffect>> PassiveEffects;
 
 	TArray<FActiveGameplayEffectHandle> ActiveEffects;
-public:	
 
+public:	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CommitEffects();
 
@@ -39,4 +42,5 @@ public:
 
 	// Called every frame
 	//virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 };

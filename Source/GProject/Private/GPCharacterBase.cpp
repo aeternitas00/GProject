@@ -184,18 +184,6 @@ float AGPCharacterBase::GetMoveSpeed() const
 	return AttributeSet->GetMoveSpeed();
 }
 
-float AGPCharacterBase::GetCurrentMag() const
-{
-	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetCurrentMagAttribute());
-	//return AttributeSet->GetCurrentMag();
-}
-
-float AGPCharacterBase::GetMagSize() const
-{
-	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetMagSizeAttribute());
-	//return AttributeSet->GetMagSize();
-}
-
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
 {
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot); //�� �ڵ��� GAS�� Replicated�� Container���� Spec�� �����Ѿ���.
@@ -316,49 +304,49 @@ bool AGPCharacterBase::GetCooldownRemainingForTag(FGameplayTagContainer Cooldown
 	return false;
 }
 
-void AGPCharacterBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
-{
-	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
-	
-	if (!Ability) return;
+//void AGPCharacterBase::UpdateCurrentMag_Implementation(float inValue = -1.0f)
+//{
+//	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
+//	
+//	if (!Ability) return;
+//
+//	if (Ability->Implements<UGPMagAbilityInterface>())
+//	{
+//		float Delta = GetCurrentMag();
+//		FGameplayTagContainer TagCon;
+//
+//		if( inValue < 0.0f )
+//			AttributeSet->SetCurrentMag(AttributeSet->GetMagSize());
+//		else
+//			AttributeSet->SetCurrentMag(inValue);
+//
+//		Delta = GetCurrentMag()- Delta;
+//		HandleCurrentMagChanged(Delta, TagCon);
+//	}
+//}
 
-	if (Ability->Implements<UGPMagAbilityInterface>())
-	{
-		float Delta = GetCurrentMag();
-		FGameplayTagContainer TagCon;
-
-		if( inValue < 0.0f )
-			AttributeSet->SetCurrentMag(AttributeSet->GetMagSize());
-		else
-			AttributeSet->SetCurrentMag(inValue);
-
-		Delta = GetCurrentMag()- Delta;
-		HandleCurrentMagChanged(Delta, TagCon);
-	}
-}
-
-void AGPCharacterBase::UpdateMagSize()
-{
-	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
-
-	float Delta = GetMagSize();
-	FGameplayTagContainer TagCon;
-
-	if (!Ability) {	AttributeSet->SetMagSize(0.0f); goto ExecHandle; }
-
-	if (Ability->Implements<UGPMagAbilityInterface>())
-	{
-		AttributeSet->SetMagSize(IGPMagAbilityInterface::Execute_GetMagSize(Ability));
-	}
-	else
-	{
-		AttributeSet->SetMagSize(0.0f);
-	}
-
-ExecHandle:
-	Delta = GetMagSize() - Delta;
-	HandleMagSizeChanged(Delta, TagCon);
-}
+//void AGPCharacterBase::UpdateMagSize()
+//{
+//	UGameplayAbility* Ability = GetSlottedAbilityInstance(CurrentWeaponSlot);
+//
+//	float Delta = GetMagSize();
+//	FGameplayTagContainer TagCon;
+//
+//	if (!Ability) {	AttributeSet->SetMagSize(0.0f); goto ExecHandle; }
+//
+//	if (Ability->Implements<UGPMagAbilityInterface>())
+//	{
+//		AttributeSet->SetMagSize(IGPMagAbilityInterface::Execute_GetMagSize(Ability));
+//	}
+//	else
+//	{
+//		AttributeSet->SetMagSize(0.0f);
+//	}
+//
+//ExecHandle:
+//	Delta = GetMagSize() - Delta;
+//	HandleMagSizeChanged(Delta, TagCon);
+//}
 
 void AGPCharacterBase::FillSlottedAbilitySpecs(TMap<FGPItemSlot, FGameplayAbilitySpec>& SlottedAbilitySpecs)
 {
@@ -569,21 +557,21 @@ void AGPCharacterBase::SetMovementSpeed(float Speed)
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
 
-void AGPCharacterBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	if (bAbilitiesInitialized)
-	{
-		OnCurrentMagChanged(DeltaValue, EventTags);
-	}
-}
-
-void AGPCharacterBase::HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-{
-	if (bAbilitiesInitialized)
-	{
-		OnMagSizeChanged(DeltaValue, EventTags);
-	}
-}
+//void AGPCharacterBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+//{
+//	if (bAbilitiesInitialized)
+//	{
+//		OnCurrentMagChanged(DeltaValue, EventTags);
+//	}
+//}
+//
+//void AGPCharacterBase::HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
+//{
+//	if (bAbilitiesInitialized)
+//	{
+//		OnMagSizeChanged(DeltaValue, EventTags);
+//	}
+//}
 
 void AGPCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

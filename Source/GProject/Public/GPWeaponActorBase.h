@@ -6,11 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "AbilitySystemInterface.h"
 #include "Component/GPAbilitySystemComponent.h"
-#include "GPWeaponAttributeSet.h"
+#include "Attributes/GPWeaponAttributeSet.h"
 #include "GPWeaponActorBase.generated.h"
 
 //class USoundCue;
 //class UAnimSequence;
+//class UGPItemAttachment;
 
 UCLASS()
 class GPROJECT_API AGPWeaponActorBase : public AActor, public IAbilitySystemInterface
@@ -47,8 +48,11 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
 	void OnWeaponActivate();
 
-	//UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Weapon")
-	//void OnWeaponFire();
+	UFUNCTION(BlueprintCallable)
+	class UGPItemAttachment* AddAttachment(UGPItemAttachment* inAttachmentItem);
+
+	UFUNCTION(BlueprintCallable,BlueprintPure) 
+	bool IsAttachableItem(UGPItemAttachment* inAttachmentItem) const;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
 	void OnWeaponDeactivate();
@@ -59,7 +63,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
 	void OnWeaponReloadEnd();
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Weapon")
 	void OnWeaponRaised();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Weapon")
@@ -73,6 +77,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetMagSize() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetFireRate() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetAccuracy() const;
+
+	UFUNCTION(BlueprintCallable)
+	float GetReloadSpeed() const;
 
 	UFUNCTION(BlueprintCallable)
 	EWFiringMode GetCurrentFiringMode() const;
@@ -117,7 +130,12 @@ protected:
 	FPrimaryAssetId AmmoItem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadwrite)
-	TMap<EWAttachmentType, TSubclassOf<class UGPWAttachmentComponent>> AttachmentSlot;
+	TMap<EWAttachmentType, UGPItemAttachment*> AttachmentSlot;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attachment)
+	TArray<EWeaponType> WeaponType;
+
+	//TMap<EWAttachmentType, UGPWAttachmentComponent*> AttachmentComponents;
 
 	void GASComponentInitialize();
 
@@ -132,6 +150,5 @@ protected:
 	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	friend UGPWeaponAttributeSet;
-
-
+	//friend UGPWAttachmentComponent;
 };

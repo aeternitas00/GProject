@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "GPAttributeSet.h"
+#include "Attributes/GPAttributeSet.h"
 #include "Component/GPAbilitySystemComponent.h"
 #include "GPCharacterBase.h"
 #include "GameplayEffect.h"
@@ -14,9 +14,6 @@ UGPAttributeSet::UGPAttributeSet()
 	, AttackPower(1.0f)
 	, DefensePower(1.0f)
 	, MoveSpeed(1.0f)
-	, Damage(0.0f)
-	, CurrentMag(0.0f)
-	, MagSize(0.0f)
 {
 }
 
@@ -31,8 +28,6 @@ void UGPAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(UGPAttributeSet, AttackPower);
 	DOREPLIFETIME(UGPAttributeSet, DefensePower);
 	DOREPLIFETIME(UGPAttributeSet, MoveSpeed);
-	DOREPLIFETIME(UGPAttributeSet, CurrentMag);
-	DOREPLIFETIME(UGPAttributeSet, MagSize);
 }
 
 void UGPAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
@@ -70,16 +65,6 @@ void UGPAttributeSet::OnRep_MoveSpeed(const FGameplayAttributeData& OldValue)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPAttributeSet, MoveSpeed, OldValue);
 
 	Cast<AGPCharacterBase>(GetOwningActor())->SetMovementSpeed(GetMoveSpeed());//
-}
-
-void UGPAttributeSet::OnRep_CurrentMag(const FGameplayAttributeData& OldValue)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPAttributeSet, CurrentMag, OldValue);
-}
-
-void UGPAttributeSet::OnRep_MagSize(const FGameplayAttributeData& OldValue)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPAttributeSet, MagSize, OldValue);
 }
 
 
@@ -138,8 +123,6 @@ void UGPAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		TargetCharacter = Cast<AGPCharacterBase>(TargetActor);
 	}
-
-	// Ÿ�Ժ� ������ ó�� ���?
 
 	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
@@ -232,21 +215,6 @@ void UGPAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		{
 			// Call for all movespeed changes
 			TargetCharacter->HandleMoveSpeedChanged(DeltaValue, SourceTags);
-		}
-	}
-	else if (Data.EvaluatedData.Attribute == GetCurrentMagAttribute())
-	{
-		if (TargetCharacter)
-		{
-			SetCurrentMag(FMath::Clamp(GetCurrentMag(), 0.0f, GetMagSize()));
-			TargetCharacter->HandleCurrentMagChanged(DeltaValue, SourceTags);
-		}
-	}
-	else if (Data.EvaluatedData.Attribute == GetMagSizeAttribute())
-	{
-		if (TargetCharacter)
-		{
-			TargetCharacter->HandleMagSizeChanged(DeltaValue, SourceTags);
 		}
 	}
 }

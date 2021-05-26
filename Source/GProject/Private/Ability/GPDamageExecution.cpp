@@ -2,7 +2,7 @@
 
 
 #include "Ability/GPDamageExecution.h"
-#include "GPAttributeSet.h"
+#include "Attributes/GPAttributeSet.h"
 #include "Component/GPAbilitySystemComponent.h"
 
 struct GPDamageStatics
@@ -22,7 +22,7 @@ struct GPDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UGPAttributeSet, AttackPower, Source, true);
 
 		// Also capture the source's raw Damage, which is normally passed in directly via the execution
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UGPAttributeSet, Damage, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UGPDamageAttributeSet, Damage, Source, true);
 	}
 };
 
@@ -71,6 +71,11 @@ void UGPDamageExecution::Execute_Implementation(const FGameplayEffectCustomExecu
 
 	float AttackPower = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AttackPowerDef, EvaluationParameters, AttackPower);
+	if (AttackPower == 0.0f)
+	{
+		AttackPower = 1.0f;
+	}
+
 
 	float Damage = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().DamageDef, EvaluationParameters, Damage);

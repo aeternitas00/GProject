@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GPWeaponAttributeSet.h"
+#include "Attributes/GPWeaponAttributeSet.h"
 #include "Component/GPAbilitySystemComponent.h"
 #include "GPWeaponActorBase.h"
 #include "GameplayEffect.h"
@@ -10,6 +10,9 @@
 UGPWeaponAttributeSet::UGPWeaponAttributeSet()
 	: CurrentMag(0.0f)
 	, MagSize(0.0f)
+	, FireRate(1.0f)
+	, Accuracy(1.0f)
+	, ReloadSpeed(1.0f)
 {}
 
 //void UGPWeaponAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float& NewValue)
@@ -58,6 +61,27 @@ void UGPWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 			TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
 		}
 	}
+	else if (Data.EvaluatedData.Attribute == GetFireRateAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetAccuracyAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetReloadSpeedAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+		}
+	}
 }
 
 void UGPWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -66,6 +90,9 @@ void UGPWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 
 	DOREPLIFETIME(UGPWeaponAttributeSet, CurrentMag);
 	DOREPLIFETIME(UGPWeaponAttributeSet, MagSize);
+	DOREPLIFETIME(UGPWeaponAttributeSet, FireRate);
+	DOREPLIFETIME(UGPWeaponAttributeSet, Accuracy);
+	DOREPLIFETIME(UGPWeaponAttributeSet, ReloadSpeed);
 }
 
 void UGPWeaponAttributeSet::OnRep_CurrentMag(const FGameplayAttributeData& OldValue)
@@ -77,3 +104,19 @@ void UGPWeaponAttributeSet::OnRep_MagSize(const FGameplayAttributeData& OldValue
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, MagSize, OldValue);
 }
+
+void UGPWeaponAttributeSet::OnRep_FireRate(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, FireRate, OldValue);
+}
+
+void UGPWeaponAttributeSet::OnRep_Accuracy(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, Accuracy, OldValue);
+}
+
+void UGPWeaponAttributeSet::OnRep_ReloadSpeed(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, ReloadSpeed, OldValue);
+}
+

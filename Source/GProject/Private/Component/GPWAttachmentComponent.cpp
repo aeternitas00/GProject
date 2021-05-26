@@ -2,7 +2,7 @@
 
 
 #include "Component/GPWAttachmentComponent.h"
-
+#include "GPWeaponActorBase.h"
 
 // Sets default values for this component's properties
 UGPWAttachmentComponent::UGPWAttachmentComponent()
@@ -33,25 +33,48 @@ void UGPWAttachmentComponent::CommitEffects_Implementation()
 		EffectContext.AddSourceObject(this);
 
 		FGameplayEffectSpecHandle NewHandle = ASC->MakeOutgoingSpec(Effect, EffectContext.GetAbilityLevel(), EffectContext);
+
 		if (NewHandle.IsValid())
 		{
 			FActiveGameplayEffectHandle ActiveGEHandle = ASC->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), ASC);
+			
+			//ActiveEffects.Add(ActiveGEHandle);
 		}
-
 	}
 }
 
 void UGPWAttachmentComponent::RemoveEffects_Implementation()
 {
 	UGPAbilitySystemComponent* ASC = Cast<AGPWeaponActorBase>(GetOwner())->GetAbilitySystemComponent();
-
-	for (FActiveGameplayEffectHandle ActiveEffect : ActiveEffects)
+	
+	for (TSubclassOf<UGameplayEffect> Effect : PassiveEffects)
 	{
-		if (ActiveEffect.IsValid())
+		if (!Effect) continue;
+
+		UGameplayEffect* EffectCDO = Effect.GetDefaultObject();
+
+		for (TSubclassOf<UGameplayEffect> ExpEffect : EffectCDO->PrematureExpirationEffectClasses)
 		{
-			ASC->RemoveActiveGameplayEffect(ActiveEffect);
+			FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
+			EffectContext.AddSourceObject(this);
+
+			FGameplayEffectSpecHandle NewHandle = ASC->MakeOutgoingSpec(ExpEffect, EffectContext.GetAbilityLevel(), EffectContext);
+
+			if (NewHandle.IsValid())
+			{
+				FActiveGameplayEffectHandle ActiveGEHandle = ASC->ApplyGameplayEffectSpecToTarget(*NewHandle.Data.Get(), ASC);
+			}
 		}
 	}
+
+	//GP_LOG(Warning,TEXT("%s , Num is %d , Property Num is %d"), *GetOwner()->GetName(), ASC->GetNumActiveGameplayEffects(), ActiveEffects.Num());
+
+	//for (const FActiveGameplayEffectHandle& ActiveEffect : ActiveEffects)
+	//{
+	//	ASC->RemoveActiveGameplayEffect(ActiveEffect);
+	//}
+
+	//ActiveEffects.Empty();
 }
 
 // Called every frame

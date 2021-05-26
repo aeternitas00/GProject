@@ -183,6 +183,19 @@ enum class EWFiringMode : uint8
 	WM_Custom2 UMETA(DisplayName = "Custom2")
 };
 
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	WT_AR		UMETA(DisplayName = "Assault Rifle"),
+	WT_Pistol	UMETA(DisplayName = "Pistol"),
+	WT_SMG		UMETA(DisplayName = "SMG"),
+	WT_SR		UMETA(DisplayName = "SniperRifle"),
+	WT_Launcher UMETA(DisplayName = "Launcher"),
+	WT_Shotgun	UMETA(DisplayName = "Shotgun"),
+	WT_DMR		UMETA(DisplayName = "DMR"),
+	WT_Custom1	UMETA(DisplayName = "Custom1"),
+	WT_Custom2	UMETA(DisplayName = "Custom2")
+}; 
 
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
@@ -197,5 +210,5 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryLoaded);
 DECLARE_MULTICAST_DELEGATE(FOnInventoryLoadedNative);
 
 /** Delegate called when the save game has been loaded/reset */
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoaded, UGPSaveGame*, SaveGame);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoadedNative, UGPSaveGame*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoaded, UGPSaveGame*, SaveGame);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoadedNative, UGPSaveGame*);

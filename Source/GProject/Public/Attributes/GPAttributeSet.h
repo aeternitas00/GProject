@@ -3,20 +3,20 @@
 #pragma once
 
 #include "GProject.h"
-#include "AttributeSet.h"
+#include "GPDamageAttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "GPAttributeSet.generated.h"
 
 // Uses macros from AttributeSet.h
-#define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
-	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
-	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
-	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
-	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
+//#define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
+//	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
+//	GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
+//	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
+//	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 /** This holds all of the attributes used by abilities, it instantiates a copy of this on every character */
 UCLASS()
-class GPROJECT_API UGPAttributeSet : public UAttributeSet
+class GPROJECT_API UGPAttributeSet : public UGPDamageAttributeSet
 {
 	GENERATED_BODY()
 public:
@@ -63,17 +63,9 @@ public:
 	ATTRIBUTE_ACCESSORS(UGPAttributeSet, MoveSpeed)
 
 	/** Damage is a 'temporary' attribute used by the DamageExecution to calculate final damage, which then turns into -Health */
-	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	/*UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FGameplayAttributeData Damage;
-	ATTRIBUTE_ACCESSORS(UGPAttributeSet, Damage)
-
-	UPROPERTY(BlueprintReadOnly, Category = "Magazine", ReplicatedUsing = OnRep_CurrentMag)
-	FGameplayAttributeData CurrentMag;
-	ATTRIBUTE_ACCESSORS(UGPAttributeSet, CurrentMag)
-
-	UPROPERTY(BlueprintReadOnly, Category = "Magazine", ReplicatedUsing = OnRep_MagSize)
-	FGameplayAttributeData MagSize;
-	ATTRIBUTE_ACCESSORS(UGPAttributeSet, MagSize)
+	ATTRIBUTE_ACCESSORS(UGPAttributeSet, Damage)*/
 
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
@@ -100,10 +92,4 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MoveSpeed(const FGameplayAttributeData& OldValue);
-
-	UFUNCTION()
-	virtual void OnRep_CurrentMag(const FGameplayAttributeData& OldValue);
-
-	UFUNCTION()
-	virtual void OnRep_MagSize(const FGameplayAttributeData& OldValue);
 };

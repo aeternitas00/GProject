@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "GProject.h"
 #include "GameFramework/Actor.h"
 #include "Types/GPAbilityTypes.h"
 #include "GPProjectileBase.generated.h"

@@ -22,5 +22,5 @@ public:
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attachment)
-	TSubclassOf<UGPWAttachmentComponent> AttachmentClass;
+	TSubclassOf<class UGPWAttachmentComponent> AttachmentClass;
 };
