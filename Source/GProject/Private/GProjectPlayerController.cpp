@@ -3,6 +3,7 @@
 #include "GProjectPlayerController.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
+#include "GPSaveGame.h"
 #include "Item/GPItem.h"
 #include "UI/ChatWindow.h"
 #include "GPClient.h"
@@ -37,8 +38,6 @@ void AGProjectPlayerController::BeginPlay()
 
 	Super::BeginPlay();
 
-	LoadoutCommit();
-
 	if (IsLocalPlayerController()) //
 	{
 		GPClient = FGPClient::GetGPClient();
@@ -50,18 +49,70 @@ void AGProjectPlayerController::BeginPlay()
 	}
 }
 
-
-bool AGProjectPlayerController::LoadoutCommit()
+bool AGProjectPlayerController::SaveInventory()
 {
-	InventoryData.Reset();
-	SlottedItems.Reset();
-
 	UWorld* World = GetWorld();
 	UGPGameInstanceBase* GameInstance = World ? World->GetGameInstance<UGPGameInstanceBase>() : nullptr;
 
 	if (!GameInstance)
 	{
 		return false;
+	}
+
+	UGPSaveGame* CurrentSaveGame = GameInstance->GetCurrentSaveGame();
+	if (CurrentSaveGame)
+	{
+		// Reset cached data in save game before writing to it
+		CurrentSaveGame->InventoryData.Reset();
+		CurrentSaveGame->SlottedItems.Reset();
+
+		for (const TPair<UGPItem*, FGPItemData>& ItemPair : InventoryData)
+		{
+			FPrimaryAssetId AssetId;
+
+			if (ItemPair.Key)
+			{
+				AssetId = ItemPair.Key->GetPrimaryAssetId();
+				CurrentSaveGame->InventoryData.Add(AssetId, ItemPair.Value);
+			}
+		}
+
+		for (const TPair<FGPItemSlot, UGPItem*>& SlotPair : SlottedItems)
+		{
+			FPrimaryAssetId AssetId;
+
+			if (SlotPair.Value)
+			{
+				AssetId = SlotPair.Value->GetPrimaryAssetId();
+			}
+			CurrentSaveGame->SlottedItems.Add(SlotPair.Key, AssetId);
+		}
+
+		// Now that cache is updated, write to disk
+		GameInstance->WriteSaveGame();
+		return true;
+	}
+	return false;
+}
+
+bool AGProjectPlayerController::LoadInventory()
+{
+	InventoryData.Reset();
+	SlottedItems.Reset();
+
+	// Fill in slots from game instance
+	UWorld* World = GetWorld();
+	UGPGameInstanceBase* GameInstance = World ? World->GetGameInstance<UGPGameInstanceBase>() : nullptr;
+
+	if (!GameInstance)
+	{
+		return false;
+	}
+
+	// Bind to loaded callback if not already bound
+	if (!GameInstance->OnSaveGameLoadedNative.IsBoundToObject(this))
+	{
+		GameInstance->OnSaveGameLoadedNative.AddUObject(this, &AGProjectPlayerController::HandleSaveGameLoaded);
 	}
 
 	for (const TPair<FPrimaryAssetType, int32>& Pair : GameInstance->ItemSlotsPerType)
@@ -72,42 +123,64 @@ bool AGProjectPlayerController::LoadoutCommit()
 		}
 	}
 
+	UGPSaveGame* CurrentSaveGame = GameInstance->GetCurrentSaveGame();
 	UGPAssetManager& AssetManager = UGPAssetManager::Get();
-
-	bool bFoundAnySlots = false;
-	for (const TPair<FPrimaryAssetId, FGPItemData>& ItemPair : GameInstance->DefaultInventory)
+	if (CurrentSaveGame)
 	{
-		UGPItem* LoadedItem = AssetManager.ForceLoadItem(ItemPair.Key);
-
-		if (LoadedItem != nullptr)
+		// Copy from save game into controller data
+		bool bFoundAnySlots = false;
+		for (const TPair<FPrimaryAssetId, FGPItemData>& ItemPair : CurrentSaveGame->InventoryData)
 		{
-			InventoryData.Add(LoadedItem, ItemPair.Value);
-			NotifyInventoryItemChanged(LoadedItem, ItemPair.Value);
-		}
-	}
+			UGPItem* LoadedItem = AssetManager.ForceLoadItem(ItemPair.Key);
 
-	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : GameInstance->DefaultSlottedItems)
-	{
-		if (SlotPair.Value.IsValid())
-		{
-			UGPItem* LoadedItem = AssetManager.ForceLoadItem(SlotPair.Value);
-			if (GameInstance->IsValidItemSlot(SlotPair.Key) && LoadedItem)
+			if (LoadedItem != nullptr)
 			{
-				SlottedItems.Add(SlotPair.Key, LoadedItem);
-				NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
-				bFoundAnySlots = true;
+				InventoryData.Add(LoadedItem, ItemPair.Value);
+				NotifyInventoryItemChanged(LoadedItem, ItemPair.Value);
 			}
 		}
+
+		for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : CurrentSaveGame->SlottedItems)
+		{
+			if (SlotPair.Value.IsValid())
+			{
+				UGPItem* LoadedItem = AssetManager.ForceLoadItem(SlotPair.Value);
+				if (GameInstance->IsValidItemSlot(SlotPair.Key) && LoadedItem)
+				{
+					SlottedItems.Add(SlotPair.Key, LoadedItem);
+					NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
+					bFoundAnySlots = true;
+				}
+			}
+		}
+
+		if (!bFoundAnySlots)
+		{
+			// Auto slot items as no slots were saved
+			FillEmptySlots();
+		}
+
+		NotifyInventoryLoaded();
+
+		return true;
 	}
 
-	if (!bFoundAnySlots)
-	{
-		// Auto slot items as no slots were saved
-		FillEmptySlots();
-	}
-	
+	// Load failed but we reset inventory, so need to notify UI
+	NotifyInventoryLoaded();
 
-	return true;
+	return false;
+}
+
+void AGProjectPlayerController::NotifyInventoryLoaded()
+{
+	// Notify native before blueprint
+	OnInventoryLoadedNative.Broadcast();
+	OnInventoryLoaded.Broadcast();
+}
+
+void AGProjectPlayerController::HandleSaveGameLoaded(UGPSaveGame* NewSaveGame)
+{
+	LoadInventory();
 }
 
 void AGProjectPlayerController::PlayerTick(float DeltaTime)

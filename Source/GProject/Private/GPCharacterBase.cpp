@@ -83,8 +83,8 @@ bool AGPCharacterBase::LoadoutCommit()
 
 	if(!GameInstance) return false;
 
-	if (GameInstance->DefaultSlottedAbilities.Num()!=0)
-		DefaultSlottedAbilities = GameInstance->DefaultSlottedAbilities;
+	//if (GameInstance->DefaultSlottedAbilities.Num()!=0)
+	//	DefaultSlottedAbilities = GameInstance->DefaultSlottedAbilities;
 	//GP_LOG(Warning, TEXT("%s"), *GetName());
 
 	return true;

@@ -35,9 +35,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	TMap<FGPItemSlot, FPrimaryAssetId> DefaultSlottedItems;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-	TMap<FGPItemSlot, TSubclassOf<class UGPGameplayAbility>> DefaultSlottedAbilities;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	TArray<FGPStageNode> StageNodes;
+
 	/** The slot name used for saving */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
 	FString SaveSlot;
@@ -59,7 +60,13 @@ public:
 	 * @param RemoveExtra If true, remove anything other than default inventory
 	 */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	void AddDefaultInventory(UGPSaveGame* SaveGame, bool bRemoveExtra = false);
+	void SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSave = true);
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void LoadDefaults(UGPSaveGame* SaveGame);
+
+	UFUNCTION(BlueprintCallable, Category = Save)
+	void CleanupDefaults();
 
 	/** Returns true if this is a valid inventory slot */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -84,6 +91,9 @@ public:
 	/** Gets the save game slot and user index used for inventory saving, ready to pass to GameplayStatics save functions */
 	UFUNCTION(BlueprintCallable, Category = Save)
 	void GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const;
+
+	UFUNCTION(BlueprintCallable, Category = Save)
+	void UpdateCurrentSaveGame();
 
 	/** Writes the current save game object to disk. The save to disk happens in a background thread*/
 	UFUNCTION(BlueprintCallable, Category = Save)

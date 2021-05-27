@@ -39,9 +39,9 @@ void UGPWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	AActor* TargetActor = nullptr;
 	AController* TargetController = nullptr;
 	AGPWeaponActorBase* TargetWeapon = nullptr;
-	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
+	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->OwnerActor.IsValid())
 	{
-		TargetActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
+		TargetActor = Data.Target.AbilityActorInfo->OwnerActor.Get();
 		TargetController = Data.Target.AbilityActorInfo->PlayerController.Get();
 		TargetWeapon = Cast<AGPWeaponActorBase>(TargetActor);
 	}

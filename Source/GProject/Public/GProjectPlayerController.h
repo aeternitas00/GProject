@@ -85,6 +85,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool IsThereEmptySlotWithType(FPrimaryAssetType inType);
 
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool SaveInventory();
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool LoadInventory();
+
 	/** Delegate called when the inventory has been loaded/reloaded */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnInventoryLoaded OnInventoryLoaded;
@@ -136,7 +142,10 @@ protected:
 	/** Calls the inventory update callbacks */
 	void NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
+	void NotifyInventoryLoaded();
 
+	/** Called when a global save game as been loaded */
+	void HandleSaveGameLoaded(UGPSaveGame* NewSaveGame);
 
 private:
 	FGPClient* GPClient;
@@ -144,8 +153,6 @@ private:
 protected:
 	UFUNCTION()
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
-
-	bool LoadoutCommit();
 protected:
 	TQueue<FString, EQueueMode::Spsc> ChatMessages;
 public:

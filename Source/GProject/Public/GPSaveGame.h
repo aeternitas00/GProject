@@ -28,6 +28,58 @@ namespace EGPSaveGameVersion
 	};
 }
 
+UENUM(BlueprintType)
+enum class EGPStageType : uint8
+{
+	ST_T1		UMETA(DisplayName = "Stage Type 1 (Ice)"),
+	ST_T2		UMETA(DisplayName = "Stage Type 2 ()"),
+	ST_T3		UMETA(DisplayName = "Stage Type 3 ()"),
+	ST_T4		UMETA(DisplayName = "Stage Type 4 ()")
+};
+
+UENUM(BlueprintType)
+enum class EGPStageStatus : uint8
+{
+	SS_NotInit	UMETA(DisplayName = "Not initialized"),
+	SS_Init		UMETA(DisplayName = "Initialized but not visited"),
+	SS_Cleared	UMETA(DisplayName = "Initialized and Cleared")
+};
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPStageInfo
+{
+	GENERATED_BODY()
+
+	FGPStageInfo() : StageLevel(0) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	int32 StageLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	EGPStageType StageType; // Tileset
+
+	// Faction
+};
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPStageNode
+{
+	GENERATED_BODY()
+
+	FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NotInit) {}
+
+	// Index of where we have to go
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TArray<int32> ConnectedStageNodeIdx;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FGPStageInfo StageInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	EGPStageStatus StageStatus;
+};
+
+
 /** Object that is written to and read from the save game archive, with a data version */
 UCLASS(BlueprintType)
 class GPROJECT_API UGPSaveGame : public USaveGame
@@ -49,6 +101,9 @@ public:
 	/** Map of slotted items */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FGPItemSlot, FPrimaryAssetId> SlottedItems;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TArray<FGPStageNode> SavedStageNodes;
 
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)

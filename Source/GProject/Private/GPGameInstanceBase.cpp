@@ -111,22 +111,68 @@ bool UGPGameInstanceBase::IsConnected() const
 	return GPClient ? true : false;//
 }
 
-void UGPGameInstanceBase::AddDefaultInventory(UGPSaveGame* SaveGame, bool bRemoveExtra)
+void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSave)
 {
-	// If we want to remove extra, clear out the existing inventory
-	if (bRemoveExtra)
-	{
-		SaveGame->InventoryData.Reset();
-	}
+	SaveGame->InventoryData.Reset();
+	SaveGame->SlottedItems.Reset();
+	SaveGame->SavedStageNodes.Reset();
 
 	// Now add the default inventory, this only adds if not already in hte inventory
 	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : DefaultInventory)
 	{
-		if (!SaveGame->InventoryData.Contains(Pair.Key))
+		SaveGame->InventoryData.Add(Pair.Key, Pair.Value);
+	}
+
+	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : DefaultSlottedItems)
+	{
+		if (SlotPair.Value.IsValid())
 		{
-			SaveGame->InventoryData.Add(Pair.Key, Pair.Value);
+			CurrentSaveGame->SlottedItems.Add(SlotPair.Key, SlotPair.Value);
 		}
 	}
+
+	for (const FGPStageNode& StageNode : StageNodes)
+	{
+		CurrentSaveGame->SavedStageNodes.Add(StageNode);
+	}
+
+	if (WriteAfterSave)
+	{
+		WriteSaveGame();
+	}
+}
+
+void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
+{
+	DefaultInventory.Reset();
+	DefaultSlottedItems.Reset();
+	StageNodes.Reset();
+
+	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
+	{
+		DefaultInventory.Add(Pair.Key, Pair.Value);
+	}
+
+	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : SaveGame->SlottedItems)
+	{
+		if (SlotPair.Value.IsValid())
+		{
+			DefaultSlottedItems.Add(SlotPair.Key, SlotPair.Value);
+		}
+	}
+
+	for (const FGPStageNode& StageNode : SaveGame->SavedStageNodes)
+	{
+		StageNodes.Add(StageNode);
+	}
+}
+
+void UGPGameInstanceBase::CleanupDefaults()
+{	
+	DefaultInventory.Reset();
+	DefaultSlottedItems.Reset();
+	StageNodes.Reset();
+	//ItemSlotsPerType.Reset();
 }
 
 
@@ -168,15 +214,19 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 	if (CurrentSaveGame)
 	{
 		// Make sure it has any newly added default inventory
-		AddDefaultInventory(CurrentSaveGame, false);
+		//AddDefaultInventory(CurrentSaveGame, false);
+		LoadDefaults(CurrentSaveGame);
 		bLoaded = true;
 	}
 	else
 	{
 		// This creates it on demand
-		CurrentSaveGame = Cast<UGPSaveGame>(UGameplayStatics::CreateSaveGameObject(UGPSaveGame::StaticClass()));
-
-		AddDefaultInventory(CurrentSaveGame, true);
+		
+		// Cast doesn't work somehow so we use this way
+		USaveGame* CreatedSaveGame = UGameplayStatics::CreateSaveGameObject(UGPSaveGame::StaticClass());
+		CurrentSaveGame = (UGPSaveGame*)(CreatedSaveGame);
+		
+		LoadDefaults(CurrentSaveGame);
 	}
 
 	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
@@ -189,6 +239,12 @@ void UGPGameInstanceBase::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) c
 {
 	SlotName = SaveSlot;
 	UserIndex = SaveUserIndex;
+}
+
+// TODO :: Update only changed things? 
+void UGPGameInstanceBase::UpdateCurrentSaveGame()
+{
+	SaveDefaults(CurrentSaveGame,true);
 }
 
 bool UGPGameInstanceBase::WriteSaveGame()
