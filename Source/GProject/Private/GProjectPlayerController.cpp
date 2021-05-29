@@ -36,7 +36,7 @@ void AGProjectPlayerController::BeginPlay()
 
 	Super::BeginPlay();
 
-	LoadoutCommit();
+	//LoadoutCommit();
 
 	if (IsLocalPlayerController()) //
 	{
