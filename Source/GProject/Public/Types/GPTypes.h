@@ -73,7 +73,7 @@ USTRUCT(BlueprintType)
 struct GPROJECT_API FGPItemData
 {
 	GENERATED_BODY()
-
+public:
 	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
 	FGPItemData()
 	: ItemCount(1)
@@ -110,8 +110,10 @@ struct GPROJECT_API FGPItemData
 	}
 
 	/** Append an item data, this adds the count and overrides everything else */
-	void UpdateItemData(const FGPItemData& Other, int32 MaxCount, int32 MaxLevel)
+	virtual void UpdateItemData(const FGPItemData& Other, int32 MaxCount, int32 MaxLevel)
 	{
+		//if (!Other) return;
+
 		if (MaxCount <= 0)
 		{
 			MaxCount = MAX_int32;
@@ -126,6 +128,7 @@ struct GPROJECT_API FGPItemData
 		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
 	}
 };
+
 
 class AGPCharacterBase;
 
@@ -152,6 +155,60 @@ struct GPROJECT_API FGPCharacterAssetStruct : public FTableRowBase
 	TSubclassOf<AGPCharacterBase> CharacterClass;
 };
 
+UENUM(BlueprintType)
+enum class EWAttachmentType : uint8
+{
+	WA_Magazine UMETA(DisplayName = "Magazine"),
+	WA_Barrel UMETA(DisplayName = "Barrel"),
+	WA_Stock UMETA(DisplayName = "Stock"),
+	WA_Optic UMETA(DisplayName = "Optic"),
+	WA_Custom1 UMETA(DisplayName = "Custom1"),
+	WA_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+UENUM(BlueprintType)
+enum class EWFireType : uint8
+{
+	WF_Primary UMETA(DisplayName = "Primary"),
+	WF_Sub UMETA(DisplayName = "Sub"),
+	WF_Special UMETA(DisplayName = "Special"),
+	WF_Custom1 UMETA(DisplayName = "Custom1"),
+	WF_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+UENUM(BlueprintType)
+enum class EWFiringMode : uint8
+{
+	WM_Single UMETA(DisplayName = "Single"),
+	WM_Burst UMETA(DisplayName = "Burst"),
+	WM_Auto UMETA(DisplayName = "Auto"),
+	WM_Custom1 UMETA(DisplayName = "Custom1"),
+	WM_Custom2 UMETA(DisplayName = "Custom2")
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	WT_AR		UMETA(DisplayName = "Assault Rifle"),
+	WT_Pistol	UMETA(DisplayName = "Pistol"),
+	WT_SMG		UMETA(DisplayName = "SMG"),
+	WT_SR		UMETA(DisplayName = "SniperRifle"),
+	WT_Launcher UMETA(DisplayName = "Launcher"),
+	WT_Shotgun	UMETA(DisplayName = "Shotgun"),
+	WT_DMR		UMETA(DisplayName = "DMR"),
+	WT_Custom1	UMETA(DisplayName = "Custom1"),
+	WT_Custom2	UMETA(DisplayName = "Custom2")
+}; 
+
+UENUM(BlueprintType)
+enum class EGPGameDifficulty : uint8
+{
+	GD_Easy			UMETA(DisplayName = "Easy"),
+	GD_Normal		UMETA(DisplayName = "Normal"),
+	GD_Hard			UMETA(DisplayName = "Hard"),
+	GD_NightMare	UMETA(DisplayName = "Nightmare")
+};
+
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, UGPItem*, FGPItemData);
@@ -165,5 +222,5 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryLoaded);
 DECLARE_MULTICAST_DELEGATE(FOnInventoryLoadedNative);
 
 /** Delegate called when the save game has been loaded/reset */
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoaded, UGPSaveGame*, SaveGame);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoadedNative, UGPSaveGame*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoaded, UGPSaveGame*, SaveGame);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSaveGameLoadedNative, UGPSaveGame*);

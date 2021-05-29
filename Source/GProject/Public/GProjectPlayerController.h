@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool AddInventoryItem(UGPItem* NewItem, int32 ItemCount = 1, int32 ItemLevel = 1, bool bAutoSlot = true);
 
+	//UFUNCTION(BlueprintCallable, Category = Inventory)
+	//bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true);
+
 	/** Remove an inventory item, will also remove from slots. A remove count of <= 0 means to remove all copies */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	int32 RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount = 1);
@@ -84,6 +87,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool IsThereEmptySlotWithType(FPrimaryAssetType inType);
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool SaveInventory();
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	bool LoadInventory();
 
 	/** Delegate called when the inventory has been loaded/reloaded */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
@@ -136,7 +145,10 @@ protected:
 	/** Calls the inventory update callbacks */
 	void NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
+	void NotifyInventoryLoaded();
 
+	/** Called when a global save game as been loaded */
+	void HandleSaveGameLoaded(UGPSaveGame* NewSaveGame);
 
 private:
 	FGPClient* GPClient;
@@ -144,8 +156,6 @@ private:
 protected:
 	UFUNCTION()
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
-
-	bool LoadoutCommit();
 protected:
 	TQueue<FString, EQueueMode::Spsc> ChatMessages;
 public:

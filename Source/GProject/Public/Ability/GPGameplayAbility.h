@@ -21,6 +21,7 @@ public:
 	// Constructor and overrides
 	UGPGameplayAbility();
 
+	//Deprecated
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Icon)
 	FSlateBrush SkillIcon;
 

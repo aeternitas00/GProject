@@ -9,7 +9,8 @@
 #include "GPInventoryInterface.h"
 #include "AbilitySystemInterface.h"
 #include "Component/GPAbilitySystemComponent.h"
-#include "GPAttributeSet.h"
+#include "Attributes/GPAttributeSet.h"
+#include "GPWeaponActorBase.h"
 #include "GPCharacterBase.generated.h"
 
 class UGPAbilitySystemComponent;
@@ -40,6 +41,7 @@ public:
 	virtual void ClientSlottedAbilityChanged(const FGPItemSlot& Slot, const FGameplayAbilitySpecHandle& SpecHandle); // for client set SlottedAbilities //TPair�� ����.
 
 protected:
+	bool LoadoutCommit();
 
 	/** Remove slotted gameplay abilities, if force is false it only removes invalid ones */
 	void RemoveSlottedGameplayAbilities(bool bRemoveAll);
@@ -110,21 +112,21 @@ protected:
 	// Update movement when MoveSpeed is changed. Called from Handle~ for server, OnRep_~ for clients.
 	virtual void SetMovementSpeed(float Speed);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//UFUNCTION(BlueprintImplementableEvent)
+	//void OnCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	virtual void HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//virtual void HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//UFUNCTION(BlueprintImplementableEvent)
+	//void OnMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
-	virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+	//virtual void HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTagUpdated(const FGameplayTag& Tag, bool TagExists);
 
 	UFUNCTION()
-	virtual void OnRep_WeaponActor(const AActor* OldValue);
+	virtual void OnRep_WeaponActor(const AGPWeaponActorBase* OldValue);
 
 	UFUNCTION()
 	virtual void OnRep_WeaponSlot(const FGPItemSlot& OldValue);
@@ -149,17 +151,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetMoveSpeed() const;
 
-	UFUNCTION(BlueprintCallable)
-	virtual float GetCurrentMag() const;
+	//UFUNCTION(BlueprintCallable)
+	//virtual float GetCurrentMag() const;
 
-	UFUNCTION(BlueprintCallable)
-	virtual float GetMagSize() const;
+	//UFUNCTION(BlueprintCallable)
+	//virtual float GetMagSize() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void UpdateMagSize();
+	//UFUNCTION(BlueprintCallable, Category = "Weapon")
+	//void UpdateMagSize();
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
-	void UpdateCurrentMag(float inValue = -1.0f);
+	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
+	//void UpdateCurrentMag(float inValue = -1.0f);
 
 	/**
 	 * Attempts to activate any ability in the specified item slot. Will return false if no activatable ability found or activation fails
@@ -204,7 +206,7 @@ protected:
 	UGPAbilitySystemComponent* AbilitySystemComponent;
 
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
-	// NPC ��ų ���� �͵�, �ٿ�� �ϰ� ���� ����
+	// NPC ��ų ���� �͵�, �ٿ��?�ϰ� ���� ����
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<TSubclassOf<UGPGameplayAbility>,int32> GameplayAbilities;
 	// TODO : with Ability level data
@@ -222,7 +224,7 @@ protected:
 	TMap<FGPItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
 
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponActor, EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
-	AActor* CurrentWeaponActor;
+	AGPWeaponActorBase* CurrentWeaponActor;
 
 	UPROPERTY(ReplicatedUsing = OnRep_WeaponSlot,EditDefaultsOnly, BlueprintReadWrite, Category = Weapon)
 	FGPItemSlot CurrentWeaponSlot;
@@ -248,4 +250,5 @@ protected:
 
 	// Friended to allow access to handle functions above
 	friend UGPAttributeSet;
+	friend AGPWeaponActorBase;
 };

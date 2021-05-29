@@ -10,9 +10,9 @@
 
 
 UGPGameInstanceBase::UGPGameInstanceBase()
-	//: SaveSlot(TEXT("SaveGame"))
-	//, SaveUserIndex(0)
-	: GPClient(nullptr)
+	: SaveSlot(TEXT("SaveGame"))
+	, SaveUserIndex(0)
+	, GPClient(nullptr)
 {
 }
 
@@ -119,6 +119,209 @@ bool UGPGameInstanceBase::IsConnected() const
 	return GPClient ? true : false;//
 }
 
+void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSave)
+{
+	SaveGame->InventoryData.Reset();
+	SaveGame->SlottedItems.Reset();
+	SaveGame->SavedStageNodes.Reset();
+
+	// Now add the default inventory, this only adds if not already in hte inventory
+	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : DefaultInventory)
+	{
+		SaveGame->InventoryData.Add(Pair.Key, Pair.Value);
+	}
+
+	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : DefaultSlottedItems)
+	{
+		if (SlotPair.Value.IsValid())
+		{
+			SaveGame->SlottedItems.Add(SlotPair.Key, SlotPair.Value);
+		}
+	}
+
+	for (const FGPStageNode& StageNode : StageNodes)
+	{
+		SaveGame->SavedStageNodes.Add(StageNode);
+	}
+
+	SaveGame->GameDifficulty = CurrentGameDifficulty;
+
+	if (WriteAfterSave)
+	{
+		WriteSaveGame();
+	}
+}
+
+void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
+{
+	DefaultInventory.Reset();
+	DefaultSlottedItems.Reset();
+	StageNodes.Reset();
+
+
+	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
+	{
+		DefaultInventory.Add(Pair.Key, Pair.Value);
+	}
+
+	for (const TPair<FGPItemSlot, FPrimaryAssetId>& SlotPair : SaveGame->SlottedItems)
+	{
+		if (SlotPair.Value.IsValid())
+		{
+			DefaultSlottedItems.Add(SlotPair.Key, SlotPair.Value);
+		}
+	}
+
+	for (const FGPStageNode& StageNode : SaveGame->SavedStageNodes)
+	{
+		StageNodes.Add(StageNode);
+	}
+
+	CurrentGameDifficulty = SaveGame->GameDifficulty;
+}
+
+void UGPGameInstanceBase::CleanupDefaultInventory()
+{	
+	DefaultInventory.Reset();
+	DefaultSlottedItems.Reset();
+	//ItemSlotsPerType.Reset();
+}
+
+
+UGPSaveGame* UGPGameInstanceBase::GetCurrentSaveGame()
+{
+	return CurrentSaveGame;
+}
+
+void UGPGameInstanceBase::SetSavingEnabled(bool bEnabled)
+{
+	bSavingEnabled = bEnabled;
+}
+
+bool UGPGameInstanceBase::LoadOrCreateSaveGame()
+{
+	UGPSaveGame* LoadedSave = nullptr;
+
+	if (UGameplayStatics::DoesSaveGameExist(SaveSlot, SaveUserIndex) && bSavingEnabled)
+	{
+		LoadedSave = Cast<UGPSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlot, SaveUserIndex));
+	}
+
+	return HandleSaveGameLoaded(LoadedSave);
+}
+
+bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
+{
+	bool bLoaded = false;
+
+	if (!bSavingEnabled)
+	{
+		// If saving is disabled, ignore passed in object
+		SaveGameObject = nullptr;
+	}
+
+	// Replace current save, old object will GC out
+	CurrentSaveGame = Cast<UGPSaveGame>(SaveGameObject);
+
+	if (CurrentSaveGame)
+	{
+		// Make sure it has any newly added default inventory
+		//AddDefaultInventory(CurrentSaveGame, false);
+		LoadDefaults(CurrentSaveGame);
+		bLoaded = true;
+	}
+	else
+	{
+		// This creates it on demand
+		
+		// Cast doesn't work somehow so we use this way
+		USaveGame* CreatedSaveGame = UGameplayStatics::CreateSaveGameObject(UGPSaveGame::StaticClass());
+		CurrentSaveGame = (UGPSaveGame*)(CreatedSaveGame);
+		
+		// Override defaults to null
+		LoadDefaults(CurrentSaveGame);
+		GenerateStageNodes();
+	}
+
+	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
+	OnSaveGameLoadedNative.Broadcast(CurrentSaveGame);
+
+	return bLoaded;
+}
+
+void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
+{
+	StageNodes.Reserve(Legnth);
+	// Generate Stage Nodes
+	for (int i = 0; i < Legnth; i++)
+	{
+		FGPStageNode NewNode;
+		NewNode.ConnectedStageNodeIdx.Add(i + 1);
+		NewNode.StageInfo.StageLevel = i+2;
+		StageNodes.Add(NewNode);
+	}
+	StageNodes[0].StageStatus = EGPStageStatus::SS_Info;
+	StageNodes[Legnth-1].ConnectedStageNodeIdx.Reset();
+
+	CurrentSaveGame->SavedStageNodes.Reset();
+	for (const FGPStageNode& StageNode : StageNodes)
+	{
+		CurrentSaveGame->SavedStageNodes.Add(StageNode);
+	}
+}
+
+
+void UGPGameInstanceBase::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const
+{
+	SlotName = SaveSlot;
+	UserIndex = SaveUserIndex;
+}
+
+// TODO :: Update only changed things? 
+void UGPGameInstanceBase::UpdateCurrentSaveGame()
+{
+	SaveDefaults(CurrentSaveGame,true);
+}
+
+bool UGPGameInstanceBase::WriteSaveGame()
+{
+	if (bSavingEnabled)
+	{
+		if (bCurrentlySaving)
+		{
+			// Schedule another save to happen after current one finishes. We only queue one save
+			bPendingSaveRequested = true;
+			return true;
+		}
+
+		// Indicate that we're currently doing an async save
+		bCurrentlySaving = true;
+
+		// This goes off in the background
+		UGameplayStatics::AsyncSaveGameToSlot(GetCurrentSaveGame(), SaveSlot, SaveUserIndex, FAsyncSaveGameToSlotDelegate::CreateUObject(this, &UGPGameInstanceBase::HandleAsyncSave));
+		return true;
+	}
+	return false;
+}
+
+void UGPGameInstanceBase::ResetSaveGame()
+{
+	// Call handle function with no loaded save, this will reset the data
+	HandleSaveGameLoaded(nullptr);
+}
+
+void UGPGameInstanceBase::HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess)
+{
+	ensure(bCurrentlySaving);
+	bCurrentlySaving = false;
+
+	if (bPendingSaveRequested)
+	{
+		// Start another save as we got a request while saving
+		bPendingSaveRequested = false;
+		WriteSaveGame();
+	}
+}
 
 void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>& InDataArr)
 {
@@ -141,7 +344,6 @@ void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>
 		CharacterData->LoadResources();
 	}
 
-	//�ε��� ���� ���� �� �Ϸ�.
 	if (AlreadyLoadedNum == InDataArr.Num())
 	{
 		//GP_LOG(Warning, TEXT("No data to load"));
@@ -149,7 +351,6 @@ void UGPGameInstanceBase::LoadCharacterData(const TArray<UGPCharacterDataAsset*>
 	}
 }
 
-//Common�� �ε�� ������ ���� �Ϸ����� üũ.
 void UGPGameInstanceBase::OnCharacterDataLoaded()
 {
 	//GP_LOG(Warning, TEXT("Loading remain : %d"), UnloadedDataNum - 1);

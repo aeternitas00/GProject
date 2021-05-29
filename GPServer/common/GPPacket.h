@@ -1,4 +1,5 @@
 #pragma once
+#include <sstream> ///
 
 enum GPPacketType : unsigned char { PT_TEST_ECHO,
 				PT_USER = 10, PT_MSG, PT_USER_LOGIN, PT_USER_LOGOUT, PT_USER_READY,
@@ -45,14 +46,14 @@ struct GameObject
 			 : X(InX), Y(InY), Z(InZ), Yaw(InYaw), Pitch(InPitch), Roll(InRoll) {}
 	virtual ~GameObject() {}
 
-	friend auto& operator<<(ostream& os, const GameObject& go)
+	friend auto& operator<<(std::ostream& os, const GameObject& go)
 	{
 		return os
 			<< go.X << " " << go.Y << " " << go.Z << " \n"
 			<< go.Yaw << " " << go.Pitch << " " << go.Roll << "\n";
 	}
 
-	friend auto& operator>>(istream& is, GameObject& go)
+	friend auto& operator>>(std::istream& is, GameObject& go)
 	{
 		return is
 			>> go.X >> go.Y >> go.Z

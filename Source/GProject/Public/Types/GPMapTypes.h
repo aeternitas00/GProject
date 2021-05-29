@@ -96,4 +96,3 @@ struct GPROJECT_API FGPLevelNode
 	//UFUNCTION(BlueprintCallable, Category = "Load")
 	//void NotifyLoaded(ULevelStreamingDynamic* inLevelDynamic);
 };
-

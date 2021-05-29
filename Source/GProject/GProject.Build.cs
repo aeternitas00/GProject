@@ -22,5 +22,6 @@ public class GProject : ModuleRules
 			"SlateCore",
 			"Niagara"
 		});
+		//PrivateDependencyModuleNames.AddRange(new string[] { "GameplayAbilities" });
     }
 }

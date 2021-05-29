@@ -24,7 +24,7 @@ public:
 	static const FPrimaryAssetType	SkillItemType;
 	static const FPrimaryAssetType	TokenItemType;
 	static const FPrimaryAssetType	WeaponItemType;
-
+	static const FPrimaryAssetType  AttachmentItemType;
 	/** Returns the current AssetManager object */
 	static UGPAssetManager& Get();
 

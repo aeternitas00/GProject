@@ -95,5 +95,7 @@ void UGPGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInf
 	Super::OnGiveAbility(ActorInfo, Spec);
 
 	AGPCharacterBase* OwningCharacter = Cast<AGPCharacterBase>(ActorInfo->OwnerActor);
-	OwningCharacter->OnGiveAbility(Spec);
+
+	if(OwningCharacter != nullptr)
+		OwningCharacter->OnGiveAbility(Spec);
 }
