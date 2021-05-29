@@ -15,7 +15,7 @@ void UGPSaveGame::Serialize(FArchive& Ar)
 			// Convert from list to item data map
 			for (const FPrimaryAssetId& ItemId : InventoryItems_DEPRECATED)
 			{
-				InventoryData.Add(ItemId, FGPItemData(1, 1));
+				/*InventoryData.Add(ItemId, UGPItemData(1, 1));*/
 			}
 
 			InventoryItems_DEPRECATED.Empty();

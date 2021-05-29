@@ -27,7 +27,7 @@ class GPROJECT_API IGPInventoryInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	/** Returns the map of items to data */
-	virtual const TMap<UGPItem*, FGPItemData>& GetInventoryDataMap() const = 0;
+	virtual const TMap<UGPItem*, UGPItemData*>& GetInventoryDataMap() const = 0;
 
 	/** Returns the map of slots to items */
 	virtual const TMap<FGPItemSlot, UGPItem*>& GetSlottedItemMap() const = 0;

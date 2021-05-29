@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "GPSaveGame.h"
 #include "Item/GPItem.h"
+#include "Item/GPItemData.h"
 #include "UI/ChatWindow.h"
 #include "GPClient.h"
 #include "GPGameInstanceBase.h"
@@ -66,7 +67,7 @@ bool AGProjectPlayerController::SaveInventory()
 		CurrentSaveGame->InventoryData.Reset();
 		CurrentSaveGame->SlottedItems.Reset();
 
-		for (const TPair<UGPItem*, FGPItemData>& ItemPair : InventoryData)
+		for (const TPair<UGPItem*, UGPItemData*>& ItemPair : InventoryData)
 		{
 			FPrimaryAssetId AssetId;
 
@@ -129,7 +130,7 @@ bool AGProjectPlayerController::LoadInventory()
 	{
 		// Copy from save game into controller data
 		bool bFoundAnySlots = false;
-		for (const TPair<FPrimaryAssetId, FGPItemData>& ItemPair : CurrentSaveGame->InventoryData)
+		for (const TPair<FPrimaryAssetId, UGPItemData*>& ItemPair : CurrentSaveGame->InventoryData)
 		{
 			UGPItem* LoadedItem = AssetManager.ForceLoadItem(ItemPair.Key);
 
@@ -202,34 +203,33 @@ void AGProjectPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 }
 
-bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCount, int32 ItemLevel, bool bAutoSlot)
+bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, UGPItemData* ItemData, bool bAutoSlot)
 {
 	bool bChanged = false;
-	if (!NewItem)
+	if (!NewItem||!ItemData)
 	{
 		GP_LOG(Warning, TEXT("AddInventoryItem: Failed trying to add null item!"));
 		return false;
 	}
 
-	if (ItemCount <= 0 || ItemLevel <= 0)
+	if (ItemData->ItemCount <= 0 || ItemData->ItemLevel <= 0)
 	{
 		GP_LOG(Warning, TEXT("AddInventoryItem: Failed trying to add item %s with negative count or level!"), *NewItem->GetName());
 		return false;
 	}
 
 	// Find current item data, which may be empty
-	FGPItemData OldData;
+	UGPItemData* OldData = nullptr;
 	GetInventoryItemData(NewItem, OldData);
 
 	// Find modified data
-	FGPItemData NewData = OldData;
-	NewData.UpdateItemData(FGPItemData(ItemCount, ItemLevel), NewItem->MaxCount, NewItem->MaxLevel);
+	ItemData->UpdateItemData(OldData, NewItem);
 
-	if (OldData != NewData)
+	if (OldData != ItemData)
 	{
 		// If data changed, need to update storage and call callback
-		InventoryData.Add(NewItem, NewData);
-		NotifyInventoryItemChanged(NewItem, NewData);
+		InventoryData.Add(NewItem, ItemData);
+		NotifyInventoryItemChanged(NewItem, ItemData);
 		bChanged = true;
 	}
 
@@ -261,12 +261,12 @@ int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32
 	}
 
 	// Find current item data, which may be empty
-	FGPItemData NewData;
+	UGPItemData* NewData=nullptr;
 	GetInventoryItemData(RemovedItem, NewData);
 
-	float BeforeRemoveNum = NewData.ItemCount;
+	float BeforeRemoveNum = NewData->ItemCount;
 
-	if (!NewData.IsValid())
+	if (!NewData->IsValid())
 	{
 		// Wasn't found
 		return -1;
@@ -275,21 +275,21 @@ int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32
 	// If RemoveCount <= 0, delete all
 	if (RemoveCount <= 0)
 	{
-		NewData.ItemCount = 0;
+		NewData->ItemCount = 0;
 	}
 	else
 	{
-		NewData.ItemCount -= RemoveCount;
+		NewData->ItemCount -= RemoveCount;
 	}
 
-	if (NewData.ItemCount > 0)
+	if (NewData->ItemCount > 0)
 	{
 		// Update data with new count
 		InventoryData.Add(RemovedItem, NewData);
 	}
 	else
 	{
-		NewData.ItemCount = 0;
+		NewData->ItemCount = 0;
 		// Remove item entirely, make sure it is unslotted
 		InventoryData.Remove(RemovedItem);
 
@@ -303,7 +303,7 @@ int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32
 		}
 	}
 
-	float AfterRemoveNum = NewData.ItemCount;
+	float AfterRemoveNum = NewData->ItemCount;
 
 	// If we got this far, there is a change so notify and save
 	NotifyInventoryItemChanged(RemovedItem, NewData);
@@ -314,7 +314,7 @@ int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32
 
 void AGProjectPlayerController::GetInventoryItems(TArray<UGPItem*>& Items, FPrimaryAssetType ItemType)
 {
-	for (const TPair<UGPItem*, FGPItemData>& Pair : InventoryData)
+	for (const TPair<UGPItem*, UGPItemData*>& Pair : InventoryData)
 	{
 		if (Pair.Key)
 		{
@@ -361,7 +361,7 @@ bool AGProjectPlayerController::SetSlottedItem(FGPItemSlot ItemSlot, UGPItem* It
 
 int32 AGProjectPlayerController::GetInventoryItemCount(UGPItem* Item) const
 {
-	const FGPItemData* FoundItem = InventoryData.Find(Item);
+	const UGPItemData* FoundItem = InventoryData.Find(Item) ? *(InventoryData.Find(Item)) : nullptr;
 
 	if (FoundItem)
 	{
@@ -370,16 +370,16 @@ int32 AGProjectPlayerController::GetInventoryItemCount(UGPItem* Item) const
 	return 0;
 }
 
-bool AGProjectPlayerController::GetInventoryItemData(UGPItem* Item, FGPItemData& ItemData) const
+bool AGProjectPlayerController::GetInventoryItemData(UGPItem* Item, UGPItemData*& ItemData)
 {
-	const FGPItemData* FoundItem = InventoryData.Find(Item);
+	UGPItemData* FoundItem = InventoryData.Find(Item) ? *(InventoryData.Find(Item)) : nullptr;
 
 	if (FoundItem)
 	{
-		ItemData = *FoundItem;
+		ItemData = FoundItem;
 		return true;
 	}
-	ItemData = FGPItemData(0, 0);
+	ItemData = nullptr;
 	return false;
 }
 
@@ -408,7 +408,7 @@ void AGProjectPlayerController::GetSlottedItems(TArray<UGPItem*>& Items, FPrimar
 void AGProjectPlayerController::FillEmptySlots()
 {
 	bool bShouldSave = false;
-	for (const TPair<UGPItem*, FGPItemData>& Pair : InventoryData)
+	for (const TPair<UGPItem*, UGPItemData*>& Pair : InventoryData)
 	{
 		bShouldSave |= FillEmptySlotWithItem(Pair.Key);
 	}
@@ -460,7 +460,7 @@ bool AGProjectPlayerController::FillEmptySlotWithItem(UGPItem* NewItem)
 	return false;
 }
 
-void AGProjectPlayerController::NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData)
+void AGProjectPlayerController::NotifyInventoryItemChanged(UGPItem* Item, UGPItemData* ItemData)
 {
 	// Notify native before blueprint
 	OnInventoryItemChangedNative.Broadcast(Item, ItemData);

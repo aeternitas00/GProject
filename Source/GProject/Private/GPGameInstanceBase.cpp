@@ -118,7 +118,7 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 	SaveGame->SavedStageNodes.Reset();
 
 	// Now add the default inventory, this only adds if not already in hte inventory
-	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : DefaultInventory)
+	for (const TPair<FPrimaryAssetId, UGPItemData*>& Pair : DefaultInventory)
 	{
 		SaveGame->InventoryData.Add(Pair.Key, Pair.Value);
 	}
@@ -151,7 +151,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	StageNodes.Reset();
 
 
-	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
+	for (const TPair<FPrimaryAssetId, UGPItemData*>& Pair : SaveGame->InventoryData)
 	{
 		DefaultInventory.Add(Pair.Key, Pair.Value);
 	}

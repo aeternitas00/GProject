@@ -29,7 +29,7 @@ public:
 
 	/** List of inventory items to add to new players */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
-	TMap<FPrimaryAssetId, FGPItemData> DefaultInventory;
+	TMap<FPrimaryAssetId, UGPItemData*> DefaultInventory;
 
 	/** Number of slots for each type of item */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)

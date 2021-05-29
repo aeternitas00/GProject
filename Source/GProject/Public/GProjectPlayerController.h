@@ -18,7 +18,7 @@ public:
 
 	/** Map of all items owned by this player, from definition to data */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
-	TMap<UGPItem*, FGPItemData> InventoryData;
+	TMap<UGPItem*, UGPItemData*> InventoryData;
 
 	/** Map of slot, from type/num to item, initialized from ItemSlotsPerType on GPGameInstanceBase */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
@@ -40,7 +40,7 @@ public:
 
 	/** Called after the inventory was changed and we notified all delegates */
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
-	void InventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
+	void InventoryItemChanged(UGPItem* Item, UGPItemData* ItemData);
 
 	/** Called after an item was equipped and we notified all delegates */
 	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
@@ -48,7 +48,7 @@ public:
 
 	/** Adds a new inventory item, will add it to an empty slot if possible. If the item supports count you can add more than one count. It will also update the level when adding if required */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
-	bool AddInventoryItem(UGPItem* NewItem, int32 ItemCount = 1, int32 ItemLevel = 1, bool bAutoSlot = true);
+	bool AddInventoryItem(UGPItem* NewItem, UGPItemData* ItemData, bool bAutoSlot = true);
 
 	//UFUNCTION(BlueprintCallable, Category = Inventory)
 	//bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true);
@@ -67,7 +67,7 @@ public:
 
 	/** Returns the item data associated with an item. Returns false if none found */
 	UFUNCTION(BlueprintPure, Category = Inventory)
-	bool GetInventoryItemData(UGPItem* Item, FGPItemData& ItemData) const;
+	bool GetInventoryItemData(UGPItem* Item,UGPItemData*& ItemData);
 
 	/** Sets slot to item, will remove from other slots if necessary. If passing null this will empty the slot */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -102,7 +102,7 @@ public:
 	FOnInventoryLoadedNative OnInventoryLoadedNative;
 
 	// Implement IGPInventoryInterface
-	virtual const TMap<UGPItem*, FGPItemData>& GetInventoryDataMap() const override
+	virtual const TMap<UGPItem*, UGPItemData*>& GetInventoryDataMap() const override
 	{
 		return InventoryData;
 	}
@@ -143,7 +143,7 @@ protected:
 	bool FillEmptySlotWithItem(UGPItem* NewItem);
 
 	/** Calls the inventory update callbacks */
-	void NotifyInventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
+	void NotifyInventoryItemChanged(UGPItem* Item, UGPItemData* ItemData);
 	void NotifySlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
 	void NotifyInventoryLoaded();
 

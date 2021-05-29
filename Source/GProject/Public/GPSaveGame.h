@@ -96,7 +96,7 @@ public:
 
 	/** Map of items to item data */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
-	TMap<FPrimaryAssetId, FGPItemData> InventoryData;
+	TMap<FPrimaryAssetId, UGPItemData*> InventoryData;
 
 	/** Map of slotted items */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)

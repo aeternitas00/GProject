@@ -160,19 +160,19 @@ protected:
 };
 
 
-USTRUCT(BlueprintType)
-struct GPROJECT_API FGPWeaponSpec
-{
-	GENERATED_BODY()
-
-	FGPWeaponSpec()
-	{}
-
-	/** The number of instances of this item in the inventory, can never be below 1 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TMap<EWAttachmentType, UGPItemAttachment*> AttachedItems;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	float FilledMag;
-
-};
+//USTRUCT(BlueprintType)
+//struct GPROJECT_API FGPWeaponSpec
+//{
+//	GENERATED_BODY()
+//
+//	FGPWeaponSpec()
+//	{}
+//
+//	/** The number of instances of this item in the inventory, can never be below 1 */
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+//	TMap<EWAttachmentType, UGPItemAttachment*> AttachedItems;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+//	float FilledMag;
+//
+//};
