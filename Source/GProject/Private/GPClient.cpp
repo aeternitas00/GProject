@@ -2,7 +2,6 @@
 #include "GPGameInstanceBase.h"
 #include "GProjectPlayerController.h"
 #include "GProjectGameMode.h"
-#include "UI/ChatWindow.h"//
 #include <sstream>
 
 class FGPSendTask : public FNonAbandonableTask
@@ -37,7 +36,6 @@ FGPClient::FGPClient()
 	GameMode = nullptr;
 	Game = nullptr;
 
-	//?에디터에서는 한번 생성되면 다음 변화가 있기 전까지 소멸하지 않음. static 인스턴스로 만들어서?
 	Thread = FRunnableThread::Create(this, TEXT("FGPClient"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
 
@@ -46,6 +44,8 @@ FGPClient::~FGPClient()
 	GP_LOG_C(Warning);
 	delete Thread; //FRunnableThreadWin::Kill(true)
 	Thread = nullptr;
+	closesocket(Socket);
+	WSACleanup();
 }
 
 FGPClient* FGPClient::GetGPClient()
@@ -123,12 +123,12 @@ uint32 FGPClient::Run()
 				//FText::AsCultureInvariant(msg);
 			{
 				FString msg(RecvBuf + size + sizeof(PacketH));
-				GP_LOG(Display, TEXT("Message: %s"), *msg);//
+				GP_LOG(Display, TEXT("Message: %s"), *msg);
 				if (PlayerCon)
 				{
 					AsyncTask(ENamedThreads::GameThread, [this, msg]()
 						{
-							PlayerCon->AddChat(msg);//test
+							PlayerCon->AddChat(msg);
 						});
 				}
 			}
@@ -142,7 +142,6 @@ uint32 FGPClient::Run()
 			case PT_PLAYER_START:
 				if (GameMode && PlayerCon)
 				{
-					GP_LOG_C(Warning);
 					AsyncTask(ENamedThreads::GameThread, [this]()
 						{
 							Game->bGPStartPlayer = true;
@@ -166,8 +165,8 @@ void FGPClient::Exit()
 {
 	GP_LOG_C(Warning);
 
-	closesocket(Socket);
-	WSACleanup();
+	/*closesocket(Socket);
+	WSACleanup();*/
 }
 
 void FGPClient::Stop()
@@ -233,7 +232,7 @@ bool FGPClient::SendStream(std::stringstream& ss, GPPacketType pt)
 {
 	char sendbuf[MAX_PKT_SIZ];
 	Packet* pckt = (Packet*)sendbuf;
-	pckt->header.size = sizeof(PacketH) + ss.fail() ? ss.str().length() : ss.tellp();//
+	pckt->header.size = sizeof(PacketH) + ss.fail() ? ss.str().length() : ss.tellp();//todo check size overflow
 	pckt->header.type = pt;
 	ss >> (char*)&pckt->data;
 	return Send(sendbuf, pckt->header.size);

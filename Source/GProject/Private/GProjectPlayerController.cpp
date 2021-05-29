@@ -25,10 +25,8 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 
 	if (InPawn && GPClient)//
 	{
-		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
+	//	Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
 	}
-
-	
 }
 
 void AGProjectPlayerController::BeginPlay()
@@ -39,10 +37,14 @@ void AGProjectPlayerController::BeginPlay()
 
 	LoadoutCommit();
 
-	if (IsLocalPlayerController()) //
+	if (!IsLocalController()) return;
+
+	GPClient = FGPClient::GetGPClient();
+
+	//if (GetNetMode() == ENetMode::NM_Client)//이 경우는 GM이 없어서 여기서 PC 셋. 그 외에는 GM::PostLogin에서 함.
 	{
-		GPClient = FGPClient::GetGPClient();
 		GPClient->SetPlayerController(this);
+		GPClient->SendHeader(PT_USER_READY);
 		//if (Client->Login()) //test
 		{
 			//GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);

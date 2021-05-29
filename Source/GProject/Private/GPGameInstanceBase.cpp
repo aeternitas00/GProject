@@ -43,12 +43,15 @@ void UGPGameInstanceBase::Shutdown()
 {
 	Super::Shutdown();
 	if (GPClient)
+	{
 		GPClient->Shutdown();
+	}
 }
 
 AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InWorld)
 {
 	const bool bIsGPClient = IsConnected() && !bIsGPHost;
+	
 	
 	// Kill non relevant client actors
 	if (bIsGPClient && GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
@@ -65,7 +68,13 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 			}
 		}
 	}
-	return 	Super::CreateGameModeForURL(InURL, InWorld);
+	AGameModeBase* GM = Super::CreateGameModeForURL(InURL, InWorld);
+	if (IsConnected())
+	{
+		GPClient->SetGameMode(Cast<AGProjectGameMode>(GM));
+	}
+
+	return GM;
 }
 
 void UGPGameInstanceBase::OnStart()
@@ -87,19 +96,18 @@ bool UGPGameInstanceBase::Connect()
 	if (!GPClient) return false;
 
 	GPClient->SetGameInstance(this);
-	FullyLoadedEvent.AddLambda([this] {GPClient->SendHeader(PT_USER_READY); });
-
-	return GPClient->Connect();//
+	//FullyLoadedEvent.AddLambda([this](){GPClient->SendHeader(PT_USER_READY); });
+	return 	true;
+	//return GPClient->Connect();//
 }
 
 void UGPGameInstanceBase::BeGPHost()
 {
 	if (!IsConnected() || !GetWorld()) return; //
 
-	AGProjectGameMode* GM = GetWorld()->GetAuthGameMode<AGProjectGameMode>();
-	if (!GM) return;
+	/*AGProjectGameMode* GM = GetWorld()->GetAuthGameMode<AGProjectGameMode>();
+	if (!GM) return;*/
 
-	GPClient->SetGameMode(GM);
 	//todo sync update 
 
 	bIsGPHost = true;
@@ -149,6 +157,7 @@ void UGPGameInstanceBase::OnCharacterDataLoaded()
 	{
 		//GP_LOG(Warning, TEXT("No data to load"));
 		OnLoadCompleted.Broadcast();
+		FullyLoadedEvent.Broadcast();
 	}
 }
 
