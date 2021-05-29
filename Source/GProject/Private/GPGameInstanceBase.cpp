@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystem.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraFunctionLibrary.h"
+#include <sstream>
 
 
 UGPGameInstanceBase::UGPGameInstanceBase()
@@ -50,11 +51,13 @@ void UGPGameInstanceBase::Shutdown()
 
 AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InWorld)
 {
-	const bool bIsGPClient = IsConnected() && !bIsGPHost;
-	
-	
-	// Kill non relevant client actors
-	if (bIsGPClient && GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
+	if (!IsConnected())
+	{
+		return Super::CreateGameModeForURL(InURL, InWorld);
+	}
+
+	//std::stringstream ss;
+	if (GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
 	{
 		for (auto Level : GetWorld()->GetLevels())//
 		{
@@ -63,17 +66,21 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 				if (Actor && !Actor->bNetLoadOnClient)
 				{
 					//GP_LOG(Display, TEXT("%s"), *Actor->GetName())
-					Actor->Destroy();
+					if (bIsGPHost)//
+					{
+
+					}
+					else
+					{
+						Actor->Destroy(); // Kill non relevant GP client actors
+					}
 				}
 			}
 		}
 	}
-	AGameModeBase* GM = Super::CreateGameModeForURL(InURL, InWorld);
-	if (IsConnected())
-	{
-		GPClient->SetGameMode(Cast<AGProjectGameMode>(GM));
-	}
 
+	AGameModeBase* GM = Super::CreateGameModeForURL(InURL, InWorld);
+	GPClient->SetGameMode(Cast<AGProjectGameMode>(GM));
 	return GM;
 }
 

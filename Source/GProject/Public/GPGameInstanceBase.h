@@ -6,7 +6,7 @@
 #include "Types/GPTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
 #include "GPSaveGame.h"
-#include "GPClient.h"
+#include "GPClient.h"//
 #include "GPGameInstanceBase.generated.h"
 
 

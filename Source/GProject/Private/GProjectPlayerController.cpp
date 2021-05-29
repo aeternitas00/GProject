@@ -26,7 +26,8 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 
 	if (InPawn && GPClient)//
 	{
-	//	Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
+		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
+		//GPClient->CreateAsyncSendTask();
 	}
 }
 
@@ -40,6 +41,7 @@ void AGProjectPlayerController::BeginPlay()
 
 	if (IsLocalPlayerController()) //
 	{
+		GPClient = FGPClient::GetGPClient();
 		GPClient->SetPlayerController(this);
 		GPClient->SendHeader(PT_USER_READY);
 		//if (Client->Login()) //test
@@ -502,7 +504,7 @@ void AGProjectPlayerController::SendData()
 		//GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
 
 		//test
-		GPClient->CreateAsyncSendTask(ss, PT_PLAYER_UPDATE);
+		//GPClient->CreateAsyncSendTask(ss, PT_PLAYER_UPDATE);
 	}
 }
 
