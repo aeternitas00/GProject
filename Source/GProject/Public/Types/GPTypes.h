@@ -73,7 +73,7 @@ USTRUCT(BlueprintType)
 struct GPROJECT_API FGPItemData
 {
 	GENERATED_BODY()
-
+public:
 	/** Constructor, default to count/level 1 so declaring them in blueprints gives you the expected behavior */
 	FGPItemData()
 	: ItemCount(1)
@@ -110,8 +110,10 @@ struct GPROJECT_API FGPItemData
 	}
 
 	/** Append an item data, this adds the count and overrides everything else */
-	void UpdateItemData(const FGPItemData& Other, int32 MaxCount, int32 MaxLevel)
+	virtual void UpdateItemData(const FGPItemData& Other, int32 MaxCount, int32 MaxLevel)
 	{
+		//if (!Other) return;
+
 		if (MaxCount <= 0)
 		{
 			MaxCount = MAX_int32;
@@ -126,6 +128,7 @@ struct GPROJECT_API FGPItemData
 		ItemLevel = FMath::Clamp(Other.ItemLevel, 1, MaxLevel);
 	}
 };
+
 
 class AGPCharacterBase;
 
@@ -196,6 +199,15 @@ enum class EWeaponType : uint8
 	WT_Custom1	UMETA(DisplayName = "Custom1"),
 	WT_Custom2	UMETA(DisplayName = "Custom2")
 }; 
+
+UENUM(BlueprintType)
+enum class EGPGameDifficulty : uint8
+{
+	GD_Easy			UMETA(DisplayName = "Easy"),
+	GD_Normal		UMETA(DisplayName = "Normal"),
+	GD_Hard			UMETA(DisplayName = "Hard"),
+	GD_NightMare	UMETA(DisplayName = "Nightmare")
+};
 
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);

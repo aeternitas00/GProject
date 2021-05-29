@@ -40,9 +40,9 @@ enum class EGPStageType : uint8
 UENUM(BlueprintType)
 enum class EGPStageStatus : uint8
 {
-	SS_NotInit	UMETA(DisplayName = "Not initialized"),
-	SS_Init		UMETA(DisplayName = "Initialized but not visited"),
-	SS_Cleared	UMETA(DisplayName = "Initialized and Cleared")
+	SS_NoInfo		UMETA(DisplayName = "Can't see info of stage"),
+	SS_Info			UMETA(DisplayName = "Can see info but not visited"),
+	SS_Cleared		UMETA(DisplayName = "Initialized and Cleared")
 };
 
 USTRUCT(BlueprintType)
@@ -50,7 +50,7 @@ struct GPROJECT_API FGPStageInfo
 {
 	GENERATED_BODY()
 
-	FGPStageInfo() : StageLevel(0) {}
+	FGPStageInfo() : StageLevel(0) , StageType(EGPStageType::ST_T1){}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	int32 StageLevel;
@@ -66,7 +66,7 @@ struct GPROJECT_API FGPStageNode
 {
 	GENERATED_BODY()
 
-	FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NotInit) {}
+	FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
 
 	// Index of where we have to go
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
@@ -108,6 +108,9 @@ public:
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	FString UserId;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
+	EGPGameDifficulty GameDifficulty;
 
 protected:
 	/** Deprecated way of storing items, this is read in but not saved out */

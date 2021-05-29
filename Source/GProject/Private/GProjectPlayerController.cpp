@@ -248,6 +248,10 @@ bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCou
 	return false;
 }
 
+//bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true) 
+//{
+//}
+
 int32 AGProjectPlayerController::RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount)
 {
 	if (!RemovedItem)

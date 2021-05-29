@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	class UGPItemAttachment* AddAttachment(UGPItemAttachment* inAttachmentItem);
 
+	UFUNCTION(BlueprintCallable)
+	UGPItemAttachment* RemoveAttachment(const EWAttachmentType& inType);
+
 	UFUNCTION(BlueprintCallable,BlueprintPure) 
 	bool IsAttachableItem(UGPItemAttachment* inAttachmentItem) const;
 
@@ -129,7 +132,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadonly)
 	FPrimaryAssetId AmmoItem;
 
-	UPROPERTY(EditAnywhere, BlueprintReadwrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Attachment)
+	TArray<EWAttachmentType> AttachableTypes;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Attachment)
 	TMap<EWAttachmentType, UGPItemAttachment*> AttachmentSlot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attachment)
@@ -151,4 +157,22 @@ protected:
 
 	friend UGPWeaponAttributeSet;
 	//friend UGPWAttachmentComponent;
+};
+
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPWeaponSpec
+{
+	GENERATED_BODY()
+
+	FGPWeaponSpec()
+	{}
+
+	/** The number of instances of this item in the inventory, can never be below 1 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TMap<EWAttachmentType, UGPItemAttachment*> AttachedItems;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	float FilledMag;
+
 };

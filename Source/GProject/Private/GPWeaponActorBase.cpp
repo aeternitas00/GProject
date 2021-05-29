@@ -21,6 +21,8 @@ AGPWeaponActorBase::AGPWeaponActorBase():CurrentFireMode()
 	
  	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+
 }
 
 UGPAbilitySystemComponent* AGPWeaponActorBase::GetAbilitySystemComponent() const
@@ -153,6 +155,11 @@ void AGPWeaponActorBase::BeginPlay()
 
 	GASComponentInitialize();
 
+	for (const EWAttachmentType& Type : AttachableTypes)
+	{
+		AttachmentSlot.Add(Type, nullptr);
+	}
+
 	if (WeaponAbilities.Num() > 0)
 		CurrentFireMode = WeaponAbilities.begin().Key();
 }
@@ -166,25 +173,11 @@ void AGPWeaponActorBase::Tick(float DeltaTime)
 // Returns replaced item. Add to empty slot will return null
 UGPItemAttachment* AGPWeaponActorBase::AddAttachment(UGPItemAttachment* inAttachmentItem)
 {
+	if ( !inAttachmentItem ) return nullptr;
+	
 	UGPWAttachmentComponent* CompCDO = inAttachmentItem->AttachmentClass->GetDefaultObject<UGPWAttachmentComponent>();
 	
-	TArray<UGPWAttachmentComponent*> FoundComps;
-	
-	GetComponents<UGPWAttachmentComponent>(FoundComps);
-
-	UGPItemAttachment* ReplacedAttachment = *AttachmentSlot.Find(CompCDO->Type);
-
-	for(UActorComponent* FoundComp : FoundComps)
-	{
-		UGPWAttachmentComponent* CastedComp = Cast<UGPWAttachmentComponent>(FoundComp);
-
-		if( CastedComp->Type == CompCDO->Type )
-		{	
-			GP_LOG(Warning,TEXT("%s"),*CastedComp->GetName());
-			CastedComp->RemoveEffects();
-			CastedComp->DestroyComponent();
-		}
-	}
+	UGPItemAttachment* ReplacedAttachment = RemoveAttachment(CompCDO->Type);
 
 	// Overwrite
 	AttachmentSlot.Add(CompCDO->Type, inAttachmentItem);
@@ -200,6 +193,31 @@ UGPItemAttachment* AGPWeaponActorBase::AddAttachment(UGPItemAttachment* inAttach
 	}
 	
 	return ReplacedAttachment;
+}
+
+UGPItemAttachment* AGPWeaponActorBase::RemoveAttachment(const EWAttachmentType& inType)
+{
+	TArray<UGPWAttachmentComponent*> FoundComps;
+
+	GetComponents<UGPWAttachmentComponent>(FoundComps);
+
+	UGPItemAttachment* RemovedAttachment = *(AttachmentSlot.Find(inType));
+
+	for (UActorComponent* FoundComp : FoundComps)
+	{
+		UGPWAttachmentComponent* CastedComp = Cast<UGPWAttachmentComponent>(FoundComp);
+
+		if (CastedComp->Type == inType)
+		{
+			//GP_LOG(Warning, TEXT("%s"), *CastedComp->GetName());
+			CastedComp->RemoveEffects();
+			CastedComp->DestroyComponent();
+		}
+	}
+
+	AttachmentSlot.Add(inType, nullptr);
+
+	return RemovedAttachment;
 }
 
 bool AGPWeaponActorBase::IsAttachableItem(UGPItemAttachment* inAttachmentItem) const

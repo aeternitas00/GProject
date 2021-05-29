@@ -127,14 +127,16 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 	{
 		if (SlotPair.Value.IsValid())
 		{
-			CurrentSaveGame->SlottedItems.Add(SlotPair.Key, SlotPair.Value);
+			SaveGame->SlottedItems.Add(SlotPair.Key, SlotPair.Value);
 		}
 	}
 
 	for (const FGPStageNode& StageNode : StageNodes)
 	{
-		CurrentSaveGame->SavedStageNodes.Add(StageNode);
+		SaveGame->SavedStageNodes.Add(StageNode);
 	}
+
+	SaveGame->GameDifficulty = CurrentGameDifficulty;
 
 	if (WriteAfterSave)
 	{
@@ -147,6 +149,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
 	StageNodes.Reset();
+
 
 	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
 	{
@@ -165,13 +168,14 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	{
 		StageNodes.Add(StageNode);
 	}
+
+	CurrentGameDifficulty = SaveGame->GameDifficulty;
 }
 
-void UGPGameInstanceBase::CleanupDefaults()
+void UGPGameInstanceBase::CleanupDefaultInventory()
 {	
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
-	StageNodes.Reset();
 	//ItemSlotsPerType.Reset();
 }
 
@@ -226,7 +230,9 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 		USaveGame* CreatedSaveGame = UGameplayStatics::CreateSaveGameObject(UGPSaveGame::StaticClass());
 		CurrentSaveGame = (UGPSaveGame*)(CreatedSaveGame);
 		
+		// Override defaults to null
 		LoadDefaults(CurrentSaveGame);
+		GenerateStageNodes();
 	}
 
 	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
@@ -234,6 +240,28 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 
 	return bLoaded;
 }
+
+void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
+{
+	StageNodes.Reserve(Legnth);
+	// Generate Stage Nodes
+	for (int i = 0; i < Legnth; i++)
+	{
+		FGPStageNode NewNode;
+		NewNode.ConnectedStageNodeIdx.Add(i + 1);
+		NewNode.StageInfo.StageLevel = i+2;
+		StageNodes.Add(NewNode);
+	}
+	StageNodes[0].StageStatus = EGPStageStatus::SS_Info;
+	StageNodes[Legnth-1].ConnectedStageNodeIdx.Reset();
+
+	CurrentSaveGame->SavedStageNodes.Reset();
+	for (const FGPStageNode& StageNode : StageNodes)
+	{
+		CurrentSaveGame->SavedStageNodes.Add(StageNode);
+	}
+}
+
 
 void UGPGameInstanceBase::GetSaveSlotInfo(FString& SlotName, int32& UserIndex) const
 {

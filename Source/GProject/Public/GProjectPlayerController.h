@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool AddInventoryItem(UGPItem* NewItem, int32 ItemCount = 1, int32 ItemLevel = 1, bool bAutoSlot = true);
 
+	//UFUNCTION(BlueprintCallable, Category = Inventory)
+	//bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true);
+
 	/** Remove an inventory item, will also remove from slots. A remove count of <= 0 means to remove all copies */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	int32 RemoveInventoryItem(UGPItem* RemovedItem, int32 RemoveCount = 1);

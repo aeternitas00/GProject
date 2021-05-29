@@ -15,6 +15,8 @@
  * Most games will need to make a game-specific subclass of GameInstance
  * Once you make a blueprint subclass of your native subclass you will want to set it to be the default in project settings
  */
+
+
 UCLASS()
 class GPROJECT_API UGPGameInstanceBase : public UGameInstance
 {
@@ -38,6 +40,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 	TArray<FGPStageNode> StageNodes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	FGPStageNode CurrentStageNode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	EGPGameDifficulty CurrentGameDifficulty;
 
 	/** The slot name used for saving */
 	UPROPERTY(BlueprintReadWrite, Category = Save)
@@ -66,7 +74,7 @@ public:
 	void LoadDefaults(UGPSaveGame* SaveGame);
 
 	UFUNCTION(BlueprintCallable, Category = Save)
-	void CleanupDefaults();
+	void CleanupDefaultInventory();
 
 	/** Returns true if this is a valid inventory slot */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
@@ -94,6 +102,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Save)
 	void UpdateCurrentSaveGame();
+
+	UFUNCTION(BlueprintCallable, Category = Save)
+	void GenerateStageNodes(const int32& Legnth = 4);
 
 	/** Writes the current save game object to disk. The save to disk happens in a background thread*/
 	UFUNCTION(BlueprintCallable, Category = Save)
