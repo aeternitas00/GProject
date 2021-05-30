@@ -56,8 +56,9 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 		return Super::CreateGameModeForURL(InURL, InWorld);
 	}
 
-	//std::stringstream ss;
-	if (GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
+	std::stringstream ss;
+	//int i = 0;
+	//if (GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
 	{
 		for (auto Level : GetWorld()->GetLevels())//
 		{
@@ -68,16 +69,18 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 					//GP_LOG(Display, TEXT("%s"), *Actor->GetName())
 					if (bIsGPHost)//
 					{
-
+						const FVector& Location = Actor->GetActorLocation();
+						ss /*<< i++ << " " */<< Location.X << " " << Location.Y << " " << Location.Z << '\n';
 					}
 					else
 					{
-						Actor->Destroy(); // Kill non relevant GP client actors
+						Actor->Destroy(); // Kill non relevant GP client actor
 					}
 				}
 			}
 		}
 	}
+	GPClient->CreateAsyncSendTask(ss, PT_GAME);
 
 	AGameModeBase* GM = Super::CreateGameModeForURL(InURL, InWorld);
 	GPClient->SetGameMode(Cast<AGProjectGameMode>(GM));

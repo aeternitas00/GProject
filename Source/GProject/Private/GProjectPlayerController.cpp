@@ -498,8 +498,8 @@ void AGProjectPlayerController::SendData()
 		const FVector& Location = GetPawn()->GetActorLocation();
 		const FVector& Velocity = GetPawn()->GetVelocity();
 		//const FRotator& Rotation = GetPawn()->GetActorRotation();
-		ss << Location.X << " " << Location.Y << " " << Location.Z << std::endl;
-		ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << std::endl;
+		ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
+		ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
 		//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << std::endl;
 		//GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
 
