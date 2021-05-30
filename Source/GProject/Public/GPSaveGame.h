@@ -103,6 +103,9 @@ public:
 	TMap<FGPItemSlot, FPrimaryAssetId> SlottedItems;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TMap<FGPItemSlot, FGPWAttachmentedData> AttachmentData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TArray<FGPStageNode> SavedStageNodes;
 
 	/** User's unique id */
