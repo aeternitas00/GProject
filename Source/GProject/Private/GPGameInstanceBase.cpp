@@ -130,6 +130,7 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 {
 	SaveGame->InventoryData.Reset();
 	SaveGame->SlottedItems.Reset();
+	SaveGame->AttachmentData.Reset();
 	SaveGame->SavedStageNodes.Reset();
 
 	// Now add the default inventory, this only adds if not already in hte inventory
@@ -144,6 +145,14 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 		{
 			SaveGame->SlottedItems.Add(SlotPair.Key, SlotPair.Value);
 		}
+	}
+
+	for (const TPair<FGPItemSlot, FGPWAttachmentedData>& SlotPair : AttachedItems)
+	{
+		//if (SlotPair.Value.IsValid())
+		//{
+			SaveGame->AttachmentData.Add(SlotPair.Key, SlotPair.Value);
+		//}
 	}
 
 	for (const FGPStageNode& StageNode : StageNodes)
@@ -163,6 +172,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 {
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
+	AttachedItems.Reset();
 	StageNodes.Reset();
 
 
@@ -179,6 +189,14 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 		}
 	}
 
+	for (const TPair<FGPItemSlot, FGPWAttachmentedData>& SlotPair : SaveGame->AttachmentData)
+	{
+		//if (SlotPair.Value.IsValid())
+		//{
+		AttachedItems.Add(SlotPair.Key, SlotPair.Value);
+		//}
+	}
+
 	for (const FGPStageNode& StageNode : SaveGame->SavedStageNodes)
 	{
 		StageNodes.Add(StageNode);
@@ -191,6 +209,7 @@ void UGPGameInstanceBase::CleanupDefaultInventory()
 {	
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
+	AttachedItems.Reset();
 	//ItemSlotsPerType.Reset();
 }
 

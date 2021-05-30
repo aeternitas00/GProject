@@ -138,7 +138,7 @@ bool AGProjectPlayerController::LoadInventory()
 			if (LoadedItem != nullptr)
 			{
 				InventoryData.Add(LoadedItem, ItemPair.Value);
-				NotifyInventoryItemChanged(LoadedItem, ItemPair.Value);
+				//NotifyInventoryItemChanged(LoadedItem, ItemPair.Value);
 			}
 		}
 
@@ -150,7 +150,7 @@ bool AGProjectPlayerController::LoadInventory()
 				if (GameInstance->IsValidItemSlot(SlotPair.Key) && LoadedItem)
 				{
 					SlottedItems.Add(SlotPair.Key, LoadedItem);
-					NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
+					//NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
 					bFoundAnySlots = true;
 				}
 			}
@@ -178,6 +178,8 @@ void AGProjectPlayerController::NotifyInventoryLoaded()
 	// Notify native before blueprint
 	OnInventoryLoadedNative.Broadcast();
 	OnInventoryLoaded.Broadcast();
+
+	InventoryLoaded();
 }
 
 void AGProjectPlayerController::HandleSaveGameLoaded(UGPSaveGame* NewSaveGame)

@@ -39,12 +39,15 @@ public:
 	FOnSlottedItemChangedNative OnSlottedItemChangedNative;
 
 	/** Called after the inventory was changed and we notified all delegates */
-	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
 	void InventoryItemChanged(UGPItem* Item, FGPItemData ItemData);
 
 	/** Called after an item was equipped and we notified all delegates */
-	UFUNCTION(BlueprintImplementableEvent, Category = Inventory)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
 	void SlottedItemChanged(FGPItemSlot ItemSlot, UGPItem* Item);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = Inventory)
+	void InventoryLoaded();
 
 	/** Adds a new inventory item, will add it to an empty slot if possible. If the item supports count you can add more than one count. It will also update the level when adding if required */
 	UFUNCTION(BlueprintCallable, Category = Inventory)

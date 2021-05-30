@@ -209,6 +209,18 @@ enum class EGPGameDifficulty : uint8
 	GD_NightMare	UMETA(DisplayName = "Nightmare")
 };
 
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPWAttachmentedData
+{
+	GENERATED_BODY()
+
+	FGPWAttachmentedData() :Attached({}){}
+
+	// Index of where we have to go
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TMap<EWAttachmentType,FPrimaryAssetId> Attached;
+};
+
 /** Delegate called when an inventory item changes */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChanged, UGPItem*, Item, FGPItemData, ItemData);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryItemChangedNative, UGPItem*, FGPItemData);

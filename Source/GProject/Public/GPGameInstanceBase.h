@@ -38,6 +38,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
 	TMap<FGPItemSlot, FPrimaryAssetId> DefaultSlottedItems;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TMap<FGPItemSlot, FGPWAttachmentedData> AttachedItems;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 	TArray<FGPStageNode> StageNodes;
 
