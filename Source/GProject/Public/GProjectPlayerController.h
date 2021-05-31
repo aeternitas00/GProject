@@ -6,6 +6,7 @@
 #include "Types/GPTypes.h"
 #include "GPInventoryInterface.h"
 #include "GameFramework/PlayerController.h"
+//#include <iosfwd>
 #include "GProjectPlayerController.generated.h"
 
 UCLASS()
@@ -157,6 +158,8 @@ private:
 	FGPClient* GPClient;
 
 protected:
+	std::stringstream& CreateStringStreamPawnData(std::stringstream& ss);
+
 	UFUNCTION()
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
 protected:

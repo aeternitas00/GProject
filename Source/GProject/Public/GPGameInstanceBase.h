@@ -174,6 +174,8 @@ public:
 	void BeGPHost();
 	////
 
+	TArray<AActor*> GPGameObjects;//
+
 public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFullyLoadedDelegate);
 	DECLARE_EVENT(UGPGameInstanceBase, FFullyLoadedEvent)
