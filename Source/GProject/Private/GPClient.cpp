@@ -2,6 +2,7 @@
 #include "GPGameInstanceBase.h"
 #include "GProjectPlayerController.h"
 #include "GProjectGameMode.h"
+#include "GPCharacterBase.h"
 #include <sstream>
 
 class FGPSendTask : public FNonAbandonableTask
@@ -146,7 +147,26 @@ uint32 FGPClient::Run()
 						{
 							Game->bGPStartPlayer = true;
 							GameMode->RestartPlayer(PlayerCon);//test
+							//Game->GPGameObjects.Add(PlayerCon->GetPawn());
 						});
+				}
+				break;
+			case PT_PLAYER_UPDATE: //todo more useful data
+				if (Game)
+				{
+					std::stringstream ss(RecvBuf + size + sizeof(PacketH));
+					int idx = 0; 
+					ss >> idx;
+					float x, y, z, yaw, pitch, roll;
+					ss >> x >> y >> z >> yaw >> pitch >> roll;
+					if (!Game->GPGameObjects.IsValidIndex(idx))//
+					{
+						AsyncTask(ENamedThreads::GameThread, [this, idx, x, y, z, yaw, pitch, roll]()
+							{
+								AGPCharacterBase* GPChar = Game->GetWorld()->SpawnActor<AGPCharacterBase>(FVector(x, y, z), FRotator(yaw, pitch, roll), FActorSpawnParameters());
+								Game->GPGameObjects.Insert(GPChar, idx);
+							});
+					}
 				}
 				break;
 
@@ -235,6 +255,8 @@ bool FGPClient::SendStream(std::stringstream& ss, GPPacketType pt)
 	pckt->header.size = sizeof(PacketH) + ss.fail() ? ss.str().length() : ss.tellp();//todo check size overflow
 	pckt->header.type = pt;
 	ss >> (char*)&pckt->data;
+	/*if (ss.good())
+	GP_LOG(Warning, TEXT("stream tellg:%d tellp: %d"), (int)ss.tellg(), (int)ss.tellp());*/
 	return Send(sendbuf, pckt->header.size);
 }
 

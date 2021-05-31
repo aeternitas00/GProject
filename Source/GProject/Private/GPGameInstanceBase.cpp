@@ -56,9 +56,7 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 		return Super::CreateGameModeForURL(InURL, InWorld);
 	}
 
-	std::stringstream ss;
-	//int i = 0;
-	//if (GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
+	if (GetWorld() && GetEngine()->GetNetMode(GetWorld()) == ENetMode::NM_Standalone)
 	{
 		for (auto Level : GetWorld()->GetLevels())//
 		{
@@ -67,20 +65,12 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 				if (Actor && !Actor->bNetLoadOnClient)
 				{
 					//GP_LOG(Display, TEXT("%s"), *Actor->GetName())
-					if (bIsGPHost)//
-					{
-						const FVector& Location = Actor->GetActorLocation();
-						ss /*<< i++ << " " */<< Location.X << " " << Location.Y << " " << Location.Z << '\n';
-					}
-					else
-					{
-						Actor->Destroy(); // Kill non relevant GP client actor
-					}
+					GPGameObjects.Add(Actor);
+					//need to be destroyed if not host
 				}
 			}
 		}
 	}
-	GPClient->CreateAsyncSendTask(ss, PT_GAME);
 
 	AGameModeBase* GM = Super::CreateGameModeForURL(InURL, InWorld);
 	GPClient->SetGameMode(Cast<AGProjectGameMode>(GM));
@@ -118,10 +108,20 @@ void UGPGameInstanceBase::BeGPHost()
 	/*AGProjectGameMode* GM = GetWorld()->GetAuthGameMode<AGProjectGameMode>();
 	if (!GM) return;*/
 
-	//todo sync update 
+	//todo sync update
 
 	bIsGPHost = true;
-	//
+
+	std::stringstream ss;
+	for (auto Actor : GPGameObjects)//
+	{
+		//GP_LOG(Display, TEXT("%s"), *Actor->GetName())
+		const FVector& Location = Actor->GetActorLocation();
+		ss /*<< i++ << " " */ << Location.X << " " << Location.Y << " " << Location.Z << '\n'
+			<< "0 0 0\n";
+	}
+	GP_LOG(Warning, TEXT("go tellp: %d"), (int)ss.tellp());
+	GPClient->CreateAsyncSendTask(ss, PT_GAME);
 }
 
 bool UGPGameInstanceBase::IsConnected() const

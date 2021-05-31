@@ -26,8 +26,9 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 
 	if (InPawn && GPClient)//
 	{
-		Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
-		//GPClient->CreateAsyncSendTask();
+		//Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
+		std::stringstream ss;
+		GPClient->CreateAsyncSendTask(CreateStringStreamPawnData(ss), PT_PLAYER_START);
 	}
 }
 
@@ -43,7 +44,7 @@ void AGProjectPlayerController::BeginPlay()
 	{
 		GPClient = FGPClient::GetGPClient();
 		GPClient->SetPlayerController(this);
-		GPClient->SendHeader(PT_USER_READY);
+		GPClient->SendHeader(PT_USER_READY);//
 		//if (Client->Login()) //test
 		{
 			//GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);
@@ -484,6 +485,18 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 	SlottedItemChanged(ItemSlot, Item);
 }
 
+std::stringstream& AGProjectPlayerController::CreateStringStreamPawnData(std::stringstream& ss)
+{
+	const FVector& Location = GetPawn()->GetActorLocation();
+	//const FVector& Velocity = GetPawn()->GetVelocity();
+	const FRotator& Rotation = GetPawn()->GetActorRotation();
+	ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
+	//ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
+	ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << '\n';
+	GP_LOG(Display, TEXT("%s length: %d tellp: %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
+	return ss;
+}
+
 void AGProjectPlayerController::SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
 {
 	if (OldVelocity.IsNearlyZero() && GetPawn()->GetVelocity().IsNearlyZero()) return;
@@ -496,17 +509,18 @@ void AGProjectPlayerController::SendData()
 {
 	if (GetPawn() && GPClient)
 	{
-		std::stringstream ss;
-		const FVector& Location = GetPawn()->GetActorLocation();
-		const FVector& Velocity = GetPawn()->GetVelocity();
+		//std::stringstream ss;
+		// 
+		//const FVector& Location = GetPawn()->GetActorLocation();
+		////const FVector& Velocity = GetPawn()->GetVelocity();
 		//const FRotator& Rotation = GetPawn()->GetActorRotation();
-		ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
-		ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
-		//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << std::endl;
-		//GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
+		//ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
+		////ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
+		//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << '\n';
+		////GP_LOG(Display, TEXT("%s %d %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
 
 		//test
-		//GPClient->CreateAsyncSendTask(ss, PT_PLAYER_UPDATE);
+		//GPClient->CreateAsyncSendTask(CreateStringStreamPawnData(ss), PT_PLAYER_UPDATE);//todo idx
 	}
 }
 
