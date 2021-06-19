@@ -7,6 +7,7 @@
 #include "Engine/GameInstance.h"
 #include "GPSaveGame.h"
 #include "GPClient.h"//
+#include "Web/GPHttpObject.h"
 #include "GPGameInstanceBase.generated.h"
 
 
@@ -183,6 +184,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Load")
 	FFullyLoadedDelegate OnLoadCompleted;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HTTP")
+	UGPHttpObject* HttpObject;
 
 private:
 	FFullyLoadedEvent FullyLoadedEvent;

@@ -20,8 +20,11 @@ public class GProject : ModuleRules
 			"GameplayTasks", 
 			"GameplayAbilities",
 			"SlateCore",
-			"Niagara"
-		});
+			"Niagara",
+            "Http",
+            "Json",
+            "JsonUtilities"
+        });
 		//PrivateDependencyModuleNames.AddRange(new string[] { "GameplayAbilities" });
     }
 }

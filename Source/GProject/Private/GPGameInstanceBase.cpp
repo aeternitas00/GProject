@@ -15,6 +15,7 @@ UGPGameInstanceBase::UGPGameInstanceBase()
 	, SaveUserIndex(0)
 	, GPClient(nullptr)
 {
+	HttpObject = CreateDefaultSubobject<UGPHttpObject>("HttpObject");
 }
 
 UGPGameInstanceBase::~UGPGameInstanceBase()
