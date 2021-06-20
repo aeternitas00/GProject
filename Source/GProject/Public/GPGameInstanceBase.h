@@ -80,6 +80,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Save)
 	void CleanupDefaultInventory();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void AddAchProgress(const FString& AchType, int32 Count = 1);
+
 	/** Returns true if this is a valid inventory slot */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool IsValidItemSlot(FGPItemSlot ItemSlot) const;

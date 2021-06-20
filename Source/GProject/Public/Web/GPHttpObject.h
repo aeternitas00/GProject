@@ -9,6 +9,23 @@
 typedef TPair<FString, FString> FStrKeyValuePair;
 typedef TArray<FStrKeyValuePair> FStrKeyValueArray;
 
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPAchievementData
+{
+	GENERATED_BODY()
+
+	FGPAchievementData():ACID(-1), Progress(-1) {}
+	FGPAchievementData(const int32& inID) :ACID(inID), Progress(-1) {}
+	FGPAchievementData(const int32& inID, const float& inProgress):ACID(inID),Progress(inProgress){}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	int32 ACID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	float Progress;
+};
+
+
 UCLASS(BlueprintType)
 class GPROJECT_API UGPHttpObject : public UObject
 {
@@ -31,18 +48,19 @@ public:
 	void UserList();
 
 	UFUNCTION(BlueprintCallable, Category = "HTTP")
-	void AchievementList();
+	void AchievementList(const FString& Email = "");
+
+	//UFUNCTION(BlueprintCallable, Category = "HTTP")
+	//void AchievementCurrentInfo(const int32& AchID);
 
 	UFUNCTION(BlueprintCallable, Category = "HTTP")
-	void AchievementCurrentInfo(const int32& AchID);
-
-	UFUNCTION(BlueprintCallable, Category = "HTTP")
-	void AchievementUpdate(const int32& AchID, const int32& Progress, bool Achieved);
+	void AchievementUpdate(const int32& AchID, const float& Progress, bool bIsAdd = false, const FString& Email="");
 
 	void OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-	void OnLoginReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 protected:
+	FString CurrentEmail; 
+	FString CurrentDisplayName;
 	FHttpModule* Http;
 
 	FHttpRequestRef RequestSetup(const FString& url, const FString& Method);
@@ -59,6 +77,16 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnLoginReceived OnLoginReceivedDelegate;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAchievementReceived, const TArray<FGPAchievementData>&, ProgressArray);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAchievementReceived OnAchievementReceivedDelegate;
+
+	//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAchUpdateReceived, const FString&, Email);
+
+	//UPROPERTY(BlueprintAssignable)
+	//FOnAchUpdateReceived OnAchUpdateReceivedDelegate;
 };
 
 

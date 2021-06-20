@@ -105,7 +105,34 @@ void UGPHttpObject::Login(const FString& inEmail, const FString& inPassword)
 	};
 
 	Request->SetContentAsString(JSONWrite(Array));
-	Request->OnProcessRequestComplete().BindUObject(this, &UGPHttpObject::OnLoginReceived);
+
+	Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+	{
+		FString Status;
+		//Create a pointer to hold the json serialized data
+		TSharedPtr<FJsonObject> JsonObject = this->JSONRead(Response, Status);
+
+		bool Succeed = false;
+
+		//Deserialize the json data given Reader and the actual object to deserialize
+		if (JsonObject != NULL)
+		{
+			GP_LOG(Display, TEXT("Login Response Received"));
+
+			if (Status == "ok")
+			{
+				Succeed = true;
+				GP_LOG(Display, TEXT("Status : OK"));
+			}
+			else
+			{
+				Succeed = false;
+				GP_LOG(Display, TEXT("Status : Not OK / Message : %s"), *JsonObject->GetStringField("message"));
+			}
+		}
+		this->OnLoginReceivedDelegate.Broadcast(Succeed);
+		this->LoginCheck();
+	});
 
 	Request->ProcessRequest();
 }
@@ -114,7 +141,29 @@ void UGPHttpObject::LoginCheck()
 {
 	FHttpRequestRef Request = RequestSetup("http://localhost/account/check", "POST");
 
-	Request->OnProcessRequestComplete().BindUObject(this, &UGPHttpObject::OnResponseReceived);
+	Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+	{
+		FString Status;
+		//Create a pointer to hold the json serialized data
+		TSharedPtr<FJsonObject> JsonObject = this->JSONRead(Response, Status);
+
+		//Deserialize the json data given Reader and the actual object to deserialize
+		if (JsonObject != NULL)
+		{
+			GP_LOG(Display, TEXT("LoginCheck Response Received"));
+
+			if (Status == "ok")
+			{
+				GP_LOG(Display, TEXT("Status : OK"));
+				this->CurrentDisplayName = JsonObject->GetStringField("displayname");
+				this->CurrentEmail = JsonObject->GetStringField("email");
+			}
+			else
+			{
+				GP_LOG(Display, TEXT("Status : Not OK / Message : %s"), *JsonObject->GetStringField("message"));
+			}
+		}
+	});
 
 	Request->ProcessRequest();
 }
@@ -138,16 +187,96 @@ void UGPHttpObject::UserList()
 	Request->ProcessRequest();
 }
 
-void UGPHttpObject::AchievementList()
+void UGPHttpObject::AchievementList(const FString& Email)
 {
+	FString URL = "http://localhost/achievement/" + Email;
+	if (Email.IsEmpty()) URL += CurrentEmail;
+	FHttpRequestRef Request = RequestSetup(URL, "GET");
+
+	Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+	{
+		FString Status;
+		//Create a pointer to hold the json serialized data
+		TSharedPtr<FJsonObject> JsonObject = this->JSONRead(Response, Status);
+
+		//Deserialize the json data given Reader and the actual object to deserialize
+		if (JsonObject != NULL)
+		{
+			GP_LOG(Display, TEXT("AchievementList Response Received"));
+
+			if (Status == "ok")
+			{
+				GP_LOG(Display, TEXT("Status : OK"));
+				TArray<TSharedPtr<FJsonValue>> Achievements = JsonObject->GetArrayField("achievements");
+				
+				TArray<FGPAchievementData> ReturnArray;
+
+				for (auto Ach : Achievements)
+				{
+					ReturnArray.Add(FGPAchievementData(Ach->AsObject()->GetIntegerField("AchievementID"), Ach->AsObject()->GetNumberField("Progress")));
+					GP_LOG(Display, TEXT("ID %d : Progress : %f"), Ach->AsObject()->GetIntegerField("AchievementID"),Ach->AsObject()->GetNumberField("Progress"));
+				}
+
+				this->OnAchievementReceivedDelegate.Broadcast(ReturnArray);
+			}
+			else
+			{
+				GP_LOG(Display, TEXT("Status : Not OK / Message : %s"), *JsonObject->GetStringField("message"));
+			}
+		}
+	});
+
+	Request->ProcessRequest();
 }
 
-void UGPHttpObject::AchievementCurrentInfo(const int32& AchID)
+void UGPHttpObject::AchievementUpdate(const int32& AchID, const float& Progress, bool bIsAdd, const FString& Email)
 {
-}
+	FHttpRequestRef Request = RequestSetup("http://localhost/achievement", "POST");
 
-void UGPHttpObject::AchievementUpdate(const int32& AchID, const int32& Progress, bool Achieved)
-{
+	FString outStr;
+	TSharedRef<TJsonWriter<TCHAR>> JsonWriter = TJsonWriterFactory<TCHAR>::Create(&outStr);
+
+	JsonWriter->WriteObjectStart();
+
+	if (Email.IsEmpty())	JsonWriter->WriteValue(TEXT("email"), *CurrentEmail);
+	else 					JsonWriter->WriteValue(TEXT("email"), Email);
+	JsonWriter->WriteValue(TEXT("achievement"), AchID);
+	JsonWriter->WriteValue(TEXT("progress"), Progress);
+	JsonWriter->WriteValue(TEXT("add"), bIsAdd);
+
+	JsonWriter->WriteObjectEnd();
+	JsonWriter->Close();
+
+	Request->SetContentAsString(outStr);
+
+	Request->OnProcessRequestComplete().BindLambda([this, Email](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+	{
+		FString Status;
+		TSharedPtr<FJsonObject> JsonObject = JSONRead(Response, Status);
+
+		//Deserialize the json data given Reader and the actual object to deserialize
+		if (JsonObject != NULL)
+		{
+			GP_LOG(Display, TEXT("AchievementUpdate Response Received"));
+
+			GP_LOG(Display, TEXT("Status : %s / Message : %s"), *Status, *JsonObject->GetStringField("message"));
+			
+			if (Status == "ok")
+				AchievementList(Email);
+
+			//OnAchUpdateReceivedDelegate->Broadcast(Email);
+			//const TSharedPtr<FJsonObject>* ReqJsonObject;
+			//if (JsonObject->TryGetObjectField("request", ReqJsonObject))
+			//{
+			//	GP_LOG(Display, TEXT("Got Request"));
+			//	GP_LOG(Display, TEXT("Email : %s"), *ReqJsonObject->Get()->GetStringField("email"));
+			//	GP_LOG(Display, TEXT("ACID : %d"), ReqJsonObject->Get()->GetIntegerField("achievement"));
+			//	GP_LOG(Display, TEXT("Progress : %f"), ReqJsonObject->Get()->GetNumberField("progress"));
+			//	GP_LOG(Display, TEXT("Add : %s"), ReqJsonObject->Get()->GetBoolField("add") ? TEXT("True") : TEXT("False"));
+			//}
+		}
+	});
+	Request->ProcessRequest();
 }
 
 
@@ -156,45 +285,15 @@ void UGPHttpObject::AchievementUpdate(const int32& AchID, const int32& Progress,
 
 void UGPHttpObject::OnResponseReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	FString Status;
 	//Create a pointer to hold the json serialized data
-	TSharedPtr<FJsonObject> JsonObject = JSONRead(Response, Status);
+	TSharedPtr<FJsonObject> JsonObject = JSONRead(Response);
 
 	//Deserialize the json data given Reader and the actual object to deserialize
 	if (JsonObject != NULL)
 	{
-		GP_LOG(Display,TEXT("Status : %s"),*Status);
-		//GEngine->AddOnScreenDebugMessage(1, 2.0f, FColor::Green, *Status );
+		GP_LOG(Display, TEXT("Response : %s"), *Response->GetContentAsString());
 	}
 
-}
-
-void UGPHttpObject::OnLoginReceived(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-{
-	FString Status;
-	//Create a pointer to hold the json serialized data
-	TSharedPtr<FJsonObject> JsonObject = JSONRead(Response, Status);
-
-	bool Succeed = false;
-
-	//Deserialize the json data given Reader and the actual object to deserialize
-	if (JsonObject != NULL)
-	{
-		GP_LOG(Display, TEXT("Login Response Received"));
-
-		if (Status == "ok")
-		{	
-			Succeed = true;
-			GP_LOG(Display, TEXT("Status : OK"));
-		}
-		else
-		{
-			Succeed = false;
-			GP_LOG(Display, TEXT("Status : Not OK / Message : %s"), *JsonObject->GetStringField("message"));
-		}
-	}
-
-	OnLoginReceivedDelegate.Broadcast(Succeed);
 }
 
 void UGPHttpObject::BeginDestroy()

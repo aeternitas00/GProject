@@ -409,3 +409,4 @@ void UGPGameInstanceBase::FXWarmupSpawn(UObject* FXSys)
 		UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSys, Trsf)->AttachToComponent(Temp->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
+
