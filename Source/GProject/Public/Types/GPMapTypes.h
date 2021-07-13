@@ -13,6 +13,23 @@
 #include "Engine/LevelStreamingDynamic.h"
 #include "GPMapTypes.generated.h"
 
+//UENUM(BlueprintType)
+//enum class EGPStageType : uint8
+//{
+//	ST_T1		UMETA(DisplayName = "Stage Type 1 (Ice)"),
+//	ST_T2		UMETA(DisplayName = "Stage Type 2 ()"),
+//	ST_T3		UMETA(DisplayName = "Stage Type 3 ()"),
+//	ST_T4		UMETA(DisplayName = "Stage Type 4 ()")
+//};
+
+UENUM(BlueprintType)
+enum class EGPStageStatus : uint8
+{
+	SS_NoInfo		UMETA(DisplayName = "Can't see info of stage"),
+	SS_Info			UMETA(DisplayName = "Can see info but not visited"),
+	SS_Cleared		UMETA(DisplayName = "Initialized and Cleared")
+};
+
 USTRUCT(BlueprintType)
 struct GPROJECT_API FGPMapConnectionData
 {
@@ -62,6 +79,9 @@ struct GPROJECT_API FGPMapData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	int32 MaxDifficulty;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	TArray<FName> AvailableTileset;
+
 	// Load target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	TSoftObjectPtr<UWorld> MapAsset;
@@ -72,7 +92,7 @@ struct GPROJECT_API FGPLevelNode
 {
 	GENERATED_BODY()
 
-	FGPLevelNode():ConnectedLevelIndex({}),LevelObject(nullptr), MapTableRowName(TEXT("")), isLoaded(false) {}
+	FGPLevelNode():ConnectedLevelIndex({}),LevelObject(nullptr), isLoaded(false) {}
 
 	// Index of where we have to go
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
@@ -86,13 +106,49 @@ struct GPROJECT_API FGPLevelNode
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	ULevelStreamingDynamic* LevelObject;
 
-	// Load target
+	// Load target, DEPRECATED
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	//FName MapTableRowName;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-	FName MapTableRowName;
+	FGPMapData MapData;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	bool isLoaded;
 
-	//UFUNCTION(BlueprintCallable, Category = "Load")
-	//void NotifyLoaded(ULevelStreamingDynamic* inLevelDynamic);
+};
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPStageInfo
+{
+	GENERATED_BODY()
+
+	FGPStageInfo() : StageLevel(0), StageTileset("") {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	int32 StageLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FName StageTileset; // Tileset
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FName StageFaction;	// Faction
+};
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPStageNode
+{
+	GENERATED_BODY()
+
+		FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
+
+	// Index of where we have to go
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+		TArray<int32> ConnectedStageNodeIdx;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+		FGPStageInfo StageInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+		EGPStageStatus StageStatus;
 };

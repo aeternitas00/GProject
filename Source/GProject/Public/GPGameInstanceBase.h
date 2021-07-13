@@ -4,6 +4,7 @@
 
 #include "GProject.h"
 #include "Types/GPTypes.h" // TODO : REMOVE THIS
+#include "Types/GPMapTypes.h" // TODO : REMOVE THIS
 #include "Engine/GameInstance.h"
 #include "GPSaveGame.h"
 #include "GPClient.h"//
