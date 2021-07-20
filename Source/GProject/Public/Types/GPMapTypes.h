@@ -85,6 +85,13 @@ struct GPROJECT_API FGPMapData : public FTableRowBase
 	// Load target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	TSoftObjectPtr<UWorld> MapAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FVector MinPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
+	FVector MaxPoint;
+
 };
 
 USTRUCT(BlueprintType)
