@@ -269,7 +269,7 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 		
 		// Override defaults to null
 		LoadDefaults(CurrentSaveGame);
-		GenerateStageNodes();
+		GenerateStageNodes(16);
 	}
 
 	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
@@ -285,10 +285,12 @@ void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
 	for (int i = 0; i < Legnth; i++)
 	{
 		FGPStageNode NewNode;
+		NewNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f,1.0f), FMath::FRandRange(-1.0f,1.0f))*1000;
 		NewNode.ConnectedStageNodeIdx.Add(i + 1);
 		NewNode.StageInfo.StageLevel = i+2;
 		StageNodes.Add(NewNode);
 	}
+	
 	StageNodes[0].StageStatus = EGPStageStatus::SS_Info;
 	StageNodes[Legnth-1].ConnectedStageNodeIdx.Reset();
 

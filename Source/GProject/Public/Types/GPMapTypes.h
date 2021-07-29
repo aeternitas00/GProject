@@ -147,15 +147,19 @@ struct GPROJECT_API FGPStageNode
 {
 	GENERATED_BODY()
 
-		FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
+	FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
 
+	// DEPRECATED
 	// Index of where we have to go
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-		TArray<int32> ConnectedStageNodeIdx;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	TArray<int32> ConnectedStageNodeIdx;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-		FGPStageInfo StageInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	FVector2D StageLoc;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
-		EGPStageStatus StageStatus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	FGPStageInfo StageInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+	EGPStageStatus StageStatus;
 };
