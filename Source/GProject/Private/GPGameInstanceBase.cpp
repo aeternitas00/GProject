@@ -281,23 +281,60 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
 {
 	StageNodes.Reserve(Legnth);
-	// Generate Stage Nodes
-	for (int i = 0; i < Legnth; i++)
+	// Generate Stage 
+
+	FGPStageNode StartNode;
+	while (StartNode.StageLoc.Size()<=400.0f)
+	{
+		StartNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f, 1.0f), FMath::FRandRange(-1.0f, 1.0f)) * 1000;
+	}
+
+	StartNode.StageInfo.StageLevel=0;
+	StartNode.StageStatus= EGPStageStatus::SS_Cleared;
+
+	StageNodes.Insert(StartNode,0);
+	FGPStageNode* StartNodeRef = &StageNodes.Top();
+
+	for (int i = 1; i < Legnth; i++)
 	{
 		FGPStageNode NewNode;
 		NewNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f,1.0f), FMath::FRandRange(-1.0f,1.0f))*1000;
-		NewNode.ConnectedStageNodeIdx.Add(i + 1);
-		NewNode.StageInfo.StageLevel = i+2;
+		NewNode.StageInfo.StageLevel = FMath::RandRange(0,3);
+
+		if (NewNode.StageLoc.Size() >= StartNodeRef->StageLoc.Size())
+		{
+			StartNodeRef->StageInfo.StageLevel = NewNode.StageInfo.StageLevel;
+			StartNodeRef->StageStatus = EGPStageStatus::SS_NoInfo;
+			NewNode.StageStatus = EGPStageStatus::SS_Cleared;
+			NewNode.StageInfo.StageLevel = 0;
+			StartNodeRef = &StageNodes[StageNodes.Add(NewNode)];
+			continue;
+		}
+
 		StageNodes.Add(NewNode);
 	}
-	
-	StageNodes[0].StageStatus = EGPStageStatus::SS_Info;
-	StageNodes[Legnth-1].ConnectedStageNodeIdx.Reset();
+
+	StartNode = *StartNodeRef;
 
 	CurrentSaveGame->SavedStageNodes.Reset();
-	for (const FGPStageNode& StageNode : StageNodes)
+	
+	bool isValidStartNode = false;
+	for (FGPStageNode& StageNode : StageNodes)
 	{
+		if (FVector2D::Distance(StageNode.StageLoc, StartNode.StageLoc) <= 400.0f
+		&& StageNode != StartNode/*Range*/)
+		{
+			StageNode.StageStatus = EGPStageStatus::SS_Info;
+			isValidStartNode=true;
+		}
 		CurrentSaveGame->SavedStageNodes.Add(StageNode);
+	}
+
+	CurrentStageNode = StartNode;
+
+	if (!isValidStartNode)
+	{
+		return;
 	}
 }
 

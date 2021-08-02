@@ -130,7 +130,7 @@ struct GPROJECT_API FGPStageInfo
 {
 	GENERATED_BODY()
 
-	FGPStageInfo() : StageLevel(0), StageTileset("") {}
+	FGPStageInfo() : StageLevel(0), StageTileset(NAME_None), StageFaction(NAME_None){}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	int32 StageLevel;
@@ -140,6 +140,14 @@ struct GPROJECT_API FGPStageInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	FName StageFaction;	// Faction
+
+	FORCEINLINE	bool operator==(const FGPStageInfo& inInfo) const {
+		return ( 
+			( this->StageLevel == inInfo.StageLevel ) && 
+			( this->StageTileset.Compare(inInfo.StageTileset) == 0 || this->StageTileset.IsNone() || inInfo.StageTileset.IsNone() ) &&
+			( this->StageFaction.Compare(inInfo.StageFaction) == 0 || this->StageFaction.IsNone() || inInfo.StageFaction.IsNone() )
+		);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -147,12 +155,7 @@ struct GPROJECT_API FGPStageNode
 {
 	GENERATED_BODY()
 
-	FGPStageNode() :ConnectedStageNodeIdx({}), StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
-
-	// DEPRECATED
-	// Index of where we have to go
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
-	TArray<int32> ConnectedStageNodeIdx;
+	FGPStageNode() : StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 	FVector2D StageLoc;
@@ -162,4 +165,16 @@ struct GPROJECT_API FGPStageNode
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 	EGPStageStatus StageStatus;
+
+	FORCEINLINE	bool operator==(const FGPStageNode& inNode) const {
+		return (
+			this->StageLoc == inNode.StageLoc && 
+			this->StageInfo == inNode.StageInfo	&& 
+			this->StageStatus == inNode.StageStatus
+		);
+	}
+
+	FORCEINLINE	bool operator!=(const FGPStageNode& inNode) const {
+		return !operator==(inNode);
+	}
 };
