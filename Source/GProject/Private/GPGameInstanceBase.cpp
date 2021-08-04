@@ -269,7 +269,7 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 		
 		// Override defaults to null
 		LoadDefaults(CurrentSaveGame);
-		GenerateStageNodes(16);
+		GenerateStageNodes(20);
 	}
 
 	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
@@ -284,7 +284,6 @@ void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
 
 	while (!isValidStartNode)
 	{
-
 		StageNodes.Empty();
 		StageNodes.Reserve(Legnth);
 
@@ -306,9 +305,26 @@ void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
 		for (int i = 1; i < Legnth; i++)
 		{
 			FGPStageNode NewNode;
-			NewNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f,1.0f), FMath::FRandRange(-1.0f,1.0f))*1000;
+			switch( /*int QuatNum =*/ i % 4 )
+			{ 	
+				case 0: 
+				NewNode.StageLoc = FVector2D(FMath::FRandRange(0.0f,1.0f), FMath::FRandRange(0.0f,1.0f))*1200;
+				break;
+				case 1:
+				NewNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f, 0.0f), FMath::FRandRange(0.0f, 1.0f)) * 1200;
+				break;
+				case 2:
+				NewNode.StageLoc = FVector2D(FMath::FRandRange(-1.0f, 0.0f), FMath::FRandRange(-1.0f, 0.0f)) * 1200;
+				break;
+				case 3:
+				NewNode.StageLoc = FVector2D(FMath::FRandRange(0.0f, 1.0f), FMath::FRandRange(-1.0f, 0.0f)) * 1200;
+				break;
+				default:
+				break;
+			}
+			
 			NewNode.StageInfo.StageLevel = FMath::RandRange(0,3);
-
+			
 			if (NewNode.StageLoc.Size() >= StartNodeRef->StageLoc.Size())
 			{
 				StartNodeRef->StageInfo.StageLevel = NewNode.StageInfo.StageLevel;
