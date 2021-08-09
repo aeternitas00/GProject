@@ -153,7 +153,8 @@ void AGPWeaponActorBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GASComponentInitialize();
+	if(HasAuthority())
+		GASComponentInitialize();
 
 	for (const EWAttachmentType& Type : AttachableTypes)
 	{
