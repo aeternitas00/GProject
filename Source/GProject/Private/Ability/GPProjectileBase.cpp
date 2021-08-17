@@ -30,6 +30,9 @@ AGPProjectileBase::AGPProjectileBase()
 	ArrowComp->SetupAttachment(RootComponent);
 
 	//InitialLifeSpan = 7.777f;
+
+	bReplicates = true;
+	SetReplicateMovement(true);
 }
 
 void AGPProjectileBase::BeginPlay()
