@@ -39,10 +39,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Meta = (ExposeOnSpawn = true))
 	FGPGameplayEffectContainerSpec EffectContainerSpec;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float LifespanAfterHit;
 
 	TArray<AActor*> HitActors;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bUseCustomInitSpeed;
+
 	// FUNC
 protected:
 

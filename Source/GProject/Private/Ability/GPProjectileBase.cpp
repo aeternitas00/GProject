@@ -6,7 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
-AGPProjectileBase::AGPProjectileBase()
+AGPProjectileBase::AGPProjectileBase(): bUseCustomInitSpeed(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -39,6 +39,15 @@ void AGPProjectileBase::BeginPlay()
 {
 	Super::BeginPlay();
 	SphereCollision->IgnoreActorWhenMoving(GetInstigator(), true);
+
+	if (bUseCustomInitSpeed)
+	{
+		FTimerHandle InitHandle;
+		GetWorld()->GetTimerManager().SetTimer(InitHandle, [this]() {
+			ProjMovementComp->Velocity *= ProjMovementComp->MaxSpeed;
+			ProjMovementComp->Velocity.Z /= ProjMovementComp->MaxSpeed;
+		}, 0.01, false);
+	}
 }
 
 void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActor)
