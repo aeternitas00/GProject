@@ -14,7 +14,7 @@ struct GPROJECT_API FGPAIDamageEvent : public FAIDamageEvent
 	typedef class UGPAISense_Damage FSenseClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sense")
-	FName Tag;
+	FName SenseTag;
 
 	FGPAIDamageEvent();
 	FGPAIDamageEvent(AActor* InDamagedActor, AActor* InInstigator, float DamageAmount, const FVector& EventLocation, const FVector& InHitLocation = FAISystem::InvalidLocation);

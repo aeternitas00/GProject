@@ -10,6 +10,8 @@ public class GProject : ModuleRules
 
 		PrivatePCHHeaderFile = "Public/GProject.h";
 
+		bEnableUndefinedIdentifierWarnings = false;
+
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", 
 			"CoreUObject", 
 			"Engine", 

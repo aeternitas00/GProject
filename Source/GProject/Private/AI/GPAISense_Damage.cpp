@@ -19,7 +19,7 @@ FGPAIDamageEvent::FGPAIDamageEvent(AActor* InDamagedActor, AActor* InInstigator,
 }
 
 FGPAIDamageEvent::FGPAIDamageEvent(FName inTag, AActor* InDamagedActor, AActor* InInstigator, float DamageAmount, const FVector& EventLocation, const FVector& InHitLocation)
-	: FAIDamageEvent(InDamagedActor, InInstigator, DamageAmount, EventLocation, InHitLocation),Tag(inTag)
+	: FAIDamageEvent(InDamagedActor, InInstigator, DamageAmount, EventLocation, InHitLocation), SenseTag(inTag)
 {
 }
 
