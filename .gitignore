@@ -79,7 +79,9 @@ GPServer/*
 !GPServer/common/GPPacket.h
 
 # Resources
-Content/Mannequin/ParagonSevarog/*
+Content/CharactersAssets/ParagonSevarog/*
+Content/CharactersAssets/ParagonMurdock/*
+Content/CharactersAssets/ParagonWraith/*
 Content/Geometry/ModularSFPack/*
 Content/Geometry/ModularSFPack2/*
 Content/Geometry/ModularSFOffice/*
