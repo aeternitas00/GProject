@@ -85,3 +85,6 @@ Content/CharactersAssets/ParagonWraith/*
 Content/Geometry/ModularSFPack/*
 Content/Geometry/ModularSFPack2/*
 Content/Geometry/ModularSFOffice/*
+
+# Short
+*.lnk
