@@ -541,8 +541,8 @@ void AGPCharacterBase::HandleManaChanged(float DeltaValue, const struct FGamepla
 
 void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
-	GP_LOG(Warning, TEXT("C: %f, B: %f"), GetMoveSpeed(), AttributeSet->MoveSpeed.GetBaseValue());
-	SetMovementSpeed(GetMoveSpeed());
+	//GP_LOG(Warning, TEXT("C: %f, B: %f"), GetMoveSpeed(), AttributeSet->MoveSpeed.GetBaseValue());
+	//SetMovementSpeed(GetMoveSpeed());
 
 	if (bAbilitiesInitialized)
 	{
@@ -552,7 +552,7 @@ void AGPCharacterBase::HandleMoveSpeedChanged(float DeltaValue, const struct FGa
 
 void AGPCharacterBase::SetMovementSpeed(float Speed)
 {
-	GP_LOG(Warning, TEXT("R: %f, Ch: %f"), Speed, GetMoveSpeed());
+	//GP_LOG(Warning, TEXT("R: %f, Ch: %f"), Speed, GetMoveSpeed());
 
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
