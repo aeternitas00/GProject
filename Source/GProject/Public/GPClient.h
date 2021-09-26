@@ -6,10 +6,10 @@
 
 #include "Windows/AllowWindowsPlatformAtomics.h"
 #include <WinSock2.h>
+#include <iosfwd>
 #include "Windows/HideWindowsPlatformAtomics.h"
 #pragma comment(lib,"ws2_32")
 
-#include <iosfwd>
 
 class GPROJECT_API FGPClient : public FRunnable
 {

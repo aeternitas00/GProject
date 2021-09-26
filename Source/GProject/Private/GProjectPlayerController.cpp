@@ -13,7 +13,7 @@
 
 AGProjectPlayerController::AGProjectPlayerController()
 {
-	bShowMouseCursor = true;
+	bShowMouseCursor = false;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	GPClient = nullptr;
 
@@ -28,7 +28,7 @@ void AGProjectPlayerController::OnPossess(APawn* InPawn)
 	{
 		//Cast<ACharacter>(InPawn)->OnCharacterMovementUpdated.AddDynamic(this, &AGProjectPlayerController::SendMovementInfo);
 		std::stringstream ss;
-		GPClient->CreateAsyncSendTask(CreateStringStreamPawnData(ss), PT_PLAYER_START);
+		//GPClient->CreateAsyncSendTask(CreateStringStreamPawnData(ss), PT_PLAYER_START);
 	}
 }
 
@@ -485,17 +485,17 @@ void AGProjectPlayerController::NotifySlottedItemChanged(FGPItemSlot ItemSlot, U
 	SlottedItemChanged(ItemSlot, Item);
 }
 
-std::stringstream& AGProjectPlayerController::CreateStringStreamPawnData(std::stringstream& ss)
-{
-	const FVector& Location = GetPawn()->GetActorLocation();
-	//const FVector& Velocity = GetPawn()->GetVelocity();
-	const FRotator& Rotation = GetPawn()->GetActorRotation();
-	ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
-	//ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
-	ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << '\n';
-	GP_LOG(Display, TEXT("%s length: %d tellp: %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
-	return ss;
-}
+//std::stringstream& AGProjectPlayerController::CreateStringStreamPawnData(std::stringstream& ss)
+//{
+	//const FVector& Location = GetPawn()->GetActorLocation();
+	////const FVector& Velocity = GetPawn()->GetVelocity();
+	//const FRotator& Rotation = GetPawn()->GetActorRotation();
+	//ss << Location.X << " " << Location.Y << " " << Location.Z << '\n';
+	////ss << Velocity.X << " " << Velocity.Y << " " << Velocity.Z << '\n';
+	//ss << Rotation.Pitch << " " << Rotation.Yaw << " " << Rotation.Roll << '\n';
+	//GP_LOG(Display, TEXT("%s length: %d tellp: %d"), ANSI_TO_TCHAR(ss.str().c_str()), ss.str().length(),(int)ss.tellp())
+	//return ss;
+//}
 
 void AGProjectPlayerController::SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
 {

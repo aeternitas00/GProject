@@ -155,10 +155,10 @@ protected:
 	void HandleSaveGameLoaded(UGPSaveGame* NewSaveGame);
 
 private:
-	FGPClient* GPClient;
+	class FGPClient* GPClient;
 
 protected:
-	std::stringstream& CreateStringStreamPawnData(std::stringstream& ss);
+	//std::stringstream& CreateStringStreamPawnData(std::stringstream& ss);
 
 	UFUNCTION()
 	void SendMovementInfo(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
