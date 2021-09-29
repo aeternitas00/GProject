@@ -43,9 +43,10 @@ void AGPProjectileBase::BeginPlay()
 	if (bUseCustomInitSpeed)
 	{
 		FTimerHandle InitHandle;
-		GetWorld()->GetTimerManager().SetTimer(InitHandle, [this]() {
-			ProjMovementComp->Velocity *= ProjMovementComp->MaxSpeed;
-			ProjMovementComp->Velocity.Z /= ProjMovementComp->MaxSpeed;
+		FVector InitVel = ProjMovementComp->Velocity;
+		GetWorld()->GetTimerManager().SetTimer(InitHandle, [this, InitVel]() {
+			ProjMovementComp->Velocity = InitVel * ProjMovementComp->MaxSpeed;
+			//ProjMovementComp->Velocity.Z /= ProjMovementComp->MaxSpeed;
 		}, 0.01, false);
 	}
 }
