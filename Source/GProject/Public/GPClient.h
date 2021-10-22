@@ -52,7 +52,13 @@ public:
 	// Runnable 인스턴스 소멸.
 	void Shutdown();
 
-	void CreateAsyncSendTask(std::stringstream& ss, GPPacketType pt);
+protected:
+	void CreateAsyncSendTask(SOCKET sock, std::stringstream& ss, GPPacketType pt);
+
+public:
+	void CreateAsyncMainSendTask(std::stringstream& ss, GPPacketType pt);
+	void CreateAsyncAuthSendTask(std::stringstream& ss, GPPacketType pt);
+
 
 private:
 	class AGProjectPlayerController* PlayerCon;
@@ -69,22 +75,27 @@ public:
 	////
 
 protected:
-	SOCKET Socket;
+	SOCKET MainSocket;
+	SOCKET AuthSocket; //
+
+	//char* AuthSecret; //credential
 	//HANDLE ConnEvent; //연결 대기 이벤트.
 
 	char RecvBuf[MAX_PKT_SIZ]; //
 	
 public:
-	// Winsock api 
+	// Winsock api mostly boilerplate stuffs
 
-	bool Connect(u_short port = GP_PORT, char* ip = "127.0.0.1"); //todo async //현재 이 서버와 게임을 분리하기 위해 GPEntry에서만 Connect해주고 있음.
-	bool Send(char* buf, int len);
-	bool SendStream(std::stringstream& ss, GPPacketType pt);
+	bool Connect(SOCKET sock, u_short port, char* ip = "127.0.0.1"); //todo async //현재 이 서버와 게임을 분리하기 위해 GPEntry에서만 Connect해주고 있음.
+	bool Send(SOCKET sock, char* buf, int len);
 	////
 
 	// GI features.
-
-	bool Login(); // todo //현재는 가상의 로그인 과정. //TODO DB
+	bool ConnectAll(); //
+	void Login(FString id, FString pwd); //test
+	void PostLogin();
+	void PostLogout();
+	bool SendStream(SOCKET sock, std::stringstream& ss, GPPacketType pt);
 	bool SendChat(FString Chat);
 	bool SendHeader(GPPacketType pt);
 	////

@@ -22,7 +22,8 @@ public class GProject : ModuleRules
 			"GameplayTasks", 
 			"GameplayAbilities",
 			"SlateCore",
-			"Niagara"
+			"Niagara",
+			"MoviePlayer"
 		});
 		//PrivateDependencyModuleNames.AddRange(new string[] { "GameplayAbilities" });
     }

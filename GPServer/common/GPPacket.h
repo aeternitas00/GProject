@@ -74,3 +74,5 @@ struct GameObject
 //}
 
 #define GP_PORT 9000
+#define GP_AUTH GP_PORT + 1
+#define GP_MATCH GP_PORT + 2

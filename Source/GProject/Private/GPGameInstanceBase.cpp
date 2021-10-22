@@ -7,6 +7,7 @@
 #include "Particles/ParticleSystem.h"
 #include "NiagaraComponent.h" 
 #include "NiagaraFunctionLibrary.h"
+#include "MoviePlayer.h"
 #include <sstream>
 
 
@@ -38,6 +39,10 @@ bool UGPGameInstanceBase::IsValidItemSlot(FGPItemSlot ItemSlot) const
 void UGPGameInstanceBase::Init()
 {
 	Super::Init();
+
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UGPGameInstanceBase::BeginLoadingScreen);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UGPGameInstanceBase::EndLoadingScreen);
+	GP_LOG_C(Warning)
 }
 
 void UGPGameInstanceBase::Shutdown()
@@ -77,6 +82,26 @@ AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InW
 	return GM;
 }
 
+void UGPGameInstanceBase::BeginLoadingScreen(const FString& MapName)
+{
+	GP_LOG_C(Warning)
+
+	if (!IsRunningDedicatedServer())
+	{
+		FLoadingScreenAttributes LoadingScreen;
+		LoadingScreen.bAutoCompleteWhenLoadingCompletes = false;
+		LoadingScreen.WidgetLoadingScreen = FLoadingScreenAttributes::NewTestLoadingScreenWidget();
+
+		GetMoviePlayer()->SetupLoadingScreen(LoadingScreen);
+		GP_LOG_C(Warning)
+	}
+}
+
+void UGPGameInstanceBase::EndLoadingScreen(UWorld* InLoadedWorld)
+{
+	GP_LOG_C(Warning)
+}
+
 void UGPGameInstanceBase::OnStart()
 {
 	//Super::OnStart(); //blank.
@@ -88,6 +113,15 @@ bool UGPGameInstanceBase::Send(FString buf)
 	if (!GPClient) return false;
 	
 	return GPClient->SendChat(buf);
+}
+
+bool UGPGameInstanceBase::Login(FString id, FString pwd)
+{
+	if (!GPClient) return false;
+
+	GPClient->Login(id, pwd);
+
+	return true;
 }
 
 bool UGPGameInstanceBase::Connect()
@@ -121,7 +155,7 @@ void UGPGameInstanceBase::BeGPHost()
 			<< "0 0 0\n";
 	}
 	GP_LOG(Warning, TEXT("go tellp: %d"), (int)ss.tellp());
-	GPClient->CreateAsyncSendTask(ss, PT_GAME);
+	GPClient->CreateAsyncMainSendTask(ss, PT_GAME);
 }
 
 bool UGPGameInstanceBase::IsConnected() const
