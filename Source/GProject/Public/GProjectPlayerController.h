@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FGPItemSlot, UGPItem*> SlottedItems;
 
+	UPROPERTY(BlueprintReadOnly, Category = Inventory)
+	TMap<UGPItem*, EItemReplicateFlag> ReplicableItems;
+
 	/** Delegate called when an inventory item has been added or removed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnInventoryItemChanged OnInventoryItemChanged;
@@ -53,6 +56,16 @@ public:
 	/** Adds a new inventory item, will add it to an empty slot if possible. If the item supports count you can add more than one count. It will also update the level when adding if required */
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	bool AddInventoryItem(UGPItem* NewItem, int32 ItemCount = 1, int32 ItemLevel = 1, bool bAutoSlot = true);
+
+	/** Make item Replicable, true = add, false = remove */
+	UFUNCTION(BlueprintCallable, Category = ItemReplicate)
+	void UpdateReplicableItem(UGPItem* NewItem, EItemReplicateFlag Flag);
+
+	UFUNCTION(BlueprintCallable, Category = ItemReplicate)
+	void UpdateReplicableItems(TArray<UGPItem*> NewItem, EItemReplicateFlag Flag);
+
+	UFUNCTION(BlueprintCallable, Category = ItemReplicate)
+	TMap<UGPItem*, EItemReplicateFlag> GetReplicableItems();
 
 	//UFUNCTION(BlueprintCallable, Category = Inventory)
 	//bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true);

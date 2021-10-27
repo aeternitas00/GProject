@@ -209,6 +209,16 @@ enum class EGPGameDifficulty : uint8
 	GD_NightMare	UMETA(DisplayName = "Nightmare")
 };
 
+UENUM(BlueprintType)
+enum class EItemReplicateFlag : uint8
+{
+	IRF_Unknown			UMETA(DisplayName = "Unknown"),
+	IRF_BPKnown			UMETA(DisplayName = "BP Known"),
+	IRF_BPBuyable		UMETA(DisplayName = "BP Buyable"),
+	IRF_Replicable		UMETA(DisplayName = "Replicable")
+};
+
+
 USTRUCT(BlueprintType)
 struct GPROJECT_API FGPWAttachmentedData
 {

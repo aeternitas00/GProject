@@ -5,9 +5,13 @@
 #include "GProject.h"
 #include "Engine/DataAsset.h"
 #include "Styling/SlateBrush.h"
+#include "AttributeSet.h"
 #include "GPAssetManager.h"
+#include <string>
+#include <unordered_map>
 #include "GPItem.generated.h"
 
+struct FGameplayAttribute;
 class UGPGameplayAbility;
 
 UCLASS()
@@ -33,9 +37,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FText ItemName;
 
-	/** User-visible long description */
+	/** User-visible short description */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	FText ItemDescription;
+
+	/** User-visible long description */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	FText ItemDetailDescription;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	TMap<FGameplayAttribute,float> ModsDescription;
 
 	/** Icon to display */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
@@ -79,4 +90,30 @@ public:
 	/** Overridden to use saved type */
 	virtual FPrimaryAssetId GetPrimaryAssetId() const override;
 
+	public:
+	std::string TCHARToString(const TCHAR* ptsz) const
+	{
+		int len = wcslen((wchar_t*)ptsz);
+		char* psz = new char[2 * len + 1];
+		wcstombs(psz, (wchar_t*)ptsz, 2 * len + 1);
+		std::string s = psz;
+		delete[] psz;
+		return s;
+	}
+
+public:
+	FORCEINLINE bool operator== (const UGPItem& iItem) const 
+	{
+		return ItemName.EqualTo(iItem.ItemName);
+	}
+
+	FORCEINLINE bool operator< (const UGPItem& iItem) const
+	{
+		std::string OrgName = TCHARToString(ItemName.ToString().GetCharArray().GetData());
+		std::string iName = TCHARToString(iItem.ItemName.ToString().GetCharArray().GetData());
+		std::hash<std::string> Hasher;
+		size_t OrgHash = Hasher(OrgName);
+		size_t iHash = Hasher(iName);
+		return (OrgHash < iHash);
+	}
 };

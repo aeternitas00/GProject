@@ -23,7 +23,7 @@ UGPGameInstanceBase::~UGPGameInstanceBase()
 }
 
 bool UGPGameInstanceBase::IsValidItemSlot(FGPItemSlot ItemSlot) const
-{
+{	
 	if (ItemSlot.IsValid())
 	{
 		const int32* FoundCount = ItemSlotsPerType.Find(ItemSlot.ItemType);
@@ -165,10 +165,7 @@ bool UGPGameInstanceBase::IsConnected() const
 
 void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSave)
 {
-	SaveGame->InventoryData.Reset();
-	SaveGame->SlottedItems.Reset();
-	SaveGame->AttachmentData.Reset();
-	SaveGame->SavedStageNodes.Reset();
+	SaveGame->ResetSavedData();
 
 	// Now add the default inventory, this only adds if not already in hte inventory
 	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : DefaultInventory)
@@ -199,6 +196,8 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 
 	SaveGame->GameDifficulty = CurrentGameDifficulty;
 
+	SaveGame->ReplicableItems = DefaultReplicableItems;
+
 	if (WriteAfterSave)
 	{
 		WriteSaveGame();
@@ -211,7 +210,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	DefaultSlottedItems.Reset();
 	AttachedItems.Reset();
 	StageNodes.Reset();
-
+	DefaultReplicableItems.Reset();
 
 	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
 	{
@@ -239,6 +238,8 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 		StageNodes.Add(StageNode);
 	}
 
+	DefaultReplicableItems = SaveGame->ReplicableItems;
+
 	CurrentGameDifficulty = SaveGame->GameDifficulty;
 }
 
@@ -247,6 +248,7 @@ void UGPGameInstanceBase::CleanupDefaultInventory()
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
 	AttachedItems.Reset();
+	DefaultReplicableItems.Reset();
 	//ItemSlotsPerType.Reset();
 }
 

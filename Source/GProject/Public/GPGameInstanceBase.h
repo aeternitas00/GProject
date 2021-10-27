@@ -29,17 +29,20 @@ public:
 	~UGPGameInstanceBase();
 
 	/** List of inventory items to add to new players */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Save)
 	TMap<FPrimaryAssetId, FGPItemData> DefaultInventory;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Save)
+	TMap<FPrimaryAssetId, EItemReplicateFlag> DefaultReplicableItems;
+
 	/** Number of slots for each type of item */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Save)
 	TMap<FPrimaryAssetType, int32> ItemSlotsPerType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Save)
 	TMap<FGPItemSlot, FPrimaryAssetId> DefaultSlottedItems;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Save)
 	TMap<FGPItemSlot, FGPWAttachmentedData> AttachedItems;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
@@ -60,7 +63,7 @@ public:
 	int32 SaveUserIndex;
 
 	/** Delegate called when the save game has been loaded/reset */
-	UPROPERTY(BlueprintAssignable, Category = Inventory)
+	UPROPERTY(BlueprintAssignable, Category = Save)
 	FOnSaveGameLoaded OnSaveGameLoaded;
 
 	/** Native delegate for save game load/reset */

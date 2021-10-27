@@ -48,6 +48,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FPrimaryAssetId, FGPItemData> InventoryData;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TMap<FPrimaryAssetId, EItemReplicateFlag> ReplicableItems;
+
 	/** Map of slotted items */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TMap<FGPItemSlot, FPrimaryAssetId> SlottedItems;
@@ -64,6 +67,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
 	EGPGameDifficulty GameDifficulty;
+
+	UFUNCTION(BlueprintCallable, Category = Inventory)
+	void ResetSavedData();
 
 protected:
 	/** Deprecated way of storing items, this is read in but not saved out */

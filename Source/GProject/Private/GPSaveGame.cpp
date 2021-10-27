@@ -24,3 +24,12 @@ void UGPSaveGame::Serialize(FArchive& Ar)
 		SavedDataVersion = EGPSaveGameVersion::LatestVersion;
 	}
 }
+
+void UGPSaveGame::ResetSavedData()
+{
+	InventoryData.Reset();
+	SlottedItems.Reset();
+	AttachmentData.Reset();
+	SavedStageNodes.Reset();
+	ReplicableItems.Reset();
+}

@@ -68,6 +68,7 @@ bool AGProjectPlayerController::SaveInventory()
 		// Reset cached data in save game before writing to it
 		CurrentSaveGame->InventoryData.Reset();
 		CurrentSaveGame->SlottedItems.Reset();
+		CurrentSaveGame->ReplicableItems.Reset();
 
 		for (const TPair<UGPItem*, FGPItemData>& ItemPair : InventoryData)
 		{
@@ -89,6 +90,17 @@ bool AGProjectPlayerController::SaveInventory()
 				AssetId = SlotPair.Value->GetPrimaryAssetId();
 			}
 			CurrentSaveGame->SlottedItems.Add(SlotPair.Key, AssetId);
+		}
+
+		for (const TPair<UGPItem*, EItemReplicateFlag>& Itembp : ReplicableItems)
+		{
+			FPrimaryAssetId AssetId;
+
+			if (Itembp.Key->IsValidLowLevelFast())
+			{
+				AssetId = Itembp.Key->GetPrimaryAssetId();
+			}
+			CurrentSaveGame->ReplicableItems.Add(AssetId, Itembp.Value);
 		}
 
 		// Now that cache is updated, write to disk
@@ -157,6 +169,19 @@ bool AGProjectPlayerController::LoadInventory()
 			}
 		}
 
+		for (const TPair<FPrimaryAssetId, EItemReplicateFlag>& ItemBP : CurrentSaveGame->ReplicableItems)
+		{
+			if (ItemBP.Key.IsValid())
+			{
+				UGPItem* LoadedItem = AssetManager.ForceLoadItem(ItemBP.Key);
+				if (LoadedItem)
+				{
+					ReplicableItems.Add(LoadedItem, ItemBP.Value);
+					//NotifySlottedItemChanged(SlotPair.Key, LoadedItem);
+				}
+			}
+		}
+
 		if (!bFoundAnySlots)
 		{
 			// Auto slot items as no slots were saved
@@ -177,6 +202,7 @@ bool AGProjectPlayerController::LoadInventory()
 void AGProjectPlayerController::NotifyInventoryLoaded()
 {
 	// Notify native before blueprint
+	
 	OnInventoryLoadedNative.Broadcast();
 	OnInventoryLoaded.Broadcast();
 
@@ -251,6 +277,22 @@ bool AGProjectPlayerController::AddInventoryItem(UGPItem* NewItem, int32 ItemCou
 		return true;
 	}
 	return false;
+}
+
+void AGProjectPlayerController::UpdateReplicableItem(UGPItem* NewItem, EItemReplicateFlag Flag)
+{
+	ReplicableItems.Add(NewItem, Flag);
+}
+
+void AGProjectPlayerController::UpdateReplicableItems(TArray<UGPItem*> NewItems, EItemReplicateFlag Flag)
+{
+	for(UGPItem* Item: NewItems)
+		ReplicableItems.Add(Item, Flag);
+}
+
+TMap<UGPItem*, EItemReplicateFlag> AGProjectPlayerController::GetReplicableItems()
+{
+	return ReplicableItems;
 }
 
 //bool AddInventoryItemWithData(UGPItem* NewItem, FGPItemData& ItemData, bool bAutoSlot = true) 
