@@ -32,7 +32,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Save)
 	TMap<FPrimaryAssetId, FGPItemData> DefaultInventory;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Save)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Save)
 	TMap<FPrimaryAssetId, EItemReplicateFlag> DefaultReplicableItems;
 
 	/** Number of slots for each type of item */

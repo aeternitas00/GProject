@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "GPAbilityTypes.h"
+#include "GPMapTypes.h"
 #include "GPBPFuncLibrary.generated.h"
 
 /**
@@ -20,8 +21,20 @@ public:
 	static bool EqualEqual_GPItemSlot(const FGPItemSlot& A, const FGPItemSlot& B);
 
 	/** Inequality operator for ItemSlot */
-	UFUNCTION(BlueprintPure, meta = (DisplayName = "NotEqualEqual (GPItemSlot)", CompactNodeTitle = "!=", Keywords = "!= not equal"), Category = Inventory)
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "NotEqual (GPItemSlot)", CompactNodeTitle = "!=", Keywords = "!= not equal"), Category = Inventory)
 	static bool NotEqual_GPItemSlot(const FGPItemSlot& A, const FGPItemSlot& B);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (GPStageNode)", CompactNodeTitle = "==", Keywords = "== equal"), Category = Stage)
+	static bool EqualEqual_GPStageNode(const FGPStageNode& A, const FGPStageNode& B);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "NotEqual (GPStageNode)", CompactNodeTitle = "!=", Keywords = "!= not equal"), Category = Stage)
+	static bool NotEqual_GPStageNode(const FGPStageNode& A, const FGPStageNode& B);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Equal (GPStageInfo)", CompactNodeTitle = "==", Keywords = "== equal"), Category = Stage)
+	static bool EqualEqual_GPStageInfo(const FGPStageInfo& A, const FGPStageInfo& B);
+
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "NotEqual (GPStageInfo)", CompactNodeTitle = "!=", Keywords = "!= not equal"), Category = Stage)
+	static bool NotEqual_GPStageInfo(const FGPStageInfo& A, const FGPStageInfo& B);
 
 	/** Validity check for ItemSlot */
 	UFUNCTION(BlueprintPure, Category = Inventory)

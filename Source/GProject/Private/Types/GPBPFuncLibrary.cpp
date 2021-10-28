@@ -18,6 +18,26 @@ bool UGPBPFuncLibrary::NotEqual_GPItemSlot(const FGPItemSlot& A, const FGPItemSl
 	return A != B;
 }
 
+bool UGPBPFuncLibrary::EqualEqual_GPStageNode(const FGPStageNode& A, const FGPStageNode& B)
+{
+	return A == B;
+}
+
+bool UGPBPFuncLibrary::NotEqual_GPStageNode(const FGPStageNode& A, const FGPStageNode& B)
+{
+	return A != B;
+}
+
+bool UGPBPFuncLibrary::EqualEqual_GPStageInfo(const FGPStageInfo& A, const FGPStageInfo& B)
+{
+	return A == B;
+}
+
+bool UGPBPFuncLibrary::NotEqual_GPStageInfo(const FGPStageInfo& A, const FGPStageInfo& B)
+{
+	return !(A == B);
+}
+
 bool UGPBPFuncLibrary::IsValidItemSlot(const FGPItemSlot& ItemSlot)
 {
 	return ItemSlot.IsValid();

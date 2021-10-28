@@ -122,7 +122,6 @@ struct GPROJECT_API FGPLevelNode
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	bool isLoaded;
-
 };
 
 USTRUCT(BlueprintType)
@@ -131,6 +130,8 @@ struct GPROJECT_API FGPStageInfo
 	GENERATED_BODY()
 
 	FGPStageInfo() : StageLevel(0), StageTileset(NAME_None), StageFaction(NAME_None){}
+	FGPStageInfo(const FGPStageInfo& copyInfo) : 
+	StageLevel(copyInfo.StageLevel), StageTileset(copyInfo.StageTileset), StageFaction(copyInfo.StageFaction) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Map)
 	int32 StageLevel;
@@ -156,6 +157,8 @@ struct GPROJECT_API FGPStageNode
 	GENERATED_BODY()
 
 	FGPStageNode() : StageInfo(), StageStatus(EGPStageStatus::SS_NoInfo) {}
+	FGPStageNode(const FGPStageNode& copyNode) : 
+	StageLoc(copyNode.StageLoc), StageInfo(copyNode.StageInfo), StageStatus(copyNode.StageStatus) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 	FVector2D StageLoc;
@@ -177,4 +180,5 @@ struct GPROJECT_API FGPStageNode
 	FORCEINLINE	bool operator!=(const FGPStageNode& inNode) const {
 		return !operator==(inNode);
 	}
+
 };

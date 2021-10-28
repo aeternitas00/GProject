@@ -61,6 +61,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	TArray<FGPStageNode> SavedStageNodes;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
+	FGPStageNode SavedCurrentStageNode;
+
 	/** User's unique id */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = SaveGame)
 	FString UserId;

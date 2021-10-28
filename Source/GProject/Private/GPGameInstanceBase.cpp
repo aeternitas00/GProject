@@ -195,7 +195,7 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 	}
 
 	SaveGame->GameDifficulty = CurrentGameDifficulty;
-
+	SaveGame->SavedCurrentStageNode = CurrentStageNode;
 	SaveGame->ReplicableItems = DefaultReplicableItems;
 
 	if (WriteAfterSave)
@@ -239,7 +239,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	}
 
 	DefaultReplicableItems = SaveGame->ReplicableItems;
-
+	CurrentStageNode = SaveGame->SavedCurrentStageNode;
 	CurrentGameDifficulty = SaveGame->GameDifficulty;
 }
 
@@ -306,6 +306,8 @@ bool UGPGameInstanceBase::HandleSaveGameLoaded(USaveGame* SaveGameObject)
 		// Override defaults to null
 		LoadDefaults(CurrentSaveGame);
 		GenerateStageNodes(20);
+
+		CurrentSaveGame->SavedCurrentStageNode=CurrentStageNode;
 	}
 
 	OnSaveGameLoaded.Broadcast(CurrentSaveGame);
