@@ -433,6 +433,7 @@ void UGPGameInstanceBase::ResetSaveGame()
 {
 	// Call handle function with no loaded save, this will reset the data
 	HandleSaveGameLoaded(nullptr);
+
 }
 
 void UGPGameInstanceBase::HandleAsyncSave(const FString& SlotName, const int32 UserIndex, bool bSuccess)
