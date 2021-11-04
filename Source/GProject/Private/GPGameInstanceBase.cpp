@@ -381,7 +381,7 @@ void UGPGameInstanceBase::GenerateStageNodes(const int32& Legnth)
 	
 		for (FGPStageNode& StageNode : StageNodes)
 		{
-			if (FVector2D::Distance(StageNode.StageLoc, StartNode.StageLoc) <= 400.0f
+			if (FVector2D::Distance(StageNode.StageLoc, StartNode.StageLoc) <= 400.0f // TODO :: make this modable
 			&& StageNode != StartNode/*Range*/)
 			{
 				StageNode.StageStatus = EGPStageStatus::SS_Info;
