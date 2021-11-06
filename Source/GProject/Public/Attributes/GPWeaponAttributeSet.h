@@ -45,9 +45,13 @@ public:
 	FGameplayAttributeData ReloadSpeed;
 	ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, ReloadSpeed)
 
-	//UPROPERTY(BlueprintReadOnly, Category = "Weapon", ReplicatedUsing = OnRep_ReloadSpeed)
-	//FGameplayAttributeData ReloadSpeed;
-	//ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, ReloadSpeed)
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", ReplicatedUsing = OnRep_RecoilX)
+	FGameplayAttributeData RecoilX;
+	ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, RecoilX)
+
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", ReplicatedUsing = OnRep_RecoilY)
+	FGameplayAttributeData RecoilY;
+	ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, RecoilY)
 
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
@@ -67,4 +71,10 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_ReloadSpeed(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_RecoilX(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_RecoilY(const FGameplayAttributeData& OldValue);
 };

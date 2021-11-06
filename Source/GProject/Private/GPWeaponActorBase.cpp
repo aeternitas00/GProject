@@ -140,6 +140,15 @@ float AGPWeaponActorBase::GetReloadSpeed() const
 	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetReloadSpeedAttribute());
 }
 
+FVector2D AGPWeaponActorBase::GetRecoil() const
+{
+	FVector2D retVal;
+
+	retVal.X = GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetRecoilXAttribute());
+	retVal.X = GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetRecoilYAttribute());
+	return retVal;
+}
+
 EWFiringMode AGPWeaponActorBase::GetCurrentFiringMode() const
 {
 	const EWFiringMode* rv = FiringModeMap.Find(CurrentFireMode);

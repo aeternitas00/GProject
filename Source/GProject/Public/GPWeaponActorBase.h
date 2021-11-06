@@ -91,6 +91,9 @@ public:
 	float GetReloadSpeed() const;
 
 	UFUNCTION(BlueprintCallable)
+	FVector2D GetRecoil() const;
+
+	UFUNCTION(BlueprintCallable)
 	EWFiringMode GetCurrentFiringMode() const;
 	
 	UFUNCTION(BlueprintCallable)

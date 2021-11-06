@@ -13,6 +13,8 @@ UGPWeaponAttributeSet::UGPWeaponAttributeSet()
 	, FireRate(1.0f)
 	, Accuracy(1.0f)
 	, ReloadSpeed(1.0f)
+	, RecoilX(0.0f)
+	, RecoilY(0.0f)
 {}
 
 //void UGPWeaponAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float& NewValue)
@@ -65,21 +67,35 @@ void UGPWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	{
 		if (TargetWeapon)
 		{
-			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+			//TargetWeapon->HandleFireRateChanged(DeltaValue, SourceTags);
 		}
 	}
 	else if (Data.EvaluatedData.Attribute == GetAccuracyAttribute())
 	{
 		if (TargetWeapon)
 		{
-			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+			//TargetWeapon->HandleAccuracyChanged(DeltaValue, SourceTags);
 		}
 	}
 	else if (Data.EvaluatedData.Attribute == GetReloadSpeedAttribute())
 	{
 		if (TargetWeapon)
 		{
-			//TargetWeapon->HandleMagSizeChanged(DeltaValue, SourceTags);
+			//TargetWeapon->HandleReloadSpeedChanged(DeltaValue, SourceTags);
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetRecoilXAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleRecoilChanged(DeltaValue, SourceTags);
+		}
+	}
+	else if (Data.EvaluatedData.Attribute == GetRecoilYAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleRecoilChanged(DeltaValue, SourceTags);
 		}
 	}
 }
@@ -93,6 +109,8 @@ void UGPWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(UGPWeaponAttributeSet, FireRate);
 	DOREPLIFETIME(UGPWeaponAttributeSet, Accuracy);
 	DOREPLIFETIME(UGPWeaponAttributeSet, ReloadSpeed);
+	DOREPLIFETIME(UGPWeaponAttributeSet, RecoilX);
+	DOREPLIFETIME(UGPWeaponAttributeSet, RecoilY);
 }
 
 void UGPWeaponAttributeSet::OnRep_CurrentMag(const FGameplayAttributeData& OldValue)
@@ -118,5 +136,16 @@ void UGPWeaponAttributeSet::OnRep_Accuracy(const FGameplayAttributeData& OldValu
 void UGPWeaponAttributeSet::OnRep_ReloadSpeed(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, ReloadSpeed, OldValue);
+}
+
+void UGPWeaponAttributeSet::OnRep_RecoilX(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, RecoilX, OldValue);
+}
+
+
+void UGPWeaponAttributeSet::OnRep_RecoilY(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, RecoilY, OldValue);
 }
 
