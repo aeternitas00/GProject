@@ -23,6 +23,7 @@ public:
 	/** Constructor */
 	UGPItem()
 		: Price(0)
+		, BPPrice(0)
 		, MaxCount(1)
 		, MaxLevel(1)
 		, AbilityLevel(1)
@@ -55,6 +56,9 @@ public:
 	/** Price in game */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
 	int32 Price;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	int32 BPPrice;
 
 	/** Maximum number of instances that can be in inventory at once, <= 0 means infinite */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Max)

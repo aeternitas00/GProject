@@ -181,14 +181,6 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 		}
 	}
 
-	for (const TPair<FGPItemSlot, FGPWAttachmentedData>& SlotPair : AttachedItems)
-	{
-		//if (SlotPair.Value.IsValid())
-		//{
-			SaveGame->AttachmentData.Add(SlotPair.Key, SlotPair.Value);
-		//}
-	}
-
 	for (const FGPStageNode& StageNode : StageNodes)
 	{
 		SaveGame->SavedStageNodes.Add(StageNode);
@@ -197,7 +189,7 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 	SaveGame->GameDifficulty = CurrentGameDifficulty;
 	SaveGame->SavedCurrentStageNode = CurrentStageNode;
 	SaveGame->ReplicableItems = DefaultReplicableItems;
-
+	SaveGame->AttachmentData = AttachedItems;
 	if (WriteAfterSave)
 	{
 		WriteSaveGame();
@@ -206,6 +198,8 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 
 void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 {
+	if ( !SaveGame ) return;
+
 	DefaultInventory.Reset();
 	DefaultSlottedItems.Reset();
 	AttachedItems.Reset();

@@ -28,6 +28,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Inventory)
 	TMap<UGPItem*, EItemReplicateFlag> ReplicableItems;
 
+	//UPROPERTY(BlueprintReadOnly, Category = SaveGame)
+	//TMap<FGPItemSlot, FGPWAttachmentedData> AttachmentData;
+
 	/** Delegate called when an inventory item has been added or removed */
 	UPROPERTY(BlueprintAssignable, Category = Inventory)
 	FOnInventoryItemChanged OnInventoryItemChanged;

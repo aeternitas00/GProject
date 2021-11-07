@@ -69,6 +69,7 @@ bool AGProjectPlayerController::SaveInventory()
 		CurrentSaveGame->InventoryData.Reset();
 		CurrentSaveGame->SlottedItems.Reset();
 		CurrentSaveGame->ReplicableItems.Reset();
+		//CurrentSaveGame->AttachmentData = AttachmentData;
 
 		for (const TPair<UGPItem*, FGPItemData>& ItemPair : InventoryData)
 		{
@@ -90,6 +91,7 @@ bool AGProjectPlayerController::SaveInventory()
 				AssetId = SlotPair.Value->GetPrimaryAssetId();
 			}
 			CurrentSaveGame->SlottedItems.Add(SlotPair.Key, AssetId);
+
 		}
 
 		for (const TPair<UGPItem*, EItemReplicateFlag>& Itembp : ReplicableItems)
@@ -102,6 +104,9 @@ bool AGProjectPlayerController::SaveInventory()
 			}
 			CurrentSaveGame->ReplicableItems.Add(AssetId, Itembp.Value);
 		}
+
+		
+
 
 		// Now that cache is updated, write to disk
 		GameInstance->WriteSaveGame();
@@ -182,11 +187,14 @@ bool AGProjectPlayerController::LoadInventory()
 			}
 		}
 
+
 		if (!bFoundAnySlots)
 		{
 			// Auto slot items as no slots were saved
 			FillEmptySlots();
 		}
+
+		//AttachmentData = CurrentSaveGame->AttachmentData;
 
 		NotifyInventoryLoaded();
 

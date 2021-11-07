@@ -145,7 +145,7 @@ FVector2D AGPWeaponActorBase::GetRecoil() const
 	FVector2D retVal;
 
 	retVal.X = GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetRecoilXAttribute());
-	retVal.X = GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetRecoilYAttribute());
+	retVal.Y = GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetRecoilYAttribute());
 	return retVal;
 }
 
