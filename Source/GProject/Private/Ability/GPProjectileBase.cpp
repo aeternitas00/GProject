@@ -51,29 +51,33 @@ void AGPProjectileBase::BeginPlay()
 	}
 }
 
-void AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActor)
+bool AGPProjectileBase::ProjectileHit(AActor* OverlappedActor, AActor* OtherActor)
 {
 	//GP_LOG(Warning, TEXT("Exec ProjectileOverlapped"));
 
 	//GP_LOG(Warning, TEXT("Name is %s"),*OtherActor->GetFName().ToString());
 
-	if (!EffectContainerSpec.HasValidEffects()) return;
+	bool retVal=false;
 
-	if (HitActors.Contains(OtherActor)) return;
+	if (!EffectContainerSpec.HasValidEffects()) return retVal;
+
+	if (HitActors.Contains(OtherActor)) return retVal;
 
 	HitActors.Add(OtherActor);
 
-	if (OtherActor == GetInstigator()) return;
+	if (OtherActor == GetInstigator()) return retVal;
 
 	TArray<AActor*> TempActor;
 	TArray<FHitResult> EmptyResult;
 
 	TempActor.Add(OtherActor);
 
-	UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(
-	UGPBPFuncLibrary::AddTargetsToEffectContainerSpec(EffectContainerSpec,EmptyResult,TempActor));
+	retVal = ( (UGPBPFuncLibrary::ApplyExternalEffectContainerSpec(
+	UGPBPFuncLibrary::AddTargetsToEffectContainerSpec(EffectContainerSpec,EmptyResult,TempActor)).
+	Num()) != 0 );
 
 
+	return retVal;
 	//SetActorEnableCollision(false);
 	//GP_LOG(Warning, TEXT("Success"));
 }

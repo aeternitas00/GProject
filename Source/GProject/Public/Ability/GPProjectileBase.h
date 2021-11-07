@@ -52,8 +52,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	// Return true successfully affected other actor
 	UFUNCTION(BlueprintCallable)
-	void ProjectileHit(AActor* OverlappedActor, AActor* OtherActor);
+	bool ProjectileHit(AActor* OverlappedActor, AActor* OtherActor);
 
 public:	
 	// Called every frame
