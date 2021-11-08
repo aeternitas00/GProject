@@ -10,7 +10,7 @@ UGPInteractionComponent::UGPInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-	TraceRadius = 30.0f;
+	TraceRadius = 10.0f;
 	TraceDistance = 50.0f;
 	CollisionChannel = ECC_WorldDynamic;
 }
