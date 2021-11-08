@@ -34,7 +34,7 @@ void UGPInteractionComponent::FindBestInteractable()
 	FRotator EyeRotation;
 
 	EyeLocation = MyPawn->GetActorLocation();
-	EyeRotation = MyPawn->GetActorRotation();
+	EyeRotation = MyPawn->GetBaseAimRotation();
 	
 	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
 
