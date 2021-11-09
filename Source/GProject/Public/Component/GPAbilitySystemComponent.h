@@ -46,6 +46,7 @@ public:
 	//UPROPERTY(BlueprintAssignable)
 	FOnTagUpdated OnTagUpdatedDelegate;
 
+	friend UGameplayAbility;
 protected:
 	//AI�� ���÷��̼� ���� �Լ����� ȣ�� ���ϵ��� �Ǿ��ִ� ��.
 	/*virtual void OnRep_ActivateAbilities() override;
