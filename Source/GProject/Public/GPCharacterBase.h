@@ -85,6 +85,11 @@ protected:
 	
 	virtual void HandleHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMaxHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
+	virtual void HandleMaxHealthChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags);
+
 	/**
 		* Called when mana is changed, either from healing or from being used as a cost
 		*

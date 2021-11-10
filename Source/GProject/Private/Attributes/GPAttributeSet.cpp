@@ -198,6 +198,18 @@ void UGPAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			TargetCharacter->HandleHealthChanged(DeltaValue, SourceTags);
 		}
 	}
+	else if (Data.EvaluatedData.Attribute == GetMaxHealthAttribute())
+	{
+		// Handle other health changes such as from healing or direct modifiers
+		// First clamp it
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+
+		if (TargetCharacter)
+		{
+			// Call for all health changes
+			TargetCharacter->HandleMaxHealthChanged(DeltaValue, SourceTags);
+		}
+	}
 	else if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		// Clamp mana

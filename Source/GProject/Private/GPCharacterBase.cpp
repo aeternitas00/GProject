@@ -531,6 +531,15 @@ void AGPCharacterBase::HandleHealthChanged(float DeltaValue, const struct FGamep
 	}
 }
 
+void AGPCharacterBase::HandleMaxHealthChanged(float DeltaValue, const FGameplayTagContainer& EventTags)
+{
+	// We only call the BP callback if this is not the initial ability setup
+	if (bAbilitiesInitialized)
+	{
+		OnMaxHealthChanged(DeltaValue, EventTags);
+	}
+}
+
 void AGPCharacterBase::HandleManaChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
 {
 	if (bAbilitiesInitialized)
