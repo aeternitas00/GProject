@@ -24,4 +24,7 @@ public:
 	/** Weapon actor to spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<AGPWeaponActorBase> WeaponActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Item)
+	FSlateBrush WeaponVerticalIcon;
 };
