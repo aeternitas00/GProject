@@ -69,6 +69,13 @@ public:
 	/** Native delegate for save game load/reset */
 	FOnSaveGameLoadedNative OnSaveGameLoadedNative;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TArray<FGPMessageInfo> Messages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
+	float CurrentAttentionLevel;
+
+
 	/**
 	 * Adds the default inventory to the inventory array
 	 * @param InventoryArray Inventory to modify

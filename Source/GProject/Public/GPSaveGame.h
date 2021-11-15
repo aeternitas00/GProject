@@ -69,7 +69,13 @@ public:
 	FString UserId;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
+	TArray<FGPMessageInfo> SavedMessages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
 	EGPGameDifficulty GameDifficulty;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = SaveGame)
+	float SavedAttentionLevel;
 
 	UFUNCTION(BlueprintCallable, Category = Inventory)
 	void ResetSavedData();

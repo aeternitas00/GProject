@@ -182,3 +182,41 @@ struct GPROJECT_API FGPStageNode
 	}
 
 };
+
+
+USTRUCT(BlueprintType)
+struct GPROJECT_API FGPMessageInfo
+{
+	GENERATED_BODY()
+
+	FGPMessageInfo():MessageIdx(-1), bIsRead(false){}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	int32 MessageIdx;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	bool bIsRead;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	FName MessageSenderName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	FText MessageText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	TMap<FPrimaryAssetId, FGPItemData> MessageItems;
+
+
+	FORCEINLINE	bool operator==(const FGPMessageInfo& inMsg) const {
+		return (
+			this->bIsRead == inMsg.bIsRead &&
+			this->MessageSenderName == inMsg.MessageSenderName &&
+			this->MessageIdx == inMsg.MessageIdx
+			);
+	}
+
+	FORCEINLINE	bool operator!=(const FGPMessageInfo& inMsg) const {
+		return !operator==(inMsg);
+	}
+
+};

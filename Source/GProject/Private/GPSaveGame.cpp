@@ -32,4 +32,5 @@ void UGPSaveGame::ResetSavedData()
 	AttachmentData.Reset();
 	SavedStageNodes.Reset();
 	ReplicableItems.Reset();
+	SavedMessages.Reset();
 }

@@ -14,6 +14,7 @@
 UGPGameInstanceBase::UGPGameInstanceBase()
 	: SaveSlot(TEXT("SaveGame"))
 	, SaveUserIndex(0)
+	, CurrentAttentionLevel(0)
 	, GPClient(nullptr)
 {
 }
@@ -186,10 +187,12 @@ void UGPGameInstanceBase::SaveDefaults(UGPSaveGame* SaveGame, bool WriteAfterSav
 		SaveGame->SavedStageNodes.Add(StageNode);
 	}
 
+	SaveGame->SavedMessages = Messages;
 	SaveGame->GameDifficulty = CurrentGameDifficulty;
 	SaveGame->SavedCurrentStageNode = CurrentStageNode;
 	SaveGame->ReplicableItems = DefaultReplicableItems;
 	SaveGame->AttachmentData = AttachedItems;
+	SaveGame->SavedAttentionLevel = CurrentAttentionLevel;
 	if (WriteAfterSave)
 	{
 		WriteSaveGame();
@@ -205,6 +208,7 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	AttachedItems.Reset();
 	StageNodes.Reset();
 	DefaultReplicableItems.Reset();
+	Messages.Reset();
 
 	for (const TPair<FPrimaryAssetId, FGPItemData>& Pair : SaveGame->InventoryData)
 	{
@@ -233,8 +237,11 @@ void UGPGameInstanceBase::LoadDefaults(UGPSaveGame* SaveGame)
 	}
 
 	DefaultReplicableItems = SaveGame->ReplicableItems;
+	Messages = SaveGame->SavedMessages;
+
 	CurrentStageNode = SaveGame->SavedCurrentStageNode;
 	CurrentGameDifficulty = SaveGame->GameDifficulty;
+	CurrentAttentionLevel = SaveGame->SavedAttentionLevel;
 }
 
 void UGPGameInstanceBase::CleanupDefaultInventory()
