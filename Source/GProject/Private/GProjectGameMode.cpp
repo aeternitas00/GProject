@@ -6,10 +6,12 @@
 #include "GameFramework/PlayerState.h"
 #include "GameFramework/GameSession.h"
 #include "GameFramework/GameState.h"
+#include "GPGameSession.h"
 
 
 AGProjectGameMode::AGProjectGameMode()
 {
+    GameSessionClass = AGPGameSession::StaticClass();//
 }
 
 void AGProjectGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)

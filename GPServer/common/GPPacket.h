@@ -16,7 +16,7 @@ struct PacketH
 };
 
 #define MAX_ID_LEN  24
-#define MAX_DAT_SIZ 1024
+#define MAX_DAT_SIZ 1024 * 2
 #define MAX_PKT_SIZ sizeof(PacketH) + MAX_DAT_SIZ
 
 struct Packet
