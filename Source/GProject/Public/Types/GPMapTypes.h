@@ -208,8 +208,7 @@ struct GPROJECT_API FGPMessageInfo
 
 
 	FORCEINLINE	bool operator==(const FGPMessageInfo& inMsg) const {
-		return (
-			this->bIsRead == inMsg.bIsRead &&
+		return (			
 			this->MessageSenderName == inMsg.MessageSenderName &&
 			this->MessageIdx == inMsg.MessageIdx
 			);
