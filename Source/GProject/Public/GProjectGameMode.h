@@ -30,6 +30,11 @@ public:
 	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
 
 	//virtual void StartToLeaveMap() override;
+
+protected:
+
+	/** Returns game session class to use */ //현재는 GameSessionClass를 셋해서 되고 있는데 이걸 이용하는듯.
+	//virtual TSubclassOf<AGameSession> GetGameSessionClass() const override;
 };
 
 

@@ -173,6 +173,9 @@ protected:
 public:
 	uint32 bGPStartPlayer : 1;
 
+	UPROPERTY(BlueprintReadWrite)
+	uint32 bIsMulti : 1;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Connect(); //todo Port, IP
