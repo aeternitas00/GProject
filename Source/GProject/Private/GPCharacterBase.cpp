@@ -486,6 +486,19 @@ void AGPCharacterBase::RemoveSlottedGameplayAbilities(bool bRemoveAll)
 	}
 }
 
+FGameplayAbilitySpecHandle AGPCharacterBase::AddGameplayAbilityByClass(TSubclassOf<UGameplayAbility> Class, int32 Level=1)
+{
+	check(AbilitySystemComponent);
+	
+	if (HasAuthority()&& Class->IsValidLowLevel())
+	{
+		FGameplayAbilitySpecHandle SpecHandle = AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Class, Level, INDEX_NONE, this));
+		return SpecHandle;
+	}
+	return FGameplayAbilitySpecHandle();
+}
+
+
 void AGPCharacterBase::AddStartupGameplayAbilities()
 {
 	check(AbilitySystemComponent);

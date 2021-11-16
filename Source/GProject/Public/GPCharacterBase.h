@@ -46,6 +46,9 @@ protected:
 	/** Remove slotted gameplay abilities, if force is false it only removes invalid ones */
 	void RemoveSlottedGameplayAbilities(bool bRemoveAll);
 
+	UFUNCTION(BlueprintCallable)
+	FGameplayAbilitySpecHandle AddGameplayAbilityByClass(TSubclassOf<UGameplayAbility> Class, int32 Level);
+
 	/** Adds slotted item abilities if needed */
 	void AddSlottedGameplayAbilities();
 
