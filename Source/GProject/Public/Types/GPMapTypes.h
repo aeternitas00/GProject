@@ -201,6 +201,9 @@ struct GPROJECT_API FGPMessageInfo
 	FName MessageSenderName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
+	FText MessageTitle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
 	FText MessageText;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Message)
