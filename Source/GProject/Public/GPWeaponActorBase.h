@@ -94,6 +94,9 @@ public:
 	FVector2D GetRecoil() const;
 
 	UFUNCTION(BlueprintCallable)
+	float GetOpticMagnification() const;
+
+	UFUNCTION(BlueprintCallable)
 	EWFiringMode GetCurrentFiringMode() const;
 	
 	UFUNCTION(BlueprintCallable)

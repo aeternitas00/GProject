@@ -149,6 +149,11 @@ FVector2D AGPWeaponActorBase::GetRecoil() const
 	return retVal;
 }
 
+float AGPWeaponActorBase::GetOpticMagnification() const
+{
+	return GetAbilitySystemComponent()->GetNumericAttribute(W_AttributeSet->GetOpticMgnfAttribute());
+}
+
 EWFiringMode AGPWeaponActorBase::GetCurrentFiringMode() const
 {
 	const EWFiringMode* rv = FiringModeMap.Find(CurrentFireMode);

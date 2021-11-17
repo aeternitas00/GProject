@@ -171,17 +171,17 @@ float AGPCharacterBase::GetMaxHealth() const
 
 float AGPCharacterBase::GetMana() const
 {
-	return AttributeSet->GetMana();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetManaAttribute());
 }
 
 float AGPCharacterBase::GetMaxMana() const
 {
-	return AttributeSet->GetMaxMana();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetMaxManaAttribute());
 }
 
 float AGPCharacterBase::GetMoveSpeed() const
 {
-	return AttributeSet->GetMoveSpeed();
+	return GetAbilitySystemComponent()->GetNumericAttribute(AttributeSet->GetMoveSpeedAttribute());
 }
 
 bool AGPCharacterBase::ActivateAbilitiesWithItemSlot(FGPItemSlot ItemSlot, bool bAllowRemoteActivation)
