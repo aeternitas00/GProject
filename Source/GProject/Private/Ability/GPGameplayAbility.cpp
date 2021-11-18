@@ -29,6 +29,17 @@ bool UGPGameplayAbility::GetTargetsFromEffectContainer(const FGPGameplayEffectCo
 	return false;
 }
 
+float UGPGameplayAbility::GetDefaultCooldown()
+{
+	float retVal=0;
+	
+	UGameplayEffect* CD = GetCooldownGameplayEffect();
+	if (!CD) return 0;
+	
+	CD->DurationMagnitude.GetStaticMagnitudeIfPossible(1, retVal);
+	return retVal;
+}
+
 FGPGameplayEffectContainerSpec UGPGameplayAbility::MakeEffectContainerSpecFromContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel)
 {
 	// First figure out our actor info

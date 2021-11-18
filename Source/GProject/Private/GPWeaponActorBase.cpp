@@ -216,7 +216,10 @@ UGPItemAttachment* AGPWeaponActorBase::RemoveAttachment(const EWAttachmentType& 
 
 	GetComponents<UGPWAttachmentComponent>(FoundComps);
 
-	UGPItemAttachment* RemovedAttachment = *(AttachmentSlot.Find(inType));
+	UGPItemAttachment* RemovedAttachment=nullptr;
+
+	if (AttachmentSlot.Find(inType))
+		RemovedAttachment = *(AttachmentSlot.Find(inType));
 
 	for (UActorComponent* FoundComp : FoundComps)
 	{

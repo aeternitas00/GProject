@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Ability)
 	bool GetTargetsFromEffectContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, TArray<FHitResult>& outHitResults, TArray<AActor*>& outTargetActors);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = Ability)
+	float GetDefaultCooldown();
+
 	/** Make gameplay effect container spec to be applied later, using the passed in container */
 	UFUNCTION(BlueprintCallable, Category = Ability, meta = (AutoCreateRefTerm = "EventData"))
 	virtual FGPGameplayEffectContainerSpec MakeEffectContainerSpecFromContainer(const FGPGameplayEffectContainer& Container, const FGameplayEventData& EventData, int32 OverrideGameplayLevel = -1);
