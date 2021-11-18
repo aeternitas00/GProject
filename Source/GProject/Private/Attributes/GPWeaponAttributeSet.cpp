@@ -15,6 +15,7 @@ UGPWeaponAttributeSet::UGPWeaponAttributeSet()
 	, ReloadSpeed(1.0f)
 	, RecoilX(0.0f)
 	, RecoilY(0.0f)
+	, OpticMgnf(1.0f)
 {}
 
 //void UGPWeaponAttributeSet::PreAttributeChange(const FGameplayAttribute & Attribute, float& NewValue)
@@ -98,6 +99,13 @@ void UGPWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 			//TargetWeapon->HandleRecoilChanged(DeltaValue, SourceTags);
 		}
 	}
+	else if (Data.EvaluatedData.Attribute == GetOpticMgnfAttribute())
+	{
+		if (TargetWeapon)
+		{
+			//TargetWeapon->HandleRecoilChanged(DeltaValue, SourceTags);
+		}
+	}
 }
 
 void UGPWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -111,6 +119,7 @@ void UGPWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME(UGPWeaponAttributeSet, ReloadSpeed);
 	DOREPLIFETIME(UGPWeaponAttributeSet, RecoilX);
 	DOREPLIFETIME(UGPWeaponAttributeSet, RecoilY);
+	DOREPLIFETIME(UGPWeaponAttributeSet, OpticMgnf);
 }
 
 void UGPWeaponAttributeSet::OnRep_CurrentMag(const FGameplayAttributeData& OldValue)
@@ -147,5 +156,10 @@ void UGPWeaponAttributeSet::OnRep_RecoilX(const FGameplayAttributeData& OldValue
 void UGPWeaponAttributeSet::OnRep_RecoilY(const FGameplayAttributeData& OldValue)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, RecoilY, OldValue);
+}
+
+void UGPWeaponAttributeSet::OnRep_OpticMgnf(const FGameplayAttributeData& OldValue)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UGPWeaponAttributeSet, OpticMgnf, OldValue);
 }
 

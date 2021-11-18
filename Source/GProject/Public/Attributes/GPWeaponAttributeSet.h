@@ -53,6 +53,10 @@ public:
 	FGameplayAttributeData RecoilY;
 	ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, RecoilY)
 
+	UPROPERTY(BlueprintReadOnly, Category = "Weapon", ReplicatedUsing = OnRep_OpticMgnf)
+	FGameplayAttributeData OpticMgnf;
+	ATTRIBUTE_ACCESSORS(UGPWeaponAttributeSet, OpticMgnf)
+
 protected:
 	/** Helper function to proportionally adjust the value of an attribute when it's associated max attribute changes. (i.e. When MaxHealth increases, Health increases by an amount that maintains the same percentage as before) */
 	//void AdjustAttributeForMaxChange(FGameplayAttributeData& AffectedAttribute, const FGameplayAttributeData& MaxAttribute, float NewMaxValue, const FGameplayAttribute& AffectedAttributeProperty);
@@ -77,4 +81,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_RecoilY(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	virtual void OnRep_OpticMgnf(const FGameplayAttributeData& OldValue);
 };
