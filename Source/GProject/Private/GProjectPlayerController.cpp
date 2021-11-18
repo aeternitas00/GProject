@@ -44,7 +44,7 @@ void AGProjectPlayerController::BeginPlay()
 	{
 		GPClient = FGPClient::GetGPClient();
 		GPClient->SetPlayerController(this);
-		GPClient->SendHeader(PT_USER_READY);//
+		//GPClient->SendHeader(PT_USER_READY);//
 		//if (Client->Login()) //test
 		{
 			//GetWorldTimerManager().SetTimer(SendTimer, this, &AGProjectPlayerController::SendData, 10.f, true);

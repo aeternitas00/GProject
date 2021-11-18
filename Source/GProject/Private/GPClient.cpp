@@ -320,13 +320,13 @@ bool FGPClient::Connect(SOCKET sock, u_short port, char* ip)
 	if (connect(sock, (SOCKADDR*)&sa, sizeof(sa)) == SOCKET_ERROR)
 	{
 		int err = WSAGetLastError(); 
-		if (err == WSAEISCONN) return true; //already connected.
+		//if (err == WSAEISCONN) return true; //already connected. //
 
 		GP_LOG(Warning, TEXT("connect failed, code : %d"), err);
 		return false;
 	}
 
-	GP_LOG(Display, TEXT("Connected to server. %s:%d"), ip, port);
+	GP_LOG(Display, TEXT("Connected to server. %s:%d"), ANSI_TO_TCHAR(ip), port);
 
 	//SetEvent(ConnEvent);
 
@@ -376,7 +376,7 @@ bool FGPClient::SendHeader(GPPacketType pt)
 
 bool FGPClient::ConnectAll()
 {
-	if (!Connect(AuthSocket, GP_AUTH)) return false;
+	//if (!Connect(AuthSocket, GP_AUTH)) return false;
 
 	if (!Connect(MainSocket, GP_PORT)) return false;
 

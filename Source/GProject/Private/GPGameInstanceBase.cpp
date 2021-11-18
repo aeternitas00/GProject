@@ -21,6 +21,11 @@ UGPGameInstanceBase::UGPGameInstanceBase()
 
 UGPGameInstanceBase::~UGPGameInstanceBase()
 {
+	if (GPClient)//
+	{
+		GP_LOG_C(Warning)
+		GPClient->Shutdown();
+	}
 }
 
 bool UGPGameInstanceBase::IsValidItemSlot(FGPItemSlot ItemSlot) const
