@@ -72,6 +72,7 @@ bool UGPAbilitySystemComponent::CancelAbilityByClass(TSubclassOf<UGameplayAbilit
 	if (FGameplayAbilitySpec* Spec = FindAbilitySpecFromClass(AbilityClass))
 	{
 		CancelAbility(Spec->Ability);
+		//ServerCancelAbility(Spec->Handle,Spec->ActivationInfo);
 		return true;
 	}
 	return false;
