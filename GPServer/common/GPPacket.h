@@ -1,39 +1,30 @@
 #pragma once
 #include <sstream> ///
 
+//todo namespace?
+
 enum GPPacketType : unsigned char { 
 				PT_NONE,
-				PT_TEST_ECHO,
-				PT_USER = 10, PT_MSG, PT_USER_LOGIN, PT_USER_LOGOUT, PT_USER_SIGNUP, PT_USER_READY,
-				PT_PLAYER = 20, PT_PLAYER_START, PT_PLAYER_UPDATE,
-				PT_SERVER = 30, PT_BE_HOST,
-				PT_GAME = 40, PT_GAME_START, PT_GAME_END,
+				PT_TEST_ECHO, PT_MSG,
+				PT_USER, 
+				PT_USER_LOGIN, PT_USER_LOGOUT, PT_USER_SIGNUP, PT_USER_READY,
+				PT_PLAYER, 
+				PT_PLAYER_START, PT_PLAYER_UPDATE,
+				PT_SERVER, 
+				PT_SERVER_LOGIN_GOOD, PT_SERVER_LOGIN_FAIL, PT_SERVER_SINGUP_GOOD, PT_SERVER_SINGUP_FAIL,
+				PT_BE_HOST,
+				PT_GAME, 
+				PT_GAME_START, PT_GAME_END,
 				PT_GOOD,
 				PT_MAX
-			  }; //
+			  }; //	//using enum GPPacketType; //enum class c++20
 
 #pragma pack(push, gp, 1)
 struct PacketH
 {
 	unsigned short	size;
 	GPPacketType	type;
-
-	friend auto& operator<<(std::ostream& os, const PacketH& h)
-	{
-		return os
-			<< h.size << " " << h.type << " \n";
-	}
-
-	friend auto& operator>>(std::istream& is, PacketH& h)
-	{
-		is >> h.size;
-		unsigned char ch = 0;
-		is >> ch;
-		h.type = (GPPacketType)ch;
-		return is;
-	}
 };
-#pragma pack(pop, gp)
 
 #define MAX_ID_LEN  24
 #define MAX_DAT_SIZ 1024 * 2
@@ -43,7 +34,12 @@ struct Packet
 {
 	PacketH	header;
 	void*	data;
+
+	void WriteData(std::stringstream& ss) {
+		ss.write((char*)&data, header.size - sizeof(header));//
+	}
 };
+#pragma pack(pop, gp)
 
 //struct GPSerializable
 //{
