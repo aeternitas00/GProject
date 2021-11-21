@@ -14,13 +14,15 @@ class AGProjectGameMode : public AGameMode
 public:
 	AGProjectGameMode();
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override; //before AActor::PreInitializeComponents
-
 	virtual void PostLogin(APlayerController* NewPlayer) override;
-
 	//virtual void GenericPlayerInitialization(AController* C) override; //Handles all player initialization that is shared between the travel methods (for client)
-
 	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+	virtual void HandleMatchIsWaitingToStart() override;
+
 
 	virtual void StartPlay() override;
 

@@ -12,6 +12,14 @@
 AGProjectGameMode::AGProjectGameMode()
 {
     GameSessionClass = AGPGameSession::StaticClass();//
+
+    //bDelayedStart = GetNetMode() != ENetMode::NM_Standalone; //host servers may wait for players.
+}
+
+void AGProjectGameMode::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+   // GP_LOG(Warning, TEXT("netmode: %d"), GetNetMode()); //아직 0(리턴 스탠드얼론임.
 }
 
 void AGProjectGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -36,9 +44,19 @@ void AGProjectGameMode::HandleStartingNewPlayer_Implementation(APlayerController
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
+void AGProjectGameMode::HandleMatchIsWaitingToStart()
+{
+    Super::HandleMatchIsWaitingToStart();
+    /*if (GameSession != nullptr)
+    {
+        GameSession->HandleMatchIsWaitingToStart();
+    }*/
+}
+
 void AGProjectGameMode::StartPlay()
 {
 	//GP_LOG_C(Warning);
+
 	Super::StartPlay();
 	//GP_LOG_C(Warning);
 }

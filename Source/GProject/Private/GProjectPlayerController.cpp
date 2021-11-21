@@ -42,8 +42,8 @@ void AGProjectPlayerController::BeginPlay()
 
 	if (IsLocalPlayerController()) //
 	{
-		GPClient = FGPClient::GetGPClient();
-		GPClient->SetPlayerController(this);
+		//GPClient = FGPClient::GetGPClient();
+		//GPClient->SetPlayerController(this);
 		//GPClient->SendHeader(PT_USER_READY);//
 		//if (Client->Login()) //test
 		{

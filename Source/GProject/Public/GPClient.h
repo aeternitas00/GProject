@@ -25,6 +25,8 @@ private:
 	/** Thread to run the worker FRunnable on */
 	FRunnableThread* Thread;
 
+	class FAsyncTask<class FGPRecvTask>* AuthRecvTask;
+
 public:
 	/*
 		Start the thread and the worker from static (easy access)!
@@ -54,6 +56,7 @@ public:
 
 protected:
 	void CreateAsyncSendTask(SOCKET sock, std::stringstream& ss, GPPacketType pt);
+	void CreateAsyncAuthRecvTask(SOCKET sock);
 
 public:
 	void CreateAsyncMainSendTask(std::stringstream& ss, GPPacketType pt);

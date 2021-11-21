@@ -43,7 +43,7 @@ class FGPRecvTask : public FNonAbandonableTask
 		: Socket(sock), ErrorCode(0)
 	{
 	}
-
+	
 	/*virtual void ProcessPacket(Packet* pckt, GPPacketType pt)
 	{
 		GP_LOG(Warning, TEXT("Packet type: %d"), pt)
@@ -82,11 +82,11 @@ class FGPRecvTask : public FNonAbandonableTask
 				//
 				switch (pt)
 				{
-				case PT_USER_LOGIN:
+				case PT_SERVER_LOGIN_GOOD:
+					GP_LOG_C(Warning);
 					FGPClient::GetGPClient()->PostLogin();
 					break;
-				case PT_USER_LOGOUT:
-					FGPClient::GetGPClient()->PostLogout();
+				case PT_SERVER_LOGIN_FAIL:
 					break;
 				case PT_TEST_ECHO:
 					break;
@@ -113,6 +113,7 @@ FGPClient::FGPClient()
 	PlayerCon = nullptr;
 	GameMode = nullptr;
 	Game = nullptr;
+	AuthRecvTask = nullptr;
 
 	Thread = FRunnableThread::Create(this, TEXT("FGPClient"), 0, TPri_BelowNormal); //windows default = 8mb for thread, could specify more
 }
@@ -176,6 +177,8 @@ uint32 FGPClient::Run()
 
 	//서버와의 연결을 기다림.
 	//WaitForSingleObject(ConnEvent, INFINITE);
+
+	CreateAsyncAuthRecvTask(AuthSocket);
 
 	int iResult; //recv 결과 바이트.
 
@@ -288,6 +291,23 @@ void FGPClient::Stop()
 
 void FGPClient::Shutdown()
 {
+	GP_LOG_C(Warning);
+
+	if (AuthRecvTask)
+	{
+		//AuthRecvTask->EnsureCompletion(false); //stops thread
+		if (!AuthRecvTask->IsDone())
+		{
+			if (shutdown(AuthSocket, SD_SEND) == SOCKET_ERROR) {
+				GP_LOG(Warning, TEXT("shutdown failed: %d"), WSAGetLastError());
+			}
+		}
+		AuthRecvTask->EnsureCompletion(false);
+
+		delete AuthRecvTask;
+		AuthRecvTask = nullptr;
+	}
+
 	if (Runnable)
 	{
 		delete Runnable; 
@@ -298,6 +318,12 @@ void FGPClient::Shutdown()
 void FGPClient::CreateAsyncSendTask(SOCKET sock, std::stringstream& ss, GPPacketType pt)
 {
 	(new FAutoDeleteAsyncTask<FGPSendTask>(sock, ss, pt))->StartBackgroundTask();//
+}
+
+void FGPClient::CreateAsyncAuthRecvTask(SOCKET sock)
+{
+	AuthRecvTask = new FAsyncTask<FGPRecvTask>(sock);//
+	AuthRecvTask->StartBackgroundTask();
 }
 
 void FGPClient::CreateAsyncMainSendTask(std::stringstream& ss, GPPacketType pt)
@@ -345,13 +371,14 @@ bool FGPClient::Send(SOCKET sock, char* buf, int len)
 
 bool FGPClient::SendStream(SOCKET sock, std::stringstream& ss, GPPacketType pt)
 {
-	char sendbuf[MAX_PKT_SIZ];
+	char sendbuf[MAX_PKT_SIZ]{};
 	Packet* pckt = (Packet*)sendbuf;
-	pckt->header.size = sizeof(PacketH) + ss.fail() ? ss.str().length() : ss.tellp();//todo check size overflow
+	int len = ss.fail() ? ss.str().length() : ss.tellp();
+	pckt->header.size = sizeof(PacketH) + len;//todo check size overflow
 	pckt->header.type = pt;
-	ss >> (char*)&pckt->data;
-	/*if (ss.good())
-	GP_LOG(Warning, TEXT("stream tellg:%d tellp: %d"), (int)ss.tellg(), (int)ss.tellp());*/
+	ss.read((char*)&pckt->data, len);
+	//if (ss.good())
+	GP_LOG(Warning, TEXT("stream data: %s tellg:%d tellp: %d"), ANSI_TO_TCHAR((char*)&pckt->data), (int)ss.tellg(), (int)ss.tellp());
 	return Send(sock, sendbuf, pckt->header.size);
 }
 
@@ -376,7 +403,7 @@ bool FGPClient::SendHeader(GPPacketType pt)
 
 bool FGPClient::ConnectAll()
 {
-	//if (!Connect(AuthSocket, GP_AUTH)) return false;
+	if (!Connect(AuthSocket, GP_AUTH)) return false;
 
 	if (!Connect(MainSocket, GP_PORT)) return false;
 
@@ -386,17 +413,9 @@ bool FGPClient::ConnectAll()
 void FGPClient::Login(FString id, FString pwd)
 {
 	std::stringstream ss;
-	ss << *id << '\n' << *pwd;
-
+	ss << TCHAR_TO_ANSI(*id) << ' ' << TCHAR_TO_ANSI(*pwd);
+	GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()));
 	CreateAsyncAuthSendTask(ss, GPPacketType::PT_USER_LOGIN);
-
-	//test
-	FAsyncTask<FGPRecvTask>* RecvTask = new FAsyncTask<FGPRecvTask>(AuthSocket);
-	RecvTask->StartBackgroundTask();
-
-	RecvTask->EnsureCompletion();
-
-	delete RecvTask;
 }
 
 void FGPClient::PostLogin()
