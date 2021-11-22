@@ -91,7 +91,7 @@ void UGPCharacterDataAsset::RecursiveLoadCheck(UClass* inClass)
 
 		UObject* ObjectValue = ObjProperty->GetPropertyValue_InContainer(AbilityCDO);
 
-		if (!ObjectValue->IsValidLowLevel()) continue;
+		if (!ObjectValue || !ObjectValue->IsValidLowLevel() ) continue;
 
 		if (ObjProperty->PropertyClass->IsChildOf<UClass>())
 		{
