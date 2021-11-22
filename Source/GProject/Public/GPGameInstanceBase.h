@@ -187,6 +187,9 @@ public:
 	bool Login(FString id, FString pwd); //test
 
 	UFUNCTION(BlueprintCallable, Category = GPClient)
+	bool JoinGP();
+
+	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool IsConnected() const;
 	
 	bool IsGPHost() const { return bIsGPHost; }

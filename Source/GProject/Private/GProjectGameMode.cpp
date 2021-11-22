@@ -33,15 +33,21 @@ void AGProjectGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	GP_LOG_C(Warning);
 	Super::PostLogin(NewPlayer);
+     //?플레이어와의 연결이 생겻을때 호출, 레벨이 바뀌어도 호출되지 않음.
+
+
 	GP_LOG_C(Warning);
 }
 
 void AGProjectGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	const bool bCanStartPlayer = GetNetMode() != ENetMode::NM_Standalone || GetGameInstance<UGPGameInstanceBase>()->CanStartGPPlayer();
-	if (!bCanStartPlayer) return;
+    GP_LOG_C(Warning);
+	/*const bool bCanStartPlayer = GetNetMode() != ENetMode::NM_Standalone || GetGameInstance<UGPGameInstanceBase>()->CanStartGPPlayer();
+	if (!bCanStartPlayer) return;*/
 	GP_LOG_C(Warning);
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+    Cast<AGProjectPlayerController>(NewPlayer)->ClientJoinGP();
+
 }
 
 void AGProjectGameMode::HandleMatchIsWaitingToStart()

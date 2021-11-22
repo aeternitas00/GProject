@@ -44,6 +44,7 @@ void AGProjectPlayerController::BeginPlay()
 	{
 		//GPClient = FGPClient::GetGPClient();
 		//GPClient->SetPlayerController(this);
+		////SetGPPlayer();
 		//GPClient->SendHeader(PT_USER_READY);//
 		//if (Client->Login()) //test
 		{
@@ -589,15 +590,37 @@ void AGProjectPlayerController::UpdateChat()
 
 void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 {
+	GP_LOG(Warning, TEXT("%s"), *ChatMsg);
+
 	if (ChatWindow)
 	{
 		ChatWindow->AddChat(ChatMsg);
+		//setup level에서 main level 간 뒤 채팅을 했을때 크래쉬.
 	}
 	else
 	{
 		ChatMessages.Enqueue(ChatMsg);
 		//bShouldUpdateChat = true;
 	}
+}
+
+void AGProjectPlayerController::SetGPPlayer()
+{
+	GPClient = FGPClient::GetGPClient();
+	GPClient->SetPlayerController(this);
+}
+
+void AGProjectPlayerController::ClientJoinGP_Implementation()
+{
+	GP_LOG_C(Warning);
+
+	//if (!GPClient)
+	{
+		SetGPPlayer();
+	}
+	GP_LOG_C(Warning);
+
+	GPClient->Join();
 }
 
 void AGProjectPlayerController::GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList)

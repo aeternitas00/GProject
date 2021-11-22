@@ -132,9 +132,18 @@ bool UGPGameInstanceBase::Login(FString id, FString pwd)
 	return true;
 }
 
+bool UGPGameInstanceBase::JoinGP()
+{
+	if (!GPClient) return false;
+
+	GPClient->Join();
+
+	return true;
+}
+
 bool UGPGameInstanceBase::Connect()
 {
-	if (GPClient) return GPClient->ConnectAll();
+	if (GPClient) return true;//GPClient->ConnectAll();
 
 	GPClient = FGPClient::GetGPClient();
 	if (!GPClient) return false;

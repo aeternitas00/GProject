@@ -81,6 +81,7 @@ protected:
 	SOCKET MainSocket;
 	SOCKET AuthSocket; //
 
+	char ID[MAX_ID_LEN];
 	//char* AuthSecret; //credential
 	//HANDLE ConnEvent; //연결 대기 이벤트.
 
@@ -95,7 +96,9 @@ public:
 
 	// GI features.
 	bool ConnectAll(); //
+	void SignUp(FString id, FString pwd);
 	void Login(FString id, FString pwd); //test
+	void Join();
 	void PostLogin();
 	void PostLogout();
 	bool SendStream(SOCKET sock, std::stringstream& ss, GPPacketType pt);

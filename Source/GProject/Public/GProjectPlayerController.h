@@ -184,8 +184,14 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	class UChatWindow* ChatWindow; //err gced //currently BP class does CreateWidget on BeginPlay.
 
+	UFUNCTION(BlueprintCallable, Category = GPClient)
 	void UpdateChat();
 	void AddChat(const FString& ChatMsg);
+
+	void SetGPPlayer();
+
+	UFUNCTION(Client, Reliable, Category = GPClient)
+	void ClientJoinGP(); //
 
 	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
 

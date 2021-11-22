@@ -410,12 +410,33 @@ bool FGPClient::ConnectAll()
 	return true;
 }
 
+void FGPClient::SignUp(FString id, FString pwd)
+{
+}
+
 void FGPClient::Login(FString id, FString pwd)
 {
 	std::stringstream ss;
-	ss << TCHAR_TO_ANSI(*id) << ' ' << TCHAR_TO_ANSI(*pwd);
-	GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()));
+	char* temp = TCHAR_TO_ANSI(*id);
+	ss << temp << ' ' << TCHAR_TO_ANSI(*pwd);
+	memcpy(ID, temp, id.Len() + 1);
+	//GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()));
+	GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ID));
 	CreateAsyncAuthSendTask(ss, GPPacketType::PT_USER_LOGIN);
+}
+
+void FGPClient::Join()
+{
+	char sendbuf[MAX_PKT_SIZ];
+	Packet* pckt = (Packet*)sendbuf;
+
+	int len = strlen(ID);
+	pckt->header.size = sizeof(PacketH) + len; //note  not sending terminating 0
+	pckt->header.type = PT_USER_LOGIN;
+	memcpy(sendbuf + sizeof(PacketH), ID, len);
+	GP_LOG(Warning, TEXT("%d %d"), len, pckt->header.size);//ANSI_TO_TCHAR(sendbuf + sizeof(PacketH))
+
+	Send(MainSocket, sendbuf, pckt->header.size);
 }
 
 void FGPClient::PostLogin()
