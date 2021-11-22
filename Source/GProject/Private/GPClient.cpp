@@ -137,9 +137,6 @@ class FGPRecvTask : public FNonAbandonableTask
 	}
 };
 
-////Thread Worker Starts as NULL, prior to being instanced
-//FGPClient* FGPClient::Runnable = nullptr;
-
 FGPClient::FGPClient() : ID("dummy")
 {
 	PlayerCon = nullptr;
@@ -159,16 +156,6 @@ FGPClient::~FGPClient()
 	closesocket(AuthSocket);
 	WSACleanup();
 }
-
-//FGPClient* FGPClient::GetGPClient()
-//{
-//	if (!Runnable && FPlatformProcess::SupportsMultithreading())
-//	{
-//		Runnable = new FGPClient();
-//	}
-//
-//	return Runnable;
-//}
 
 bool FGPClient::Init()
 {
@@ -344,12 +331,6 @@ void FGPClient::Shutdown()
 		delete AuthRecvTask;
 		AuthRecvTask = nullptr;
 	}
-
-	/*if (Runnable)
-	{
-		delete Runnable;
-		Runnable = nullptr;
-	}*/
 }
 
 void FGPClient::CreateAsyncSendTask(SOCKET sock, std::stringstream& ss, GPPacketType pt)
@@ -468,10 +449,10 @@ void FGPClient::Join()
 	Packet* pckt = (Packet*)sendbuf;
 
 	int len = strlen(ID);
-	pckt->header.size = sizeof(PacketH) + len; //note  not sending terminating 0
+	pckt->header.size = sizeof(PacketH) + len; //not sending terminating 0
 	pckt->header.type = PT_USER_LOGIN;
 	memcpy(sendbuf + sizeof(PacketH), ID, len);
-	GP_LOG(Warning, TEXT("%d %d"), len, pckt->header.size);//ANSI_TO_TCHAR(sendbuf + sizeof(PacketH))
+	//GP_LOG(Warning, TEXT("%d %d"), len, pckt->header.size);//ANSI_TO_TCHAR(sendbuf + sizeof(PacketH))
 
 	Send(MainSocket, sendbuf, pckt->header.size);
 }

@@ -605,7 +605,6 @@ void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 
 void AGProjectPlayerController::SetGPPlayer()
 {
-	//GPClient = FGPClient::GetGPClient();
 	UGPGameInstanceBase* GameInstance = GetWorld()->GetGameInstance<UGPGameInstanceBase>();
 	GPClient = GameInstance->GPClient;
 
@@ -616,11 +615,14 @@ void AGProjectPlayerController::ClientJoinGP_Implementation()
 {
 	GP_LOG_C(Warning);
 
-	//if (!GPClient)
+	if (!GPClient)
 	{
 		SetGPPlayer();
 	}
-	GP_LOG_C(Warning);
+	else 
+	{
+		GPClient->SetPlayerController(this);
+	}
 
 	GPClient->Join();
 }

@@ -67,7 +67,7 @@ void UGPGameInstanceBase::Shutdown()
 
 AGameModeBase* UGPGameInstanceBase::CreateGameModeForURL(FURL InURL, UWorld* InWorld)
 {
-	if (!IsConnected())
+	if (!IsGPHost()) //
 	{
 		return Super::CreateGameModeForURL(InURL, InWorld);
 	}
