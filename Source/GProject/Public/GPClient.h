@@ -19,8 +19,8 @@ public:
 	virtual ~FGPClient() override;
 
 private:
-	/** Singleton instance, can access the thread any time via static accessor, if it is active! */
-	static  FGPClient* Runnable;
+	///** Singleton instance, can access the thread any time via static accessor, if it is active! */
+	//static  FGPClient* Runnable; //singleton has issue on 'Run under single process' option.
 
 	/** Thread to run the worker FRunnable on */
 	FRunnableThread* Thread;
@@ -33,7 +33,7 @@ public:
 		This code ensures only thread will be able to run at a time.
 		This function returns a handle to the newly started instance.
 	*/
-	static FGPClient* GetGPClient();
+	//static FGPClient* GetGPClient();
 
 public:
 	// Begin FRunnable interface. 
@@ -46,8 +46,8 @@ public:
 
 	////
 
-	//Run을 끝내(길 바라)는 메소드.
-	virtual void Stop() override; // FRunnableThreadWin이 소멸할 때 스레드(Run)를 중지하기 위해 호출.
+	// FRunnableThreadWin이 소멸할 때 스레드(Run)를 중지하기 위해 호출.
+	virtual void Stop() override; //Run을 끝내(길 바라)는 메소드.
 
 	// End FRunnable interface
 
@@ -56,7 +56,7 @@ public:
 
 protected:
 	void CreateAsyncSendTask(SOCKET sock, std::stringstream& ss, GPPacketType pt);
-	void CreateAsyncAuthRecvTask(SOCKET sock);
+	void CreateAsyncAuthRecvTask(SOCKET sock, FGPClient* cl);
 
 public:
 	void CreateAsyncMainSendTask(std::stringstream& ss, GPPacketType pt);

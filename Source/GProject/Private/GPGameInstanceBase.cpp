@@ -48,6 +48,8 @@ void UGPGameInstanceBase::Init()
 
 	FCoreUObjectDelegates::PreLoadMap.AddUObject(this, &UGPGameInstanceBase::BeginLoadingScreen);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &UGPGameInstanceBase::EndLoadingScreen);
+	
+	InitGPClient();
 	GP_LOG_C(Warning)
 }
 
@@ -57,7 +59,8 @@ void UGPGameInstanceBase::Shutdown()
 	GP_LOG_C(Warning)
 	if (GPClient)
 	{
-		GPClient->Shutdown();
+		GPClient->Shutdown();//
+		delete GPClient;//
 		GPClient = nullptr;//
 	}
 }
@@ -141,16 +144,14 @@ bool UGPGameInstanceBase::JoinGP()
 	return true;
 }
 
-bool UGPGameInstanceBase::Connect()
+void UGPGameInstanceBase::InitGPClient()
 {
-	if (GPClient) return true;//GPClient->ConnectAll();
-
-	GPClient = FGPClient::GetGPClient();
-	if (!GPClient) return false;
+	GPClient = new FGPClient;
+	//GEngine->AddOnScreenDebugMessage(0, 3, FColor::Green, FString::Printf(TEXT("%x, %x"), this, GPClient));
+	GP_LOG(Warning, TEXT("%x %x"), this, GPClient);
 
 	GPClient->SetGameInstance(this);
 	//FullyLoadedEvent.AddLambda([this](){GPClient->SendHeader(PT_USER_READY); });
-	return 	true;
 	//return GPClient->Connect();//
 }
 

@@ -592,10 +592,9 @@ void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 {
 	GP_LOG(Warning, TEXT("%s"), *ChatMsg);
 
-	if (ChatWindow)
+	if (ChatWindow && ChatWindow->IsValidLowLevel())
 	{
 		ChatWindow->AddChat(ChatMsg);
-		//setup level에서 main level 간 뒤 채팅을 했을때 크래쉬.
 	}
 	else
 	{
@@ -606,7 +605,10 @@ void AGProjectPlayerController::AddChat(const FString& ChatMsg)
 
 void AGProjectPlayerController::SetGPPlayer()
 {
-	GPClient = FGPClient::GetGPClient();
+	//GPClient = FGPClient::GetGPClient();
+	UGPGameInstanceBase* GameInstance = GetWorld()->GetGameInstance<UGPGameInstanceBase>();
+	GPClient = GameInstance->GPClient;
+
 	GPClient->SetPlayerController(this);
 }
 

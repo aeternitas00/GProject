@@ -46,7 +46,7 @@ void AGProjectGameMode::HandleStartingNewPlayer_Implementation(APlayerController
 	if (!bCanStartPlayer) return;*/
 	GP_LOG_C(Warning);
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-    Cast<AGProjectPlayerController>(NewPlayer)->ClientJoinGP();
+    Cast<AGProjectPlayerController>(NewPlayer)->ClientJoinGP();//
 
 }
 

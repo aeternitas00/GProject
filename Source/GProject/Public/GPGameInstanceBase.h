@@ -163,7 +163,7 @@ protected:
 	virtual void OnStart() override;
 
 	//GPServer
-private:
+public://
 	FGPClient* GPClient;
 
 protected:
@@ -176,9 +176,10 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	uint32 bIsMulti : 1;
 
+protected:
+	void InitGPClient(); //todo Port, IP
+
 public:
-	UFUNCTION(BlueprintCallable, Category = GPClient)
-	bool Connect(); //todo Port, IP
 
 	UFUNCTION(BlueprintCallable, Category = GPClient)
 	bool Send(FString buf); //chat
