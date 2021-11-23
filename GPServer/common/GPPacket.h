@@ -1,13 +1,14 @@
 #pragma once
 #include <sstream> ///
+#include <map>
 
-//todo namespace?
 
 enum GPPacketType : unsigned char { 
 				PT_NONE,
 				PT_TEST_ECHO, PT_MSG,
 				PT_USER, 
-				PT_USER_LOGIN, PT_USER_LOGOUT, PT_USER_SIGNUP, PT_USER_READY,
+				PT_USER_HOST, PT_USER_JOIN, PT_USER_READY,
+				PT_USER_LOGIN, PT_USER_LOGOUT, PT_USER_SIGNUP, 
 				PT_PLAYER, 
 				PT_PLAYER_START, PT_PLAYER_UPDATE,
 				PT_SERVER, 
@@ -15,9 +16,10 @@ enum GPPacketType : unsigned char {
 				PT_BE_HOST,
 				PT_GAME, 
 				PT_GAME_START, PT_GAME_END,
-				PT_GOOD,
+				PT_GOOD, PT_MORE,
 				PT_MAX
-			  }; //	//using enum GPPacketType; //enum class c++20
+			  }; //	//todo using enum GPPacketType; //enum class c++20
+
 
 #pragma pack(push, gp, 1)
 struct PacketH
@@ -41,14 +43,11 @@ struct Packet
 };
 #pragma pack(pop, gp)
 
-//struct GPSerializable
-//{
-//	virtual bool Serialize() = 0;
-//	virtual bool DeSerialize() = 0;
-//};
 
 struct GameObject
 {
+	typedef std::map<int, GameObject> GOMap;
+
 	float X;
 	float Y;
 	float Z;
@@ -75,20 +74,25 @@ struct GameObject
 			>> go.X >> go.Y >> go.Z
 			>> go.Yaw >> go.Pitch >> go.Roll;
 	}
+
+	friend auto& operator<<(std::ostream& os, const GOMap& gom)
+	{
+		for (const auto& pair : gom) {
+			os << pair.first << ' ' << pair.second << std::endl;
+		}
+		return os;
+	}
+
+	friend auto& operator>>(std::istream& is, GOMap& gom)
+	{
+		for (std::pair<int, GameObject>&& pair : gom) {
+			is >> pair.first >> pair.second;
+		}
+		return is;
+	}
 };
 
 
-//template<typename Stream>
-//bool Serialize(Stream& stream, GameObject& go)
-//{
-//	return stream << go;
-//}
-//
-//template<typename Stream>
-//bool Deserialize(Stream& stream, GameObject& go)
-//{
-//	return stream >> go;
-//}
 
 #define GP_PORT 9000
 #define GP_AUTH GP_PORT + 1
