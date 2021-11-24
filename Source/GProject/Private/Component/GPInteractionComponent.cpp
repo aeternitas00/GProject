@@ -21,6 +21,11 @@ void UGPInteractionComponent::PrimaryInteract()
 	ServerInteract(FocusedActor);
 }
 
+bool UGPInteractionComponent::IsFocused()
+{
+	return (!!FocusedActor);
+}
+
 void UGPInteractionComponent::FindBestInteractable()
 {
 //	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();

@@ -23,6 +23,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PrimaryInteract();
 
+	UFUNCTION(BlueprintCallable)
+	bool IsFocused();
+
+
 protected:
 	// Reliable - Will always arrive, eventually. Request will be re-sent unless an acknowledgment was received.
 	// Unreliable - Not guaranteed, packet can get lost and won't retry.
@@ -42,6 +46,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Trace")
 	float TraceDistance;
+
+	//UPROPERTY(EditDefaultsOnly, Category = "Trace")
+	//float PingDistance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Trace")
 	float TraceRadius;
