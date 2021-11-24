@@ -120,6 +120,9 @@ class FGPRecvTask : public FNonAbandonableTask
 					break;
 				case PT_SERVER_LOGIN_FAIL:
 					break;
+				case PT_USER_SIGNUP:
+					//bool bResult = ;
+					Client->PostSignup(RecvBuf[size + pckt->header.size] != 0);
 				case PT_TEST_ECHO:
 					break;
 				}
@@ -245,7 +248,27 @@ uint32 FGPClient::Run()
 				}
 			}
 				break;
-			case PT_BE_HOST:
+			case PT_USER_HOST:
+				if (PlayerCon)
+				{
+					bool bResult = RecvBuf[size + pckt->header.size] != 0;
+					AsyncTask(ENamedThreads::GameThread, [this, bResult]()
+						{
+							PlayerCon->RecieveHostGP(bResult);
+						});
+				}
+				break;
+			case PT_USER_JOIN:
+				if (PlayerCon)
+				{
+					bool bResult = RecvBuf[size + pckt->header.size] != 0;
+					AsyncTask(ENamedThreads::GameThread, [this, bResult]()
+						{
+							PlayerCon->RecieveJoinParty(bResult);
+						});
+				}
+				break;
+			case PT_BE_HOST: //for standalone test
 				if (Game)
 				{
 					Game->BeGPHost();
@@ -430,6 +453,13 @@ bool FGPClient::ConnectAll()
 
 void FGPClient::SignUp(FString id, FString pwd)
 {
+	std::stringstream ss;
+	char* temp = TCHAR_TO_ANSI(*id);
+	ss << temp << ' ' << TCHAR_TO_ANSI(*pwd);
+	memcpy(ID, temp, id.Len() + 1);
+	//GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ss.str().c_str()));
+	GP_LOG(Warning, TEXT("%s"), ANSI_TO_TCHAR(ID));
+	CreateAsyncAuthSendTask(ss, GPPacketType::PT_USER_SIGNUP);
 }
 
 void FGPClient::Login(FString id, FString pwd)
@@ -462,6 +492,14 @@ void FGPClient::PostLogin()
 	AsyncTask(ENamedThreads::GameThread, [this]()
 		{
 			Game->OnLoggedIn.Broadcast();
+		});
+}
+
+void FGPClient::PostSignup(bool bResult)
+{
+	AsyncTask(ENamedThreads::GameThread, [this, bResult]()
+		{
+			Game->OnSignup.Broadcast(bResult);
 		});
 }
 

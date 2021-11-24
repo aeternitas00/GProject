@@ -193,6 +193,19 @@ public:
 	UFUNCTION(Client, Reliable, Category = GPClient)
 	void ClientJoinGP(); //
 
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	void HostGP(bool bHost);
+
+	UFUNCTION(BlueprintCallable, Category = GPClient)
+	void JoinParty(bool bJoin);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = GPClient)
+	void RecieveHostGP(bool bHost);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = GPClient)
+	void RecieveJoinParty(bool bJoin);
+
+public:
 	virtual void GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList) override;
 
 protected:

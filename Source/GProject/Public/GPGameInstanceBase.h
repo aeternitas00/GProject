@@ -204,6 +204,10 @@ public:
 	FLoggedInDelegate OnLoggedIn;
 	////
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSignupDelegate, bool, bResult);
+	UPROPERTY(BlueprintAssignable, Category = "GPClient")
+	FSignupDelegate OnSignup;
+
 	TArray<AActor*> GPGameObjects;//
 
 public:

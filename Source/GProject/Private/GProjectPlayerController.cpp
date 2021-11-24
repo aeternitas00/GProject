@@ -627,6 +627,20 @@ void AGProjectPlayerController::ClientJoinGP_Implementation()
 	GPClient->Join();
 }
 
+void AGProjectPlayerController::HostGP(bool bHost)
+{
+	std::stringstream ss;
+	ss << bHost;
+	GPClient->CreateAsyncMainSendTask(ss, PT_USER_HOST);
+}
+
+void AGProjectPlayerController::JoinParty(bool bJoin)
+{
+	std::stringstream ss;
+	ss << bJoin;
+	GPClient->CreateAsyncMainSendTask(ss, PT_USER_JOIN);
+}
+
 void AGProjectPlayerController::GetSeamlessTravelActorList(bool bToEntry, TArray<class AActor*>& ActorList)
 {
 	Super::GetSeamlessTravelActorList(bToEntry, ActorList);

@@ -101,6 +101,7 @@ public:
 	void Join();
 	void PostLogin();
 	void PostLogout();
+	void PostSignup(bool bResult);
 	bool SendStream(SOCKET sock, std::stringstream& ss, GPPacketType pt);
 	bool SendChat(FString Chat);
 	bool SendHeader(GPPacketType pt);
