@@ -333,7 +333,7 @@ void FGPClient::Stop()
 	}
 	//shutdown되어 정상적으로 서버에서 0바이트를 수신하면 다시 0바이트를 보낼 것이므로 Run의 recv루프가 탈출 될 것.
 
-	//SetEvent(ConnEvent); //아직 연결이 되지 않은 상태일 때 Run의 대기를 풀어줌. 
+	//SetEvent(ConnEvent); //아직 연결이 되지 않은 상태일 때 Run의 대기를 풀어줌. //dep
 }
 
 void FGPClient::Shutdown()

@@ -38,47 +38,67 @@ struct Packet
 	void*	data;
 
 	void WriteData(std::stringstream& ss) {
-		ss.write((char*)&data, header.size - sizeof(header));//
+		ss.write((char*)&data, header.size - sizeof(header));//todo endian
 	}
 };
 #pragma pack(pop, gp)
 
+/* serialize / deserialize
+ * 이후에는 std의 스트림을 쓴다면 std::ios::binary 와 read() / write()를 쓰게 바꾸거나  
+ * 현재 ClientConsole에서 테스트 중인 커스텀 GPBitWriter로 바꾸어야함.
+*/
 
-struct GameObject
+
+struct GPVector
 {
-	typedef std::map<int, GameObject> GOMap;
-
 	float X;
 	float Y;
 	float Z;
 
-	float Yaw;
+	friend auto& operator<<(std::ostream& os, const GPVector& v)
+	{
+		return os << v.X << ' ' << v.Y << ' ' << v.Z;
+	}
+
+	friend auto& operator>>(std::istream& is, GPVector& v)
+	{
+		return is >> v.X >> v.Y >> v.Z;
+	}
+};
+
+struct GameObject
+{
+	typedef std::map<int, GameObject> GOMap;//
+
+	GPVector Location;
+
 	float Pitch;
+	float Yaw;
 	float Roll;
 
-	GameObject(float InX = 0.f, float InY = 0.f, float InZ = 0.f,
-			   float InYaw = 0.f, float InPitch = 0.f, float InRoll = 0.f) 
-			 : X(InX), Y(InY), Z(InZ), Yaw(InYaw), Pitch(InPitch), Roll(InRoll) {}
+	GPVector Velocity;
+
+	
 	virtual ~GameObject() {}
 
 	friend auto& operator<<(std::ostream& os, const GameObject& go)
 	{
-		return os
-			<< go.X << " " << go.Y << " " << go.Z << " \n"
-			<< go.Yaw << " " << go.Pitch << " " << go.Roll << "\n";
+		return os << go.Location << ' '
+			<< go.Pitch << ' ' << go.Yaw << ' ' << go.Roll << ' '
+			<< go.Velocity;
 	}
 
 	friend auto& operator>>(std::istream& is, GameObject& go)
 	{
-		return is
-			>> go.X >> go.Y >> go.Z
-			>> go.Yaw >> go.Pitch >> go.Roll;
+		return is >> go.Location
+			>> go.Pitch >> go.Yaw >> go.Roll
+			>> go.Velocity;
 	}
 
 	friend auto& operator<<(std::ostream& os, const GOMap& gom)
 	{
 		for (const auto& pair : gom) {
-			os << pair.first << ' ' << pair.second << std::endl;
+			os << pair.first << ' ' << pair.second << '\n';
 		}
 		return os;
 	}
@@ -91,7 +111,6 @@ struct GameObject
 		return is;
 	}
 };
-
 
 
 #define GP_PORT 9000
