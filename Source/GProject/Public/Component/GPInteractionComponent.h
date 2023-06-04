@@ -4,7 +4,7 @@
 
 #include "GProject.h"
 #include "UObject/ScriptInterface.h"
-#include "Actor.h"
+#include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
 #include "Interface/GPInteractionInterface.h"
 #include "GPInteractionComponent.generated.h"

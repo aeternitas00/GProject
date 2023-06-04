@@ -214,6 +214,26 @@ void AGPCharacterBase::CancelAbilitiesWithItemSlot(FGPItemSlot ItemSlot)
 
 }
 
+bool AGPCharacterBase::ActivateAbilitiesWithAbilityClass(TSubclassOf<UGameplayAbility> AbilityClass, bool bAllowRemoteActivation)
+{
+	bool rv=false;
+
+	if (AbilitySystemComponent)
+	{
+		rv = AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass, bAllowRemoteActivation);
+	}
+
+	return rv;
+}
+
+void AGPCharacterBase::CancelAbilitiesWithAbilityClass(TSubclassOf<UGameplayAbility> AbilityClass)
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->CancelAbilityByClass(AbilityClass);
+	}
+}
+
 void AGPCharacterBase::GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities)
 {
 	FGameplayAbilitySpecHandle* FoundHandle = SlottedAbilities.Find(ItemSlot);
@@ -578,22 +598,6 @@ void AGPCharacterBase::SetMovementSpeed(float Speed)
 
 	GetCharacterMovement()->MaxWalkSpeed = Speed;
 }
-
-//void AGPCharacterBase::HandleCurrentMagChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-//{
-//	if (bAbilitiesInitialized)
-//	{
-//		OnCurrentMagChanged(DeltaValue, EventTags);
-//	}
-//}
-//
-//void AGPCharacterBase::HandleMagSizeChanged(float DeltaValue, const struct FGameplayTagContainer& EventTags)
-//{
-//	if (bAbilitiesInitialized)
-//	{
-//		OnMagSizeChanged(DeltaValue, EventTags);
-//	}
-//}
 
 void AGPCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

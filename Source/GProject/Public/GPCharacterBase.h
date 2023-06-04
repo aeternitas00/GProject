@@ -159,18 +159,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetMoveSpeed() const;
 
-	//UFUNCTION(BlueprintCallable)
-	//virtual float GetCurrentMag() const;
-
-	//UFUNCTION(BlueprintCallable)
-	//virtual float GetMagSize() const;
-
-	//UFUNCTION(BlueprintCallable, Category = "Weapon")
-	//void UpdateMagSize();
-
-	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Weapon")
-	//void UpdateCurrentMag(float inValue = -1.0f);
-
 	/**
 	 * Attempts to activate any ability in the specified item slot. Will return false if no activatable ability found or activation fails
 	 * Returns true if it thinks it activated, but it may return false positives due to failure later in activation.
@@ -182,12 +170,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	void CancelAbilitiesWithItemSlot(FGPItemSlot ItemSlot);
 
-	/** Returns a list of active abilities bound to the item slot. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	void GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities);
+	bool ActivateAbilitiesWithAbilityClass(TSubclassOf<UGameplayAbility> AbilityClass, bool bAllowRemoteActivation = true);
 
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
-	UGameplayAbility* GetSlottedAbilityInstance(FGPItemSlot ItemSlot);
+	void CancelAbilitiesWithAbilityClass(TSubclassOf<UGameplayAbility> AbilityClass);
 
 	/**
 	 * Attempts to activate all abilities that match the specified tags
@@ -196,6 +183,14 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	bool ActivateAbilitiesWithTags(FGameplayTagContainer AbilityTags, bool bAllowRemoteActivation);
+
+	/** Returns a list of active abilities bound to the item slot. This only returns if the ability is currently running */
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	void GetActiveAbilitiesWithItemSlot(FGPItemSlot ItemSlot, TArray<UGPGameplayAbility*>& ActiveAbilities);
+
+	/** DEBUG */
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	UGameplayAbility* GetSlottedAbilityInstance(FGPItemSlot ItemSlot);
 
 	/** Returns a list of active abilities matching the specified tags. This only returns if the ability is currently running */
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
@@ -214,10 +209,8 @@ protected:
 	UGPAbilitySystemComponent* AbilitySystemComponent;
 
 	/** Abilities to grant to this character on creation. These will be activated by tag or event and are not bound to specific inputs */
-	// NPC ��ų ���� �͵�, �ٿ��?�ϰ� ���� ����
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
 	TMap<TSubclassOf<UGPGameplayAbility>,int32> GameplayAbilities;
-	// TODO : with Ability level data
 
 	/** Map of item slot to gameplay ability class, these are bound before any abilities added by the inventory */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Abilities)
@@ -227,7 +220,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	TArray<TSubclassOf<UGameplayEffect>> PassiveGameplayEffects;
 
-	/** Map of slot to ability granted by that slot. I may refactor this later */
+	/** Map of slot to ability granted by that slot. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	TMap<FGPItemSlot, FGameplayAbilitySpecHandle> SlottedAbilities;
 
@@ -243,7 +236,7 @@ protected:
 
 	/** List of attributes modified by the ability system */
 	UPROPERTY(BlueprintReadOnly)
-	UGPAttributeSet* AttributeSet; //�� ��ü�� ������ GAS���� ó���ϴ� ��ü(replicated)�� �ٸ�.
+	UGPAttributeSet* AttributeSet;
 
 	/** Cached pointer to the inventory source for this character, can be null */
 	UPROPERTY()

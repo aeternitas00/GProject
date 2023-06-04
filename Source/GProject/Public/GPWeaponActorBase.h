@@ -128,6 +128,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Abilities)
 	TMap<EWFireType,TSubclassOf<class UGPGameplayAbility>> WeaponAbilities;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Attachment)
+	TArray<EWAttachmentType> AttachableTypes;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Attachment)
+	TMap<EWAttachmentType, UGPItemAttachment*> AttachmentSlot;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attachment)
+	TArray<EWeaponType> WeaponType;
+
+	// FIX : Better Montage selector?
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Abilities)
 	UAnimMontage* WeaponAnimMontage;
 	//TMap<EWFireType, FGameplayAbilitySpecHandle> AbilityHandles;
@@ -137,15 +147,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadonly)
 	FPrimaryAssetId AmmoItem;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Attachment)
-	TArray<EWAttachmentType> AttachableTypes;
-
-	//UPROPERTY(EditAnywhere, BlueprintReadwrite, Category = Attachment)
-	TMap<EWAttachmentType, UGPItemAttachment*> AttachmentSlot;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Attachment)
-	TArray<EWeaponType> WeaponType;
 
 	//TMap<EWAttachmentType, UGPWAttachmentComponent*> AttachmentComponents;
 

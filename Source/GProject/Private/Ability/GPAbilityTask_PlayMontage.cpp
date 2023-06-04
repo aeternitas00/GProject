@@ -158,17 +158,17 @@ void UGPAbilityTask_PlayMontage::Activate()
 		}
 		else
 		{
-			ABILITY_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent call to PlayMontage failed!"));
+			GP_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent call to PlayMontage failed!"));
 		}
 	}
 	else
 	{
-		ABILITY_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent called on invalid AbilitySystemComponent"));
+		GP_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent called on invalid AbilitySystemComponent"));
 	}
 
 	if (!bPlayedMontage)
 	{
-		ABILITY_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."), *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
+		GP_LOG(Warning, TEXT("UGPAbilityTask_PlayMontageAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."), *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
 			OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
@@ -180,7 +180,7 @@ void UGPAbilityTask_PlayMontage::Activate()
 
 void UGPAbilityTask_PlayMontage::ExternalCancel()
 {
-	check(AbilitySystemComponent);
+	check(AbilitySystemComponent.Get());
 
 	OnAbilityCancelled();
 
@@ -228,7 +228,7 @@ bool UGPAbilityTask_PlayMontage::StopPlayingMontage()
 
 	// Check if the montage is still playing
 	// The ability would have been interrupted, in which case we should automatically stop the montage
-	if (AbilitySystemComponent && Ability)
+	if (AbilitySystemComponent!=nullptr && Ability!=nullptr)
 	{
 		if (AbilitySystemComponent->GetAnimatingAbility() == Ability
 			&& AbilitySystemComponent->GetCurrentMontage() == MontageToPlay)
